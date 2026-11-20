@@ -124,6 +124,73 @@ export interface TranslationDictionary {
     placeholderPreviewNote: string;
     fallbackBadge: string;
     previewPlaceholderHint: string;
+    viewDetailsLabel: string;
+    openPreviewLabel: string;
+  };
+  productDetail: {
+    backToLibrary: string;
+    openFullscreenPreview: string;
+    liveInteractiveHint: string;
+    thumbnailPreviewHint: string;
+    fallbackPreviewHint: string;
+    buyNowCta: string;
+    getFreeCta: string;
+    checkoutDeferredNotice: string;
+    wishlistAdd: string;
+    wishlistSaved: string;
+    specs: {
+      framework: string;
+      category: string;
+      previewMode: string;
+      themeSupport: string;
+      themeBoth: string;
+      themeDarkOnly: string;
+      latestZip: string;
+      lifetimePolicy: string;
+      lifetimeValue: string;
+    };
+    tabs: {
+      overview: string;
+      documentation: string;
+      sourceCode: string;
+    };
+    overviewTagsHeading: string;
+    overviewFilesHeading: string;
+    docsInstallHeading: string;
+    docsNotesHeading: string;
+    lockedCode: {
+      badge: string;
+      title: string;
+      description: string;
+      disclaimerTitle: string;
+      disclaimerBody: string;
+      filesHeading: string;
+    };
+    notFoundTitle: string;
+    notFoundBody: string;
+  };
+  preview: {
+    backToDetails: string;
+    backToLibrary: string;
+    viewDetails: string;
+    viewportLabel: string;
+    viewportDesktop: string;
+    viewportTablet: string;
+    viewportMobile: string;
+    themeDark: string;
+    themeLight: string;
+    themeFixedDark: string;
+    refreshDemo: string;
+    refreshedNotice: string;
+    modeReactRegistry: string;
+    modeStaticIframe: string;
+    modeMockFallback: string;
+    loadingPreview: string;
+    fallbackTitle: string;
+    fallbackBody: string;
+    fallbackBackCta: string;
+    notFoundTitle: string;
+    notFoundBody: string;
   };
   foundation: {
     freeLabel: string;

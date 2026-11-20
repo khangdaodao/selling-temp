@@ -1,18 +1,23 @@
 /**
- * Miniature card artwork & inline interactive placeholders for forma/ catalog cards.
- * - Matches reference artwork for flagship products (Orbit, Northbound, Metric, Halo, Pulse,
- *   Nexus, Priceless, Voices, Monolith).
- * - Provides working inline interactive demos for simple `interactive-card` components
- *   (Signal Button, Prism Switch, Kinetic Metric Card, Voices) ahead of the full Phase 1.3+ Preview Registry.
+ * Miniature card artwork & inline interactive demos for forma/ catalog cards.
+ * - Delegates `interactive-card` products (`Signal Button`, `Prism Switch`, `Kinetic Metric Card`,
+ *   `Voices`) directly to the shared Controlled Preview Registry components in `compact` mode
+ *   so interactive logic is never duplicated.
+ * - Renders reference-matching miniature visuals for complex sections and templates.
  * - Displays an explicit mock-fallback placeholder when `previewComponentKey === null`.
  *
- * Related: src/features/catalog/components/catalog-product-card.tsx, src/types/domain.ts
+ * Related: src/features/preview/registry/interactive-demos.tsx, src/features/catalog/components/catalog-product-card.tsx
  */
 
 'use client';
 
-import { useState } from 'react';
-import { Check, Sparkles, Terminal } from 'lucide-react';
+import { Terminal } from 'lucide-react';
+import {
+  KineticMetricDemo,
+  PrismSwitchDemo,
+  SignalButtonDemo,
+  VoicesTestimonialsDemo,
+} from '@/features/preview/registry/interactive-demos';
 import { useI18n } from '@/i18n/use-i18n-store';
 import type { Product } from '@/types/domain';
 
@@ -22,173 +27,8 @@ interface ProductCardVisualProps {
   compact?: boolean;
 }
 
-function SignalButtonInlineDemo(): React.JSX.Element {
-  const [triggered, setTriggered] = useState(false);
-  const [count, setCount] = useState(0);
-
-  return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[#09090c] px-4">
-      <button
-        type="button"
-        onClick={() => {
-          setTriggered((prev) => !prev);
-          setCount((prev) => prev + 1);
-        }}
-        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-all ${
-          triggered
-            ? 'border-accent-cyan bg-accent-cyan/15 text-accent-cyan shadow-cyanGlow'
-            : 'border-white/15 bg-white text-zinc-950 hover:bg-zinc-200'
-        }`}
-      >
-        {triggered ? (
-          <>
-            <Check className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Signal Verified</span>
-          </>
-        ) : (
-          <>
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Trigger Signal</span>
-          </>
-        )}
-      </button>
-      <span className="font-mono text-[10px] text-zinc-500">
-        Interactive clicks: {count}
-      </span>
-    </div>
-  );
-}
-
-function PrismSwitchInlineDemo(): React.JSX.Element {
-  const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
-
-  return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[#09090c] px-4">
-      <div
-        role="radiogroup"
-        aria-label="Billing period demo"
-        className="inline-flex rounded-full border border-white/10 bg-[#131318] p-1"
-      >
-        <button
-          type="button"
-          role="radio"
-          aria-checked={billing === 'monthly'}
-          onClick={() => setBilling('monthly')}
-          className={`rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
-            billing === 'monthly'
-              ? 'bg-white text-zinc-950'
-              : 'text-zinc-400 hover:text-white'
-          }`}
-        >
-          Monthly
-        </button>
-        <button
-          type="button"
-          role="radio"
-          aria-checked={billing === 'annual'}
-          onClick={() => setBilling('annual')}
-          className={`rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
-            billing === 'annual'
-              ? 'bg-accent-cyan text-zinc-950 font-semibold'
-              : 'text-zinc-400 hover:text-white'
-          }`}
-        >
-          Annual -20%
-        </button>
-      </div>
-      <p className="font-mono text-xs text-zinc-300">
-        {billing === 'annual' ? '$15 / mo (billed yearly)' : '$19 / mo'}
-      </p>
-    </div>
-  );
-}
-
-function KineticMetricInlineDemo(): React.JSX.Element {
-  const [range, setRange] = useState<'7D' | '30D'>('7D');
-  const bars =
-    range === '7D'
-      ? [34, 48, 42, 68, 60, 84, 96]
-      : [52, 58, 72, 65, 88, 92, 100];
-
-  return (
-    <div className="flex h-full w-full flex-col justify-between bg-[#09090c] p-3.5 text-left">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Revenue</p>
-          <p className="font-mono text-base font-semibold text-white">
-            {range === '7D' ? '$12,480' : '$48,920'}
-          </p>
-        </div>
-        <div className="inline-flex rounded border border-white/10 bg-[#131318] p-0.5">
-          {(['7D', '30D'] as const).map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setRange(item)}
-              className={`rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors ${
-                range === item
-                  ? 'bg-accent-cyan text-zinc-950 font-semibold'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex h-14 items-end gap-1.5 pt-2">
-        {bars.map((height, idx) => (
-          <div
-            key={idx}
-            style={{ height: `${height}%` }}
-            className="flex-1 rounded-sm bg-accent-cyan/75 transition-all duration-200"
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function VoicesInlineDemo(): React.JSX.Element {
-  const [selected, setSelected] = useState<0 | 1>(0);
-
-  return (
-    <div className="flex h-full w-full flex-col justify-between bg-zinc-100 p-3.5 text-zinc-950">
-      <p className="text-center text-xs font-semibold tracking-tight text-zinc-900">
-        Good words. Great people.
-      </p>
-      <div className="grid grid-cols-2 gap-2">
-        {[
-          { quote: '"Clean tokens & zero bloat."', author: 'Alex, Staff Eng' },
-          { quote: '"Shipped 3x faster."', author: 'Maya, Founder' },
-        ].map((item, index) => {
-          const active = selected === index;
-          return (
-            <button
-              key={item.author}
-              type="button"
-              onClick={() => setSelected(index as 0 | 1)}
-              className={`rounded-md border p-2 text-left transition-all ${
-                active
-                  ? 'border-zinc-950 bg-white shadow-sm'
-                  : 'border-zinc-300 bg-zinc-50 opacity-75 hover:opacity-100'
-              }`}
-            >
-              <p className="text-[10px] font-medium leading-snug text-zinc-900">
-                {item.quote}
-              </p>
-              <p className="mt-1.5 text-[9px] text-zinc-500">{item.author}</p>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 /**
- * Renders reference-matching thumbnails or interactive inline placeholders per product.
+ * Renders reference-matching thumbnails or compact interactive React Registry demos per product.
  */
 export function ProductCardVisual({
   product,
@@ -215,28 +55,28 @@ export function ProductCardVisual({
     case 'component-signal-button':
       return (
         <div className={`${heightClass} w-full overflow-hidden rounded-lg border border-white/[0.08]`}>
-          <SignalButtonInlineDemo />
+          <SignalButtonDemo theme="dark" compact />
         </div>
       );
 
     case 'component-prism-toggle':
       return (
         <div className={`${heightClass} w-full overflow-hidden rounded-lg border border-white/[0.08]`}>
-          <PrismSwitchInlineDemo />
+          <PrismSwitchDemo theme="dark" compact />
         </div>
       );
 
     case 'component-kinetic-card':
       return (
         <div className={`${heightClass} w-full overflow-hidden rounded-lg border border-white/[0.08]`}>
-          <KineticMetricInlineDemo />
+          <KineticMetricDemo theme="dark" compact />
         </div>
       );
 
     case 'component-voices-cards':
       return (
         <div className={`${heightClass} w-full overflow-hidden rounded-lg border border-white/[0.08]`}>
-          <VoicesInlineDemo />
+          <VoicesTestimonialsDemo theme="light" compact />
         </div>
       );
 

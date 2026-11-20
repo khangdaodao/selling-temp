@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orbit — Static Template Preview (forma/)</title>
+    <style>
+      :root {
+        --bg: #070709;
+        --surface: #111116;
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #ffffff;
+        --muted: #a1a1aa;
+        --accent: #00d8ff;
+        --btn-bg: #ffffff;
+        --btn-text: #09090b;
+      }
+      body.light {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --border: rgba(9, 9, 11, 0.1);
+        --text: #09090b;
+        --muted: #52525b;
+        --accent: #0284c7;
+        --btn-bg: #09090b;
+        --btn-text: #ffffff;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        transition: background 0.2s ease, color 0.2s ease;
+      }
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding: 16px 0;
+        position: sticky;
+        top: 0;
+        background: var(--bg);
+        z-index: 10;
+      }
+      .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+      .nav-links { display: flex; gap: 24px; font-size: 13px; color: var(--muted); }
+      .nav-links a { color: inherit; text-decoration: none; cursor: pointer; }
+      .nav-links a:hover { color: var(--text); }
+      .pill-btn {
+        border: 0; border-radius: 999px; padding: 8px 16px;
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        background: var(--btn-bg); color: var(--btn-text);
+      }
+      .hero { padding: 56px 0 40px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 32px; align-items: center; }
+      .eyebrow {
+        display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+        text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+      }
+      h1 { font-size: 44px; line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 16px; }
+      .lead { color: var(--muted); font-size: 16px; max-width: 480px; margin-bottom: 24px; }
+      .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+      .ghost-btn {
+        border: 1px solid var(--border); background: transparent; color: var(--text);
+        border-radius: 999px; padding: 8px 16px; font-size: 12px; font-weight: 500; cursor: pointer;
+      }
+      .panel {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 16px; padding: 20px;
+      }
+      .tabs { display: inline-flex; gap: 4px; border: 1px solid var(--border); border-radius: 8px; padding: 3px; margin-bottom: 16px; }
+      .tab {
+        border: 0; background: transparent; color: var(--muted); font-size: 11px;
+        font-weight: 600; padding: 5px 10px; border-radius: 6px; cursor: pointer;
+      }
+      .tab.active { background: var(--btn-bg); color: var(--btn-text); }
+      .metric-val { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; }
+      .metric-sub { font-size: 12px; color: var(--accent); margin-top: 2px; }
+      .bars { display: flex; align-items: flex-end; gap: 8px; height: 110px; margin-top: 20px; }
+      .bar { flex: 1; background: var(--accent); opacity: 0.78; border-radius: 4px 4px 0 0; transition: height 0.25s ease; }
+      .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 24px 0 56px; }
+      .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+      .card h3 { font-size: 15px; margin-bottom: 6px; }
+      .card p { font-size: 13px; color: var(--muted); }
+      .badge { font-size: 10px; color: var(--muted); border-top: 1px solid var(--border); padding: 16px 0 32px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+      @media (max-width: 768px) {
+        .hero { grid-template-columns: 1fr; padding-top: 36px; }
+        h1 { font-size: 34px; }
+        .grid-3 { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 480px) {
+        .nav-links { display: none; }
+        h1 { font-size: 28px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap nav">
+        <div class="brand">orbit<span style="color: var(--accent)">.</span></div>
+        <nav class="nav-links" aria-label="Template preview navigation">
+          <a>Product</a>
+          <a>Telemetry</a>
+          <a>Customers</a>
+          <a>Pricing</a>
+        </nav>
+        <button class="pill-btn" id="demo-cta" type="button">Start free</button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="hero">
+        <div>
+          <span class="eyebrow">Static Iframe Template • Sandbox Isolated</span>
+          <h1>Less busywork.<br />More momentum.</h1>
+          <p class="lead">
+            Independent HTML preview for the Orbit SaaS template. Resize the viewport above
+            to test real CSS breakpoints and toggle metrics below.
+          </p>
+          <div class="cta-row">
+            <button class="pill-btn" id="deploy-btn" type="button">Request Access</button>
+            <button class="ghost-btn" id="ping-btn" type="button">Simulate Ping</button>
+          </div>
+          <p id="cta-status" style="margin-top: 12px; font-size: 12px; color: var(--accent); min-height: 18px;"></p>
+        </div>
+
+        <div class="panel">
+          <div class="tabs" role="tablist">
+            <button class="tab active" type="button" data-mode="mrr">MRR</button>
+            <button class="tab" type="button" data-mode="arr">ARR</button>
+            <button class="tab" type="button" data-mode="dau">Active Teams</button>
+          </div>
+          <div class="metric-val" id="metric-val">$24,680</div>
+          <div class="metric-sub" id="metric-sub">+24.8% vs last 30 days</div>
+          <div class="bars" id="bars">
+            <div class="bar" style="height: 36%"></div>
+            <div class="bar" style="height: 52%"></div>
+            <div class="bar" style="height: 44%"></div>
+            <div class="bar" style="height: 68%"></div>
+            <div class="bar" style="height: 62%"></div>
+            <div class="bar" style="height: 85%"></div>
+            <div class="bar" style="height: 98%"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid-3">
+        <div class="card">
+          <h3>Instant Telemetry</h3>
+          <p>Zero-noise KPI panels crafted for high-clarity executive summaries.</p>
+        </div>
+        <div class="card">
+          <h3>Tokenized Surfaces</h3>
+          <p>Switches seamlessly between obsidian dark and crisp daylight themes.</p>
+        </div>
+        <div class="card">
+          <h3>Isolated Execution</h3>
+          <p>Runs inside sandbox="allow-scripts" with zero access to store storage.</p>
+        </div>
+      </section>
+
+      <div class="badge">
+        <span>Orbit Static Preview • forma/ Demo Assets</span>
+        <span id="viewport-readout">Viewport active</span>
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('theme') === 'light') {
+          document.body.classList.add('light');
+        }
+
+        var modes = {
+          mrr: { val: '$24,680', sub: '+24.8% vs last 30 days', bars: [36, 52, 44, 68, 62, 85, 98] },
+          arr: { val: '$296,160', sub: '+31.2% annualized velocity', bars: [45, 49, 60, 70, 78, 88, 100] },
+          dau: { val: '1,420', sub: '99.4% weekly retention', bars: [55, 62, 58, 74, 80, 79, 92] }
+        };
+
+        var tabs = document.querySelectorAll('.tab');
+        var valEl = document.getElementById('metric-val');
+        var subEl = document.getElementById('metric-sub');
+        var barEls = document.querySelectorAll('.bar');
+
+        tabs.forEach(function (tab) {
+          tab.addEventListener('click', function () {
+            tabs.forEach(function (t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            var data = modes[tab.getAttribute('data-mode')] || modes.mrr;
+            valEl.textContent = data.val;
+            subEl.textContent = data.sub;
+            barEls.forEach(function (b, idx) {
+              b.style.height = data.bars[idx] + '%';
+            });
+          });
+        });
+
+        var statusEl = document.getElementById('cta-status');
+        document.getElementById('deploy-btn').addEventListener('click', function () {
+          statusEl.textContent = 'Demo request simulated inside isolated iframe.';
+        });
+        document.getElementById('ping-btn').addEventListener('click', function () {
+          statusEl.textContent = 'Telemetry ping OK — 14ms (simulated)';
+        });
+        document.getElementById('demo-cta').addEventListener('click', function () {
+          statusEl.textContent = 'Orbit Trial CTA clicked (iframe preview mode).';
+        });
+
+        function updateWidth() {
+          var el = document.getElementById('viewport-readout');
+          if (el) el.textContent = 'Inner width: ' + window.innerWidth + 'px';
+        }
+        window.addEventListener('resize', updateWidth);
+        updateWidth();
+      })();
+    </script>
+  </body>
+</html>

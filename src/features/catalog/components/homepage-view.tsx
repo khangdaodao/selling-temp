@@ -164,12 +164,11 @@ export function HomepageView({
               t.library.freeLabel,
             );
             return (
-              <Link
+              <article
                 key={product.id}
-                href={`/library?q=${encodeURIComponent(product.name)}`}
                 className="forma-surface group flex flex-col justify-between rounded-xl p-4 transition-all hover:border-white/25"
               >
-                <div>
+                <Link href={`/products/${product.slug}`} className="block">
                   <ProductCardVisual product={product} />
 
                   <div className="mt-4 flex items-baseline justify-between gap-3 px-0.5">
@@ -188,16 +187,27 @@ export function HomepageView({
                   <p className="mt-1 line-clamp-2 px-0.5 text-sm text-zinc-400">
                     {pickLocalizedText(product.shortDescription, locale)}
                   </p>
-                </div>
+                </Link>
 
                 <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] px-0.5 pt-3 text-xs text-zinc-500">
                   <span className="font-mono">{product.frameworks.join(' · ')}</span>
-                  <span className="inline-flex items-center gap-1 text-zinc-300 transition-colors group-hover:text-white">
-                    {t.home.viewInLibrary}
-                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href={`/preview/${product.slug}`}
+                      className="text-zinc-400 transition-colors hover:text-accent-cyan"
+                    >
+                      {t.library.openPreviewLabel}
+                    </Link>
+                    <Link
+                      href={`/products/${product.slug}`}
+                      className="inline-flex items-center gap-1 text-zinc-200 transition-colors hover:text-white"
+                    >
+                      {t.library.viewDetailsLabel}
+                      <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    </Link>
+                  </div>
                 </div>
-              </Link>
+              </article>
             );
           })}
         </div>

@@ -4,6 +4,24 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.3.0] — 2026-11-21 — Phase 1.3: Product Detail + Smart Hybrid Preview
+
+### Đã thêm mới & Cập nhật (Added / Changed)
+- **Controlled React Preview Registry (`src/features/preview/`):**
+  - Tạo `interactive-demos.tsx` với 4 demo component tương tác thật (`SignalButtonDemo`, `PrismSwitchDemo`, `KineticMetricDemo`, `VoicesTestimonialsDemo`).
+  - Tạo `section-demos.tsx` cho các component/template phức tạp (`Halo`, `Pulse`, `Nexus`, `Priceless`, `Monolith`, `Vector Navbar`, `Baseline Footer`, `Metric`, `Atelier`, `Mono Folio`, `Kestrel Docs`).
+  - Tạo `preview-registry.tsx` sử dụng `next/dynamic` để lazy-load theo từng demo, tự chuyển sang sandboxed iframe hoặc màn hình **Mock Fallback** khi `previewComponentKey === null`.
+- **Static Template Previews độc lập (`public/demo-previews/`):**
+  - Tạo `orbit/index.html` và `northbound/index.html` hỗ trợ query `?theme=dark|light`, chuyển tab/filter tương tác nội bộ và responsive CSS breakpoints thực tế bên trong `<iframe sandbox="allow-scripts" loading="lazy">`.
+- **Fullscreen Live Preview (`/preview/[slug]`):**
+  - Tạo `src/app/preview/[slug]/page.tsx` và `FullscreenPreviewView` với Viewport Presets (`Desktop`, `Tablet 768px`, `Mobile 375px`), nút chuyển `Dark`/`Light`, nút `Refresh` làm mới trạng thái demo/iframe, nút `View Details` và CTA.
+- **Product Detail (`/products/[slug]`) & Wishlist (`src/features/wishlist/`):**
+  - Tạo `src/app/products/[slug]/page.tsx`, `ProductDetailView` và `useWishlistStore` lưu qua `StorageAdapter`.
+  - Hỗ trợ live interactive stage ngay trên trang chi tiết cho component đơn giản, 3 tabs `Overview` / `Documentation` / `Source Code`, cùng trạng thái khóa mã nguồn mô phỏng UI và cảnh báo bảo mật Phase 1.
+- **Kết nối Catalog:** Cập nhật `CatalogProductCard`, `HomepageView` và `ProductCardVisual` nối thẳng sang `/products/[slug]`, `/preview/[slug]` và tái sử dụng shared interactive demos.
+
+---
+
 ## [0.2.0] — 2026-11-20 — Phase 1.2: Homepage + Library
 
 ### Đã thêm mới & Cập nhật (Added / Changed)

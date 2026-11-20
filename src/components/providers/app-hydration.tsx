@@ -9,6 +9,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useWishlistStore } from '@/features/wishlist/use-wishlist-store';
 import { useI18nStore } from '@/i18n/use-i18n-store';
 
 /**
@@ -16,10 +17,12 @@ import { useI18nStore } from '@/i18n/use-i18n-store';
  */
 export function AppHydration(): null {
   const hydrateFromEnvironment = useI18nStore((state) => state.hydrateFromEnvironment);
+  const hydrateWishlist = useWishlistStore((state) => state.hydrateWishlist);
 
   useEffect(() => {
     hydrateFromEnvironment();
-  }, [hydrateFromEnvironment]);
+    hydrateWishlist();
+  }, [hydrateFromEnvironment, hydrateWishlist]);
 
   return null;
 }

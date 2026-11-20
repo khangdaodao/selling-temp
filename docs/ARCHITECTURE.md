@@ -56,10 +56,13 @@ Nếu `JSON.parse` gặp lỗi, `version` lệch với `STORAGE_SCHEMA_VERSION`,
 
 ---
 
-## 5. Mô hình Bảo mật cho Smart Hybrid Preview
+## 5. Mô hình Bảo mật cho Smart Hybrid Preview (Phase 1.3 & Tương lai)
 
-- **Phase 1:** Live preview chỉ render từ **Preview Registry** được kiểm soát chặt chẽ (dựa vào `previewComponentKey`). Những sản phẩm có `previewComponentKey: null` (ví dụ `Beacon AI Console`) sẽ hiển thị màn hình Mock Fallback ghi nhãn trung thực. Hệ thống tuyệt đối không biên dịch hay chạy file ZIP do người dùng upload.
-- **Phase 2+ (Nếu cho phép preview bundle upload từ ngoài):** Bắt buộc chạy trong `<iframe sandbox="allow-scripts">` đặt tại một **origin/domain tách biệt hoàn toàn** kèm header CSP chặt để mã preview không thể đọc cookie phiên đăng nhập hay `localStorage` của trang chính.
+- **Phase 1.3 (Đã triển khai):** Hệ thống Preview (`src/features/preview/registry/preview-registry.tsx`) phân tách làm 3 nhánh rõ ràng qua `previewComponentKey`:
+  1. **Controlled React Preview Registry (`kind: 'react-component'`):** Nạp lười (`next/dynamic`) các component demo được viết sẵn và kiểm soát trong source code (`interactive-demos.tsx`, `section-demos.tsx`).
+  2. **Sandboxed Static HTML Iframe (`kind: 'static-iframe'`):** Các website template tĩnh độc lập (`public/demo-previews/orbit/index.html`, `public/demo-previews/northbound/index.html`) được nhúng qua `<iframe sandbox="allow-scripts" loading="lazy">`. Việc **cố tình bỏ `allow-same-origin`** ép trình duyệt chạy iframe trong một *opaque origin* tách biệt, nên JS bên trong bản demo có thể tương tác UI bình thường nhưng **bị chặn tuyệt đối** không đọc được `localStorage`, cookie hay DOM của cửa hàng chính.
+  3. **Honest Mock Fallback (`previewComponentKey === null`):** Hiển thị màn hình thông báo minh bạch thay vì giả vờ chạy code thật. Hệ thống không tự biên dịch hay chạy file ZIP do người dùng upload.
+- **Phase 2+ (Nếu cho phép preview bundle upload từ ngoài):** Bắt buộc phục vụ file từ một **origin/domain tách biệt hoàn toàn** kèm header CSP chặt và `<iframe sandbox="allow-scripts">`.
 
 ---
 
