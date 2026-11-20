@@ -1,0 +1,154 @@
+/**
+ * English (en) UI dictionary for forma/.
+ * Maintains full structural parity with the Vietnamese dictionary.
+ *
+ * Related: src/i18n/types.ts, src/i18n/dictionaries/vi.ts
+ */
+
+import type { TranslationDictionary } from '../types';
+
+export const enDictionary: TranslationDictionary = {
+  meta: {
+    title: 'forma/ — Minimalist UI Components & Website Templates',
+    description:
+      'Demo-first store for production-ready UI Components and Website Templates built with Next.js, React, and Tailwind CSS.',
+    libraryTitle: 'Library — forma/',
+    libraryDescription:
+      'Browse forma/ UI Components and Website Templates with live interactive cards and structured filters.',
+  },
+  demoBar: {
+    badge: 'DEMO MODE • PHASE 1',
+    notice: 'Simulated localStorage persistence — No live backend or real payments yet.',
+    resetButton: 'Reset demo data',
+    resetDone: 'Demo data restored!',
+    currencyLabel: 'Currency',
+    localeLabel: 'Language',
+  },
+  nav: {
+    home: 'Home',
+    library: 'Library',
+    about: 'About',
+    support: 'Support',
+    signIn: 'Sign in',
+    exploreLibrary: 'Explore Library',
+    menuOpen: 'Open navigation menu',
+    menuClose: 'Close navigation menu',
+    comingSoonNote: 'This route unlocks in an upcoming Phase 1 sub-phase.',
+  },
+  footer: {
+    tagline:
+      'Minimalist UI Components and Website Templates designed for a demo-first interactive experience before purchase.',
+    columns: {
+      productsTitle: 'Products',
+      productsLinks: {
+        library: 'Full Library',
+        components: 'UI Components',
+        templates: 'Website Templates',
+        freebies: 'Free Releases',
+      },
+      companyTitle: 'Workspace',
+      companyLinks: {
+        about: 'About forma/',
+        support: 'Support & FAQ',
+        account: 'Account (Demo)',
+        admin: 'Admin (Demo)',
+      },
+      legalTitle: 'Policies',
+      legalLinks: {
+        license: 'Usage License',
+        updates: 'Lifetime Updates',
+        privacy: 'Demo Boundaries',
+      },
+    },
+    copyright: '© 2026 forma/. All rights reserved.',
+    demoNote: 'Phase 1 Demo Build (Frontend-only)',
+  },
+  home: {
+    headlineLine1: 'Impressive websites.',
+    headlineLine2: 'Start with',
+    headlineAccent: 'better design.',
+    subheadline:
+      'Curated minimalist UI Components and Website Templates for Next.js & React. Interact directly before you claim or buy.',
+    primaryCta: 'Explore Library',
+    secondaryCta: 'View templates',
+    trustLifetime: 'Lifetime updates',
+    trustSupport: 'Dedicated support',
+    liveBadgeTitle: 'Live interactive',
+    liveBadgeSubtitle: 'Test micro-demos before buying',
+    audienceLabel: 'DESIGNED FOR BUILDERS',
+    audiences: [
+      'Independent designers',
+      'Freelancers',
+      'Startups',
+      'Creative agencies',
+    ],
+    showcaseTitle: 'Our Products',
+    showcaseCta: 'View all products',
+    showcaseEyebrow: 'FEATURED RELEASES',
+    showcaseSubnote: 'Selected from 18 Components & Templates in the Library',
+    viewInLibrary: 'View in Library',
+  },
+  library: {
+    tabAll: 'All',
+    tabComponents: 'Components',
+    tabTemplates: 'Templates',
+    searchPlaceholder: 'Search components, templates, or tags...',
+    searchClear: 'Clear search query',
+    sortLabel: 'Sort by',
+    sortOptions: {
+      newest: 'Newest',
+      priceAsc: 'Price: Low → High',
+      priceDesc: 'Price: High → Low',
+      nameAsc: 'Name: A → Z',
+    },
+    sidebar: {
+      categoriesHeading: 'CATEGORIES',
+      allCategories: 'All categories',
+      categories: {
+        hero: 'Hero',
+        navbar: 'Navbar',
+        pricing: 'Pricing',
+        cards: 'Cards',
+        footer: 'Footer',
+        dashboard: 'Dashboard',
+        saas: 'SaaS',
+        portfolio: 'Portfolio',
+        ecommerce: 'E-commerce',
+      },
+      tierHeading: 'PRICING',
+      tierAll: 'All items',
+      tierFree: 'Free',
+      tierPaid: 'Paid',
+      frameworkHeading: 'FRAMEWORK',
+      frameworkAll: 'All frameworks',
+      promoTitle: 'Ready to elevate your next build?',
+      promoBody: 'Start exploring free high-craft UI Components and Website Templates.',
+      promoCta: 'Browse Free items',
+    },
+    eyebrow: 'FORMA/ LIBRARY',
+    headline: 'A beautiful start for every idea.',
+    showingPrefix: 'Showing',
+    showingSuffix: 'items',
+    clearFilters: 'Clear filters',
+    mobileFilterButton: 'Filters & Categories',
+    mobileFilterHide: 'Hide filters',
+    loadingLabel: 'Loading catalog from repository...',
+    emptyTitle: 'No matching products found',
+    emptyBody: 'Try another search keyword, switch categories, or reset active filters.',
+    emptyResetCta: 'Reset all filters',
+    freeLabel: 'Free',
+    componentLabel: 'Component',
+    templateLabel: 'Template',
+    interactiveBadge: 'Interactive card',
+    placeholderPreviewNote: 'Thumbnail preview • Fullscreen in next phase',
+    fallbackBadge: 'Mock Fallback',
+    previewPlaceholderHint:
+      'Product detail & fullscreen live preview will unlock in the upcoming phase.',
+  },
+  foundation: {
+    freeLabel: 'Free',
+    paidLabel: 'Paid',
+    componentLabel: 'Component',
+    templateLabel: 'Template',
+  },
+};
