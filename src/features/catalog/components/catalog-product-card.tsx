@@ -10,8 +10,10 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowUpRight, Heart, Maximize2, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Check, Heart, Maximize2, ShoppingBag, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { useCartStore } from '@/features/cart/use-cart-store';
 import { useWishlistStore } from '@/features/wishlist/use-wishlist-store';
 import { pickLocalizedText, useI18n } from '@/i18n/use-i18n-store';
 import { formatProductPrice } from '@/lib/format/currency';
@@ -29,11 +31,19 @@ export function CatalogProductCard({
   product,
 }: CatalogProductCardProps): React.JSX.Element {
   const { t, locale, currency } = useI18n();
+  const session = useAuthStore((state) => state.session);
+  const ownedProductIds = useAuthStore((state) => state.ownedProductIds);
+  const cartItems = useCartStore((state) => state.items);
+  const addItem = useCartStore((state) => state.addItem);
+  const openDrawer = useCartStore((state) => state.openDrawer);
+
   const wishlisted = useWishlistStore((state) =>
     state.productIds.includes(product.id),
   );
   const toggleWishlist = useWishlistStore((state) => state.toggleWishlist);
 
+  const isOwned = session !== null && ownedProductIds.includes(product.id);
+  const isInCart = cartItems.some((item) => item.productId === product.id);
   const isInteractive = product.previewMode === 'interactive-card';
   const categoryLabel = t.library.sidebar.categories[product.category];
   const formattedPrice = formatProductPrice(
@@ -124,7 +134,36 @@ export function CatalogProductCard({
         </div>
 
         <div className="flex items-center gap-2">
-          {isInteractive ? (
+          {isOwned ? (
+            <Badge variant="cyan" className="px-2 py-0.5 text-[10px]">
+              <Check className="h-2.5 w-2.5" aria-hidden="true" />
+              <span>{t.cart.ownedBadge}</span>
+            </Badge>
+          ) : product.tier === 'paid' ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (isInCart) {
+                  openDrawer();
+                } else {
+                  addItem(product.id, session ? ownedProductIds : []);
+                }
+              }}
+              aria-label={
+                isInCart
+                  ? `${t.cart.inCartBadge}: ${product.name}`
+                  : `${t.cart.addToCart}: ${product.name}`
+              }
+              className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-medium transition-colors ${
+                isInCart
+                  ? 'border-accent-cyan/40 bg-accent-cyan/10 text-accent-cyan'
+                  : 'border-white/10 bg-[#141418] text-zinc-200 hover:border-white/25 hover:text-white'
+              }`}
+            >
+              <ShoppingBag className="h-3 w-3" aria-hidden="true" />
+              <span>{isInCart ? t.cart.inCartBadge : '+'}</span>
+            </button>
+          ) : isInteractive ? (
             <Badge variant="cyan" className="px-2 py-0.5 text-[10px]">
               <Sparkles className="h-2.5 w-2.5" aria-hidden="true" />
               <span>{t.library.interactiveBadge}</span>

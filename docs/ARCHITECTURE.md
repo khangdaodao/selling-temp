@@ -35,8 +35,10 @@ flowchart LR
 Next.js App Router render nháp component trên server trước khi gửi HTML xuống trình duyệt (áp dụng cho cả `'use client'` components). Trên server không có `window.localStorage` hay `navigator.language`, nên nếu đọc chúng ngay trong lúc render đầu tiên sẽ làm HTML server khác với client (lỗi Hydration Mismatch).
 
 `forma/` giải quyết triệt để qua 2 bước:
-1. State khởi tạo mặc định của Zustand store luôn cố định giống nhau trên cả Server và Client (`locale: 'vi'`, `currency: 'VND'`).
-2. Component `<AppHydration />` đặt trong [layout.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/layout.tsx) chạy `useEffect` (chỉ thực thi sau khi đã mount trên trình duyệt) để đọc `StorageAdapter` / `navigator.language` và cập nhật lại store êm mượt.
+1. State khởi tạo mặc định của các Zustand stores (`i18n`, `wishlist`, `cart`, `auth`) luôn cố định rỗng/mặc định giống nhau trên cả Server và Client (`locale: 'vi'`, `currency: 'VND'`, `items: []`, `session: null`).
+2. Component `<AppHydration />` đặt trong [layout.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/layout.tsx) chạy `useEffect` (chỉ thực thi sau khi đã mount trên trình duyệt) để đọc `StorageAdapter` (`forma:v1:*`), `navigator.language`, giỏ hàng, phiên đăng nhập và quyền sở hữu demo một cách êm mượt.
+
+> **Nguyên tắc tin cậy ở Phase 2 (No Client Authority):** Toàn bộ `cart`, `coupon`, `auth_session`, `orders` và `owned_product_ids` trong `localStorage` ở Phase 1 chỉ phục vụ mô phỏng trải nghiệm UX. Khi chuyển lên Phase 2, trình duyệt có thể bị chỉnh sửa bằng DevTools nên **không bao giờ được dùng làm nguồn sự thật (authority)** cho giá bán, giảm giá, vai trò admin hay quyền tải mã nguồn — mọi kiểm tra và tính tiền bắt buộc phải chạy trên server đối chiếu với MySQL.
 
 ---
 

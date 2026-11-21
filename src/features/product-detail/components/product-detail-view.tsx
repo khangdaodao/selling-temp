@@ -14,6 +14,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -23,16 +24,20 @@ import {
   Heart,
   Lock,
   ShieldAlert,
+  ShoppingBag,
   Sparkles,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { MonacoCodeViewer } from '@/features/account/components/monaco-code-viewer';
 import { ProductCardVisual } from '@/features/catalog/components/product-card-visual';
+import { useCartStore } from '@/features/cart/use-cart-store';
 import { PreviewCanvas } from '@/features/preview/registry/preview-registry';
 import { useWishlistStore } from '@/features/wishlist/use-wishlist-store';
 import { pickLocalizedText, useI18n } from '@/i18n/use-i18n-store';
 import { formatProductPrice } from '@/lib/format/currency';
-import { orderRepository, productRepository } from '@/services';
+import { productRepository } from '@/services';
 import type { Product } from '@/types/domain';
 
 interface ProductDetailViewProps {
@@ -56,11 +61,19 @@ export function ProductDetailView({
   slug,
   initialProduct,
 }: ProductDetailViewProps): React.JSX.Element {
+  const router = useRouter();
   const { t, locale, currency } = useI18n();
   const [product, setProduct] = useState<Product | null>(initialProduct);
-  const [ownedIds, setOwnedIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+
+  const session = useAuthStore((state) => state.session);
+  const ownedProductIds = useAuthStore((state) => state.ownedProductIds);
+  const claimFreeProduct = useAuthStore((state) => state.claimFreeProduct);
+
+  const cartItems = useCartStore((state) => state.items);
+  const addItem = useCartStore((state) => state.addItem);
+  const openDrawer = useCartStore((state) => state.openDrawer);
 
   const wishlisted = useWishlistStore((state) =>
     product ? state.productIds.includes(product.id) : false,
@@ -71,15 +84,9 @@ export function ProductDetailView({
     let active = true;
 
     const syncData = async (): Promise<void> => {
-      const [latestProduct, owned] = await Promise.all([
-        productRepository.getBySlug(slug),
-        orderRepository.getOwnedProductIds(),
-      ]);
-      if (active) {
-        if (latestProduct) {
-          setProduct(latestProduct);
-        }
-        setOwnedIds(owned);
+      const latestProduct = await productRepository.getBySlug(slug);
+      if (active && latestProduct) {
+        setProduct(latestProduct);
       }
     };
 
@@ -101,7 +108,8 @@ export function ProductDetailView({
     );
   }
 
-  const isOwned = ownedIds.includes(product.id);
+  const isOwned = session !== null && ownedProductIds.includes(product.id);
+  const isInCart = cartItems.some((item) => item.productId === product.id);
   const isInlineInteractive =
     product.previewMode === 'interactive-card' && product.previewComponentKey !== null;
   const formattedPrice = formatProductPrice(
@@ -112,9 +120,30 @@ export function ProductDetailView({
   );
   const categoryLabel = t.library.sidebar.categories[product.category];
 
-  const handleDeferredCheckout = (): void => {
-    setActionNotice(t.productDetail.checkoutDeferredNotice);
-    window.setTimeout(() => setActionNotice(null), 3200);
+  const handlePrimaryPurchaseAction = async (): Promise<void> => {
+    if (isOwned) {
+      setActionNotice(t.cart.alreadyOwnedNotice);
+      return;
+    }
+
+    if (product.tier === 'free') {
+      if (!session) {
+        router.push(`/login?next=${encodeURIComponent(`/products/${product.slug}`)}`);
+        return;
+      }
+      await claimFreeProduct(product, currency);
+      setActionNotice(t.cart.freeClaimedSuccess);
+      return;
+    }
+
+    const result = addItem(product.id, session ? ownedProductIds : []);
+    if (result === 'already_in_cart') {
+      setActionNotice(t.cart.alreadyInCartNotice);
+    } else if (result === 'already_owned') {
+      setActionNotice(t.cart.alreadyOwnedNotice);
+    } else {
+      setActionNotice(null);
+    }
   };
 
   return (
@@ -275,18 +304,41 @@ export function ProductDetailView({
                   </Link>
                 </Button>
 
-                <Button
-                  type="button"
-                  variant="default"
-                  size="lg"
-                  onClick={handleDeferredCheckout}
-                >
-                  <span>
-                    {product.tier === 'free'
-                      ? t.productDetail.getFreeCta
-                      : t.productDetail.buyNowCta}
-                  </span>
-                </Button>
+                {isOwned ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setActiveTab('source')}
+                  >
+                    <Check className="h-4 w-4 text-accent-cyan" aria-hidden="true" />
+                    <span>{t.cart.alreadyOwnedCta}</span>
+                  </Button>
+                ) : isInCart ? (
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="lg"
+                    onClick={openDrawer}
+                  >
+                    <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+                    <span>{t.cart.inCartViewDrawer}</span>
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="lg"
+                    onClick={() => void handlePrimaryPurchaseAction()}
+                  >
+                    <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+                    <span>
+                      {product.tier === 'free'
+                        ? t.productDetail.getFreeCta
+                        : t.cart.addToCart}
+                    </span>
+                  </Button>
+                )}
               </div>
 
               {actionNotice ? (
@@ -465,9 +517,18 @@ export function ProductDetailView({
                     </div>
                   </>
                 ) : (
-                  <p className="text-sm text-accent-cyan">
-                    Owned in My Library — full Monaco Viewer unlocks in Phase 1.5.
-                  </p>
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-3 text-xs text-accent-cyan">
+                      <span>{t.cart.unlockNotice}</span>
+                      <Link
+                        href="/account"
+                        className="font-semibold underline underline-offset-4 hover:text-white"
+                      >
+                        {t.account.tabs.myLibrary} →
+                      </Link>
+                    </div>
+                    <MonacoCodeViewer product={product} />
+                  </div>
                 )}
               </div>
             ) : null}

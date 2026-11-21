@@ -63,6 +63,8 @@ export interface IAuthRepository {
   signInWithDemoForm(input: { email: string; name?: string }): Promise<AuthSession>;
   /** Simulates clicking "Continue with Google (Demo UI)" without asking for Google credentials. */
   signInWithGoogleDemoUi(): Promise<AuthSession>;
+  /** Updates display name and email of the active Phase 1 demo profile (never handles passwords). */
+  updateDemoProfile(input: { name: string; email: string }): Promise<AuthSession>;
   /** Clears the current mock session. */
   signOut(): Promise<void>;
 }

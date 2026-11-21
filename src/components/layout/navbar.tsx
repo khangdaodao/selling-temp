@@ -1,11 +1,11 @@
 /**
  * Primary navigation bar for forma/, closely following the Homepage and Library reference screens.
- * Highlights the active route (`/` or `/library`), routes CTAs to `/library`, provides a responsive
- * mobile drawer with quick locale/currency toggles, and marks Phase 1.3+ routes clearly.
+ * Highlights active routes, exposes the Cart Drawer trigger with live item badge,
+ * shows active Demo User state or `/login` link, and provides a responsive mobile drawer.
  *
- * TODO(Phase 1.3): Point Login, About, and Support links to dedicated routes once created.
+ * TODO(Phase 1.6): Point About and Support links to dedicated routes once created.
  *
- * Related: src/components/ui/button.tsx, src/i18n/use-i18n-store.ts
+ * Related: src/features/cart/components/cart-drawer.tsx, src/features/auth/use-auth-store.ts
  */
 
 'use client';
@@ -13,8 +13,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowUpRight, Menu, X } from 'lucide-react';
+import { ArrowUpRight, LogOut, Menu, ShoppingBag, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { useCartStore } from '@/features/cart/use-cart-store';
 import { useI18n } from '@/i18n/use-i18n-store';
 
 /**
@@ -23,6 +25,11 @@ import { useI18n } from '@/i18n/use-i18n-store';
 export function Navbar(): React.JSX.Element {
   const pathname = usePathname();
   const { t, locale, currency, setLocale, setCurrency } = useI18n();
+  const session = useAuthStore((state) => state.session);
+  const signOut = useAuthStore((state) => state.signOut);
+  const cartItems = useCartStore((state) => state.items);
+  const openDrawer = useCartStore((state) => state.openDrawer);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pendingNotice, setPendingNotice] = useState<string | null>(null);
 
@@ -91,15 +98,48 @@ export function Navbar(): React.JSX.Element {
         </nav>
 
         {/* Desktop Actions */}
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2.5 md:flex">
           <button
             type="button"
-            onClick={handleDeferredRoute}
-            title={t.nav.comingSoonNote}
-            className="px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:text-white"
+            onClick={openDrawer}
+            aria-label={t.cart.title}
+            className="relative inline-flex h-9 items-center gap-1.5 rounded-md border border-white/10 bg-surface px-2.5 text-xs font-medium text-zinc-200 transition-colors hover:border-white/25 hover:text-white"
           >
-            {t.nav.signIn}
+            <ShoppingBag className="h-3.5 w-3.5 text-accent-cyan" aria-hidden="true" />
+            <span className="font-mono">{cartItems.length}</span>
           </button>
+
+          {session ? (
+            <div className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-surface pl-2 pr-1 py-1">
+              <Link
+                href="/account"
+                className="inline-flex items-center gap-1.5 rounded pr-1 text-xs text-zinc-200 transition-colors hover:text-accent-cyan"
+                title={t.account.tabs.myLibrary}
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded bg-accent-cyan/15 font-mono text-[10px] font-bold text-accent-cyan">
+                  {session.user.avatarInitials}
+                </span>
+                <span className="max-w-[110px] truncate">{session.user.name}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                aria-label={t.auth.signOut}
+                title={t.auth.signOut}
+                className="rounded p-1 text-zinc-400 hover:bg-white/10 hover:text-white"
+              >
+                <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:text-white"
+            >
+              {t.nav.signIn}
+            </Link>
+          )}
+
           <Button variant="cyan" size="sm" asChild>
             <Link href="/library">
               <span>{t.nav.exploreLibrary}</span>
@@ -108,16 +148,28 @@ export function Navbar(): React.JSX.Element {
           </Button>
         </div>
 
-        {/* Mobile Menu Trigger */}
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          aria-expanded={mobileMenuOpen}
-          aria-label={mobileMenuOpen ? t.nav.menuClose : t.nav.menuOpen}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-surface text-zinc-200 transition-colors hover:border-white/25 hover:text-white md:hidden"
-        >
-          {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </button>
+        {/* Mobile Actions & Menu Trigger */}
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            type="button"
+            onClick={openDrawer}
+            aria-label={t.cart.title}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-white/10 bg-surface px-2.5 text-xs font-medium text-zinc-200"
+          >
+            <ShoppingBag className="h-3.5 w-3.5 text-accent-cyan" aria-hidden="true" />
+            <span className="font-mono">{cartItems.length}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-expanded={mobileMenuOpen}
+            aria-label={mobileMenuOpen ? t.nav.menuClose : t.nav.menuOpen}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-surface text-zinc-200 transition-colors hover:border-white/25 hover:text-white"
+          >
+            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
 
       {pendingNotice ? (
@@ -198,16 +250,33 @@ export function Navbar(): React.JSX.Element {
           </div>
 
           <div className="mt-4 flex flex-col gap-2 border-t border-white/[0.08] pt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                handleDeferredRoute();
-                setMobileMenuOpen(false);
-              }}
-            >
-              {t.nav.signIn}
-            </Button>
+            {session ? (
+              <div className="flex items-center justify-between rounded-md border border-white/10 bg-surface px-3 py-2 text-xs">
+                <Link
+                  href="/account"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="truncate font-medium text-white hover:text-accent-cyan"
+                >
+                  {session.user.name}
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-zinc-400 hover:text-white"
+                >
+                  {t.auth.signOut}
+                </button>
+              </div>
+            ) : (
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                  {t.nav.signIn}
+                </Link>
+              </Button>
+            )}
             <Button variant="cyan" size="sm" asChild>
               <Link href="/library" onClick={() => setMobileMenuOpen(false)}>
                 <span>{t.nav.exploreLibrary}</span>

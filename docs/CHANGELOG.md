@@ -4,6 +4,37 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.5.0] — 2026-11-21 — Phase 1.5: Mock Auth + Customer Account + Code Viewer
+
+### Đã thêm mới & Cập nhật (Added / Changed)
+- **Minimal Customer Account (`/account` — `src/features/account/`):**
+  - Tạo `src/app/account/page.tsx` và `AccountView` với Auth Gate khi chưa đăng nhập, hồ sơ Mock Profile (không lưu mật khẩu), thống kê nhanh và 4 tab ngang (`My Library`, `Orders`, `Wishlist`, `Settings`).
+  - Hỗ trợ chỉnh sửa tên/email Mock Profile qua `IAuthRepository.updateDemoProfile`, đăng xuất (`Sign out`) và nút `Reset All Demo Data`.
+- **Lazy-Loaded Read-Only Monaco Source Viewer (`monaco-code-viewer.tsx`):**
+  - Cài đặt `@monaco-editor/react` (`^4.7.0`) và nạp lười bằng `next/dynamic(..., { ssr: false })`.
+  - Hỗ trợ cây thư mục file, thanh tìm kiếm trong code kèm nhảy tới dòng khớp, syntax highlighting, nút `Copy code`, `Fullscreen` và khóa chỉ đọc (`readOnly: true`, `domReadOnly: true`).
+  - Tích hợp trực tiếp vào `My Library` trên `/account` và tab `Source Code` của sản phẩm đã sở hữu trên `/products/[slug]`.
+- **Tài nguyên tải mẫu & Điều hướng:**
+  - Tạo gói ZIP mẫu an toàn `public/demo-assets/forma-sample-bundle.zip` phục vụ nút tải ZIP mới nhất.
+  - Cập nhật `Navbar` và `Footer` trỏ link sang `/account`.
+
+---
+
+## [0.4.0] — 2026-11-21 — Phase 1.4: Cart + Checkout + Coupons + Mock Auth
+
+### Đã thêm mới & Cập nhật (Added / Changed)
+- **Mock Auth (`/login` & `useAuthStore`):**
+  - Tạo `src/app/login/page.tsx`, `LoginView` và `useAuthStore` bám sát ảnh thiết kế gốc số 3 (chế độ Login / Register / Forgot Password mô phỏng, Google UI Demo, 2 tài khoản Demo chọn sẵn, điều hướng an toàn quay lại `?next=`).
+- **Cart Store & Slide-over Cart Drawer (`src/features/cart/`):**
+  - Tạo `useCartStore` lưu bền vững qua `StorageAdapter` (`forma:v1:cart`), chống thêm trùng sản phẩm đã có trong giỏ hoặc đã sở hữu, và `CartDrawer` trượt từ cạnh phải.
+- **One-Page Checkout (`/checkout` — `src/features/checkout/`):**
+  - Tạo `src/app/checkout/page.tsx` và `CheckoutView` yêu cầu đăng nhập Mock Auth trước khi thanh toán (hỗ trợ quay lại `/checkout` sau khi login).
+  - Tích hợp kiểm tra mã giảm giá (`FORMA20`, `WELCOME10`, `EXPIRED50`, báo lỗi mã không tồn tại), tính toán tổng tiền số nguyên VND/USD, mô phỏng trạng thái thanh toán `Success` / `Failure`, và lưu lịch sử đơn hàng + quyền sở hữu vào `localStorage`.
+- **Nối mạch Quyền sở hữu & App Shell:**
+  - Cập nhật `AppHydration`, `Navbar` (nút mở Cart Drawer kèm bộ đếm và hiển thị tài khoản Demo đang đăng nhập), `CatalogProductCard`, `ProductDetailView` và `FullscreenPreviewView` để hỗ trợ `Get Free`, chặn mua trùng sản phẩm đã sở hữu và mở khóa tab `Source Code` mô phỏng UI.
+
+---
+
 ## [0.3.0] — 2026-11-21 — Phase 1.3: Product Detail + Smart Hybrid Preview
 
 ### Đã thêm mới & Cập nhật (Added / Changed)

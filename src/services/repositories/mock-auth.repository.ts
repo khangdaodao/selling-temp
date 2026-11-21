@@ -29,6 +29,17 @@ function isAuthSession(value: unknown): value is AuthSession {
   );
 }
 
+function computeAvatarInitials(name: string, fallbackEmail: string): string {
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('') || fallbackEmail.slice(0, 2).toUpperCase()
+  );
+}
+
 export class MockAuthRepository implements IAuthRepository {
   /** @inheritdoc */
   getDemoAccounts(): DemoUser[] {
@@ -68,14 +79,25 @@ export class MockAuthRepository implements IAuthRepository {
       (account) => account.email.toLowerCase() === normalizedEmail,
     );
 
-    const user: DemoUser = matchingPreset ?? {
-      id: `usr_${normalizedEmail.replace(/[^a-z0-9]/g, '_')}`,
-      name: input.name?.trim() || normalizedEmail.split('@')[0] || 'Demo User',
-      email: normalizedEmail,
-      role: 'customer',
-      avatarInitials: (input.name?.trim() || normalizedEmail).slice(0, 2).toUpperCase(),
-      createdAt: new Date().toISOString(),
-    };
+    const cleanInputName = input.name?.trim();
+    const resolvedName =
+      cleanInputName || matchingPreset?.name || normalizedEmail.split('@')[0] || 'Demo User';
+    const initials = computeAvatarInitials(resolvedName, normalizedEmail);
+
+    const user: DemoUser = matchingPreset
+      ? {
+          ...matchingPreset,
+          name: resolvedName,
+          avatarInitials: initials,
+        }
+      : {
+          id: `usr_${normalizedEmail.replace(/[^a-z0-9]/g, '_')}`,
+          name: resolvedName,
+          email: normalizedEmail,
+          role: 'customer',
+          avatarInitials: initials,
+          createdAt: new Date().toISOString(),
+        };
 
     const session: AuthSession = {
       user,
@@ -99,6 +121,29 @@ export class MockAuthRepository implements IAuthRepository {
     };
     writeStorage(STORAGE_KEYS.authSession, session);
     return session;
+  }
+
+  /** @inheritdoc */
+  async updateDemoProfile(input: { name: string; email: string }): Promise<AuthSession> {
+    const current = await this.getSession();
+    if (!current) {
+      throw new Error('Cannot update profile without an active demo session.');
+    }
+    const cleanName = input.name.trim() || current.user.name;
+    const cleanEmail = input.email.trim().toLowerCase() || current.user.email;
+    const initials = computeAvatarInitials(cleanName, cleanEmail);
+
+    const updatedSession: AuthSession = {
+      ...current,
+      user: {
+        ...current.user,
+        name: cleanName,
+        email: cleanEmail,
+        avatarInitials: initials,
+      },
+    };
+    writeStorage(STORAGE_KEYS.authSession, updatedSession);
+    return updatedSession;
   }
 
   /** @inheritdoc */

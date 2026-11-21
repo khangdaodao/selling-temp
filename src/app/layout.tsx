@@ -12,6 +12,7 @@ import { Footer } from '@/components/layout/footer';
 import { Navbar } from '@/components/layout/navbar';
 import { DemoModeBar } from '@/components/layout/demo-mode-bar';
 import { AppHydration } from '@/components/providers/app-hydration';
+import { CartDrawer } from '@/features/cart/components/cart-drawer';
 import './globals.css';
 
 const inter = Inter({
@@ -48,6 +49,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-canvas font-sans text-foreground antialiased">
         <AppHydration />
+        <CartDrawer />
         <div className="flex min-h-screen flex-col">
           <DemoModeBar />
           <Navbar />

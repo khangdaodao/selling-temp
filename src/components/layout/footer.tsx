@@ -92,9 +92,9 @@ export function Footer(): React.JSX.Element {
                   </Link>
                 </li>
                 <li>
-                  <span className="text-zinc-500" title={t.nav.comingSoonNote}>
+                  <Link href="/account" className="transition-colors hover:text-white">
                     {t.footer.columns.companyLinks.account}
-                  </span>
+                  </Link>
                 </li>
                 <li>
                   <span className="text-zinc-500" title={t.nav.comingSoonNote}>

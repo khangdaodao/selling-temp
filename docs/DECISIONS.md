@@ -51,3 +51,16 @@
 - **Bối cảnh:** Cần hệ thống type an toàn, UI bám sát thiết kế Dark Minimalism + Cyan Accent, component hỗ trợ accessibility (keyboard/focus) và animation có chủ đích.
 - **Quyết định:** Chọn Next.js `15.5.x`, React `19`, TypeScript strict (`noUncheckedIndexedAccess`), Tailwind CSS `3.4.x`, Radix/shadcn primitives, `lucide-react` và `motion` (`12.x`).
 - **Lý do:** Tailwind v3 tương thích rất mượt với biến CSS HSL của `shadcn/ui`, còn `motion` giúp xử lý các animation phức tạp có kiểm soát mà không làm rối code UI.
+
+---
+
+## ADR-006: Dùng `@monaco-editor/react` với Lazy Loading (`ssr: false`) cho Trình xem Code
+
+- **Trạng thái:** Đã duyệt (Phase 1.5)
+- **Bối cảnh:** Trang Customer Account (`My Library`) và tab `Source Code` trên trang chi tiết sản phẩm cần trình xem mã nguồn có cây thư mục, tìm kiếm trong code, đánh số dòng, syntax highlighting chuẩn IDE, chế độ chỉ đọc (`readOnly: true`) và hỗ trợ Fullscreen.
+- **Quyết định:** Cài đặt `@monaco-editor/react` (`^4.7.0`) và nạp lười bằng `next/dynamic(..., { ssr: false })` trong [monaco-code-viewer.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/account/components/monaco-code-viewer.tsx).
+- **Lý do:**
+  - Monaco Editor phụ thuộc các API của trình duyệt (`window`, Web Workers) nên bắt buộc phải dùng `ssr: false` khi chạy trên Next.js App Router.
+  - Nạp lười bằng `next/dynamic` giúp tách Monaco khỏi bundle ban đầu của `/account` (route `/account` giữ gọn ở mức `4.63 kB`) và chỉ tải worker khi người dùng bấm `Xem Mã nguồn`.
+  - Hỗ trợ sẵn `readOnly: true`, `domReadOnly: true`, và tự nạp language worker cho TypeScript/CSS/Markdown.
+- **Đánh đổi:** Thêm 1 package UI editor và tải worker từ CDN khi người dùng mở khung xem code; hoàn toàn chấp nhận được vì không ảnh hưởng tới tốc độ tải của các trang công khai (`/` và `/library`).

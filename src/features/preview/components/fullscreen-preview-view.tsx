@@ -11,18 +11,23 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ArrowUpRight,
+  Check,
   Monitor,
   Moon,
   RefreshCw,
+  ShoppingBag,
   Smartphone,
   Sun,
   Tablet,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { useCartStore } from '@/features/cart/use-cart-store';
 import { useI18n } from '@/i18n/use-i18n-store';
 import { formatProductPrice } from '@/lib/format/currency';
 import { productRepository } from '@/services';
@@ -42,6 +47,7 @@ export function FullscreenPreviewView({
   slug,
   initialProduct,
 }: FullscreenPreviewViewProps): React.JSX.Element {
+  const router = useRouter();
   const { t, currency } = useI18n();
   const [product, setProduct] = useState<Product | null>(initialProduct);
   const [viewport, setViewport] = useState<PreviewViewport>('desktop');
@@ -52,6 +58,13 @@ export function FullscreenPreviewView({
   );
   const [refreshKey, setRefreshKey] = useState(0);
   const [notice, setNotice] = useState<string | null>(null);
+
+  const session = useAuthStore((state) => state.session);
+  const ownedProductIds = useAuthStore((state) => state.ownedProductIds);
+  const claimFreeProduct = useAuthStore((state) => state.claimFreeProduct);
+  const cartItems = useCartStore((state) => state.items);
+  const addItem = useCartStore((state) => state.addItem);
+  const openDrawer = useCartStore((state) => state.openDrawer);
 
   useEffect(() => {
     let active = true;
@@ -94,15 +107,34 @@ export function FullscreenPreviewView({
     t.library.freeLabel,
   );
 
+  const isOwned = session !== null && ownedProductIds.includes(product.id);
+  const isInCart = cartItems.some((item) => item.productId === product.id);
+
   const handleRefresh = (): void => {
     setRefreshKey((prev) => prev + 1);
     setNotice(t.preview.refreshedNotice);
     window.setTimeout(() => setNotice(null), 1800);
   };
 
-  const handleBuyPlaceholder = (): void => {
-    setNotice(t.productDetail.checkoutDeferredNotice);
-    window.setTimeout(() => setNotice(null), 2800);
+  const handleCtaClick = async (): Promise<void> => {
+    if (isOwned) {
+      setNotice(t.cart.alreadyOwnedNotice);
+      return;
+    }
+    if (product.tier === 'free') {
+      if (!session) {
+        router.push(`/login?next=${encodeURIComponent(`/preview/${product.slug}`)}`);
+        return;
+      }
+      await claimFreeProduct(product, currency);
+      setNotice(t.cart.freeClaimedSuccess);
+      return;
+    }
+    if (isInCart) {
+      openDrawer();
+      return;
+    }
+    addItem(product.id, session ? ownedProductIds : []);
   };
 
   const viewportWidthClass =
@@ -220,13 +252,31 @@ export function FullscreenPreviewView({
               <Link href={`/products/${product.slug}`}>{t.preview.viewDetails}</Link>
             </Button>
 
-            <Button variant="cyan" size="sm" onClick={handleBuyPlaceholder}>
-              <span>
-                {product.tier === 'free'
-                  ? t.productDetail.getFreeCta
-                  : `${formattedPrice}`}
-              </span>
-              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            <Button
+              variant={isOwned ? 'outline' : 'cyan'}
+              size="sm"
+              onClick={() => void handleCtaClick()}
+            >
+              {isOwned ? (
+                <>
+                  <Check className="h-3.5 w-3.5 text-accent-cyan" aria-hidden="true" />
+                  <span>{t.cart.ownedBadge}</span>
+                </>
+              ) : isInCart ? (
+                <>
+                  <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>{t.cart.inCartBadge}</span>
+                </>
+              ) : (
+                <>
+                  <span>
+                    {product.tier === 'free'
+                      ? t.productDetail.getFreeCta
+                      : `${formattedPrice}`}
+                  </span>
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </>
+              )}
             </Button>
           </div>
         </div>
