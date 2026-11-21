@@ -48,12 +48,20 @@ export default function RootLayout({
       className={`dark ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen bg-canvas font-sans text-foreground antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-accent-cyan focus:px-3 focus:py-1.5 focus:text-xs focus:font-semibold focus:text-zinc-950"
+        >
+          Skip to main content
+        </a>
         <AppHydration />
         <CartDrawer />
         <div className="flex min-h-screen flex-col">
           <DemoModeBar />
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1">
+            {children}
+          </main>
           <Footer />
         </div>
       </body>

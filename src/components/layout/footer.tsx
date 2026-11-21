@@ -3,8 +3,6 @@
  * Displays the `forma/` wordmark and tagline on the left, 3 structured link columns on the right,
  * and a copyright + Phase 1 demo boundary notice at the bottom.
  *
- * TODO(Phase 1.3): Update Account, Admin, About, and Support links as routes are implemented.
- *
  * Related: src/i18n/use-i18n-store.ts, src/app/layout.tsx
  */
 
@@ -82,12 +80,12 @@ export function Footer(): React.JSX.Element {
               </h3>
               <ul className="mt-4 space-y-2.5 text-sm text-zinc-400">
                 <li>
-                  <Link href="/" className="transition-colors hover:text-white">
+                  <Link href="/about" className="transition-colors hover:text-white">
                     {t.footer.columns.companyLinks.about}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/" className="transition-colors hover:text-white">
+                  <Link href="/support" className="transition-colors hover:text-white">
                     {t.footer.columns.companyLinks.support}
                   </Link>
                 </li>
@@ -97,9 +95,9 @@ export function Footer(): React.JSX.Element {
                   </Link>
                 </li>
                 <li>
-                  <span className="text-zinc-500" title={t.nav.comingSoonNote}>
+                  <Link href="/admin" className="transition-colors hover:text-accent-cyan">
                     {t.footer.columns.companyLinks.admin}
-                  </span>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -110,17 +108,17 @@ export function Footer(): React.JSX.Element {
               </h3>
               <ul className="mt-4 space-y-2.5 text-sm text-zinc-400">
                 <li>
-                  <Link href="/library" className="transition-colors hover:text-white">
+                  <Link href="/support" className="transition-colors hover:text-white">
                     {t.footer.columns.legalLinks.license}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/library" className="transition-colors hover:text-white">
+                  <Link href="/support" className="transition-colors hover:text-white">
                     {t.footer.columns.legalLinks.updates}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/library" className="transition-colors hover:text-white">
+                  <Link href="/about" className="transition-colors hover:text-white">
                     {t.footer.columns.legalLinks.privacy}
                   </Link>
                 </li>

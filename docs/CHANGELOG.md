@@ -4,6 +4,36 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.7.0] — 2026-11-21 — Phase 1.7: QA + Handoff
+
+### Đã thêm mới & Cải thiện (Added / Fixed / Audited)
+- **Fix Token Cyan Alpha Toàn cục ([globals.css](file:///c:/BusinessWeb/Selling_tem/src/app/globals.css), [tailwind.config.ts](file:///c:/BusinessWeb/Selling_tem/tailwind.config.ts)):**
+  - Chuyển `accent.cyan` sang cú pháp RGB có hỗ trợ `<alpha-value>` (`--accent-cyan-rgb: 0 216 255`), khắc phục 38 chỗ dùng `bg-accent-cyan/*` và `border-accent-cyan/*` (Badge, CatalogProductCard, sparkline bars của `Kinetic Metric Card`, Checkout, Login).
+- **Dọn dẹp Dependencies (`package.json`):** Gỡ 3 gói Radix chưa sử dụng (`@radix-ui/react-dialog`, `@radix-ui/react-select`, `@radix-ui/react-tabs`, giảm 39 packages trong `node_modules`).
+- **Accessibility, Reduced Motion & i18n Resilience:**
+  - Thêm `@media (prefers-reduced-motion: reduce)` trong `globals.css` và bọc `HomepageView` trong `<MotionConfig reducedMotion="user">`.
+  - Thêm liên kết bàn phím `Skip to main content` trên [layout.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/layout.tsx), bổ sung `autoComplete="off"` trên form quản trị, đồng bộ `document.documentElement.lang` và fallback chuỗi rỗng trong `pickLocalizedText`.
+- **Guard Sản phẩm Draft/Đã xóa:** Cập nhật `ProductDetailView` và `FullscreenPreviewView` tự chuyển sang trạng thái Not Found / Hidden khi sản phẩm chuyển `Draft` hoặc bị xóa khỏi `localStorage`.
+- **Trang phụ & Error/404 Boundaries:** Tạo [about/page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/about/page.tsx), [support/page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/support/page.tsx), [not-found.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/not-found.tsx), [error.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/error.tsx), [secondary-views.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/secondary-views.tsx) và gỡ toàn bộ placeholder `#coming-soon` khỏi `Navbar` & `Footer`.
+- **Bàn giao Tài liệu Phase 1:** Cập nhật đồng bộ [README.md](file:///c:/BusinessWeb/Selling_tem/README.md), [PRODUCT.md](file:///c:/BusinessWeb/Selling_tem/docs/PRODUCT.md), [PROGRESS.md](file:///c:/BusinessWeb/Selling_tem/docs/PROGRESS.md) (Known Limitations, Phase 2 Backlog, Demo Runbook) và [PROJECT_STRUCTURE.md](file:///c:/BusinessWeb/Selling_tem/docs/PROJECT_STRUCTURE.md).
+
+---
+
+## [0.6.0] — 2026-11-21 — Phase 1.6: Admin Dashboard
+
+### Đã thêm mới & Cập nhật (Added / Changed)
+- **Admin Dashboard (`/admin` — `src/app/admin/page.tsx` & `src/features/admin/components/admin-view.tsx`):**
+  - Xây dựng cổng Mock Admin Role Gate (có nút 1 chạm chuyển sang `admin@forma.demo`, cảnh báo rõ ràng chỉ là mô phỏng UI không phải bảo mật thật).
+  - Giao diện Sidebar 7 mục responsive (`Overview`, `Products`, `Orders`, `Customers`, `Coupons`, `Analytics`, `Settings & Reset`), hỗ trợ deep link qua `?tab=`.
+  - **Products CRUD & Publish Sync:** Tìm kiếm, lọc (`All`/`Published`/`Draft`), tạo/sửa/xóa sản phẩm (metadata, `thumbnailVariant`, `frameworks`, giá số nguyên VND/USD, `previewMode`, `previewComponentKey` an toàn từ registry) và bật tắt `Published` ⇄ `Draft` đồng bộ trực tiếp vào `localStorage` để `/library` ẩn bản `Draft`.
+  - **Upload Source ZIP an toàn (Metadata Only):** `<input type="file" accept=".zip">` chỉ lấy `file.name` và `file.size` lưu vào `zipMetadata`, không đọc nhị phân hay lưu file lớn vào `localStorage`.
+  - **Coupons CRUD & Analytics Mock:** Tạo/cập nhật/bật-tắt/xóa mã giảm giá (`code`, `%`, hạn dùng, mô tả song ngữ), danh sách đơn hàng/khách hàng mô phỏng, mục `Analytics` gắn nhãn `MOCK ANALYTICS` với biểu đồ doanh thu minh họa + phân bổ danh mục trực tiếp, và `Reset All Demo Data`.
+- **Điều hướng, i18n & Responsive Polish:**
+  - Mở rộng từ điển song ngữ `vi`/`en` với đầy đủ section `admin` và nối link `/admin` tại [footer.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/footer.tsx) + badge `Admin` trên [navbar.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/navbar.tsx).
+  - Tinh chỉnh responsive Navbar tại `768px` (ẩn tên dài của session trên Tablet để không chật chội), dùng solid cyan + pixel bar height trên biểu đồ `Analytics`, và bổ sung `id`/`name` cho toàn bộ form controls.
+
+---
+
 ## [0.5.0] — 2026-11-21 — Phase 1.5: Mock Auth + Customer Account + Code Viewer
 
 ### Đã thêm mới & Cập nhật (Added / Changed)

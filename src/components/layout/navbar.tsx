@@ -1,9 +1,9 @@
 /**
  * Primary navigation bar for forma/, closely following the Homepage and Library reference screens.
- * Highlights active routes, exposes the Cart Drawer trigger with live item badge,
- * shows active Demo User state or `/login` link, and provides a responsive mobile drawer.
+ * Highlights active routes (`/`, `/library`, `/about`, `/support`), exposes the Cart Drawer trigger
+ * with live item badge, shows active Demo User state, `/account`, `/admin` quick link, and mobile drawer.
  *
- * TODO(Phase 1.6): Point About and Support links to dedicated routes once created.
+ * TODO(Phase 2): Replace mock role badge checks with server-verified session data.
  *
  * Related: src/features/cart/components/cart-drawer.tsx, src/features/auth/use-auth-store.ts
  */
@@ -31,24 +31,25 @@ export function Navbar(): React.JSX.Element {
   const openDrawer = useCartStore((state) => state.openDrawer);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [pendingNotice, setPendingNotice] = useState<string | null>(null);
 
   const navItems = [
-    { label: t.nav.home, href: '/', active: pathname === '/', ready: true },
+    { label: t.nav.home, href: '/', active: pathname === '/' },
     {
       label: t.nav.library,
       href: '/library',
       active: pathname.startsWith('/library'),
-      ready: true,
     },
-    { label: t.nav.about, href: '#coming-soon', active: false, ready: false },
-    { label: t.nav.support, href: '#coming-soon', active: false, ready: false },
+    {
+      label: t.nav.about,
+      href: '/about',
+      active: pathname.startsWith('/about'),
+    },
+    {
+      label: t.nav.support,
+      href: '/support',
+      active: pathname.startsWith('/support'),
+    },
   ];
-
-  const handleDeferredRoute = (): void => {
-    setPendingNotice(t.nav.comingSoonNote);
-    window.setTimeout(() => setPendingNotice(null), 2600);
-  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#050505]/85 backdrop-blur-md">
@@ -63,38 +64,26 @@ export function Navbar(): React.JSX.Element {
         </Link>
 
         {/* Centered Desktop Navigation */}
-        <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
-          {navItems.map((item) =>
-            item.ready ? (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`relative py-1 text-sm transition-colors ${
-                  item.active
-                    ? 'font-medium text-white'
-                    : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                {item.label}
-                {item.active ? (
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-0 -bottom-[19px] h-[2px] bg-white"
-                  />
-                ) : null}
-              </Link>
-            ) : (
-              <button
-                key={item.label}
-                type="button"
-                onClick={handleDeferredRoute}
-                title={t.nav.comingSoonNote}
-                className="py-1 text-sm text-zinc-400 transition-colors hover:text-white"
-              >
-                {item.label}
-              </button>
-            ),
-          )}
+        <nav aria-label="Primary" className="hidden items-center gap-4 md:flex lg:gap-7">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`relative py-1 text-sm transition-colors ${
+                item.active
+                  ? 'font-medium text-white'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              {item.label}
+              {item.active ? (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 -bottom-[19px] h-[2px] bg-white"
+                />
+              ) : null}
+            </Link>
+          ))}
         </nav>
 
         {/* Desktop Actions */}
@@ -111,15 +100,23 @@ export function Navbar(): React.JSX.Element {
 
           {session ? (
             <div className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-surface pl-2 pr-1 py-1">
+              {session.user.role === 'admin' ? (
+                <Link
+                  href="/admin"
+                  className="rounded border border-cyan-400/35 bg-cyan-400/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-accent-cyan transition-colors hover:bg-cyan-400/20"
+                >
+                  Admin
+                </Link>
+              ) : null}
               <Link
                 href="/account"
                 className="inline-flex items-center gap-1.5 rounded pr-1 text-xs text-zinc-200 transition-colors hover:text-accent-cyan"
                 title={t.account.tabs.myLibrary}
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded bg-accent-cyan/15 font-mono text-[10px] font-bold text-accent-cyan">
+                <span className="flex h-6 w-6 items-center justify-center rounded bg-cyan-400/15 font-mono text-[10px] font-bold text-accent-cyan">
                   {session.user.avatarInitials}
                 </span>
-                <span className="max-w-[110px] truncate">{session.user.name}</span>
+                <span className="hidden max-w-[110px] truncate lg:inline">{session.user.name}</span>
               </Link>
               <button
                 type="button"
@@ -172,47 +169,24 @@ export function Navbar(): React.JSX.Element {
         </div>
       </div>
 
-      {pendingNotice ? (
-        <div
-          role="status"
-          className="border-t border-accent-cyan/20 bg-accent-cyan/10 px-4 py-1.5 text-center text-xs text-accent-cyan"
-        >
-          {pendingNotice}
-        </div>
-      ) : null}
-
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen ? (
         <div className="border-t border-white/[0.08] bg-[#09090b] px-4 py-4 md:hidden">
           <nav aria-label="Mobile Primary" className="flex flex-col gap-2">
-            {navItems.map((item) =>
-              item.ready ? (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`rounded-md px-3 py-2 text-sm transition-colors ${
-                    item.active
-                      ? 'bg-white/10 font-medium text-white'
-                      : 'text-zinc-400 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ) : (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => {
-                    handleDeferredRoute();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="rounded-md px-3 py-2 text-left text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
-                >
-                  {item.label}
-                </button>
-              ),
-            )}
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`rounded-md px-3 py-2 text-sm transition-colors ${
+                  item.active
+                    ? 'bg-white/10 font-medium text-white'
+                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Mobile quick locale & currency switchers */}
@@ -251,21 +225,32 @@ export function Navbar(): React.JSX.Element {
 
           <div className="mt-4 flex flex-col gap-2 border-t border-white/[0.08] pt-4">
             {session ? (
-              <div className="flex items-center justify-between rounded-md border border-white/10 bg-surface px-3 py-2 text-xs">
-                <Link
-                  href="/account"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="truncate font-medium text-white hover:text-accent-cyan"
-                >
-                  {session.user.name}
-                </Link>
+              <div className="flex items-center justify-between gap-2 rounded-md border border-white/10 bg-surface px-3 py-2 text-xs">
+                <div className="flex min-w-0 items-center gap-2">
+                  {session.user.role === 'admin' ? (
+                    <Link
+                      href="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="shrink-0 rounded border border-accent-cyan/30 bg-accent-cyan/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-accent-cyan"
+                    >
+                      Admin
+                    </Link>
+                  ) : null}
+                  <Link
+                    href="/account"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="truncate font-medium text-white hover:text-accent-cyan"
+                  >
+                    {session.user.name}
+                  </Link>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
                     void signOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="text-zinc-400 hover:text-white"
+                  className="shrink-0 text-zinc-400 hover:text-white"
                 >
                   {t.auth.signOut}
                 </button>

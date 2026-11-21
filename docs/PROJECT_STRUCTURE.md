@@ -2,7 +2,7 @@
 
 Tài liệu này phản ánh **đúng cây thư mục thực tế** hiện có trong `c:\BusinessWeb\Selling_tem`. Các thư mục tương lai sẽ chỉ được tạo khi bước vào sub-phase cần dùng tới chúng.
 
-## Cây Thư mục Hiện tại (Phase 1.5)
+## Cây Thư mục Hiện tại (Phase 1.7 — Hoàn chỉnh Phase 1)
 
 ```text
 forma/
@@ -25,18 +25,24 @@ forma/
 ├── docs/
 │   ├── ARCHITECTURE.md                            # Kiến trúc phân lớp, SSR Hydration, Preview Isolation, Phase 2 authority
 │   ├── CHANGELOG.md                               # Nhật ký thay đổi theo từng phase
-│   ├── DECISIONS.md                               # Các quyết định kiến trúc (ADR-001 đến ADR-006)
+│   ├── DECISIONS.md                               # Các quyết định kiến trúc (ADR-001 đến ADR-007)
 │   ├── PRODUCT.md                                 # Yêu cầu sản phẩm, personas, i18n, chính sách giá
 │   ├── PROGRESS.md                                # Tiến độ công việc thật & danh sách TODO(Phase 2)
 │   └── PROJECT_STRUCTURE.md                       # File này
 └── src/
     ├── app/
-    │   ├── globals.css                            # CSS custom properties (tokens) & bảng màu shadcn/ui
+    │   ├── globals.css                            # CSS custom properties (tokens + RGB cyan alpha + reduced-motion)
     │   ├── icon.svg                               # Biểu tượng SVG thương hiệu `forma/` cho tab trình duyệt
-    │   ├── layout.tsx                             # Root server layout, AppHydration, CartDrawer, Navbar, Footer
+    │   ├── layout.tsx                             # Root server layout, Skip link, AppHydration, CartDrawer, Navbar, Footer
+    │   ├── not-found.tsx                          # Trang 404 Not Found tối giản có nút quay lại Library/Home
+    │   ├── error.tsx                              # Client Error Boundary kèm retry & khôi phục Reset Demo Data
     │   ├── page.tsx                               # Server Component entrypoint cho Homepage (`/`)
+    │   ├── about/
+    │   │   └── page.tsx                           # Server Component entrypoint cho trang Giới thiệu (`/about`)
     │   ├── account/
     │   │   └── page.tsx                           # Server Component entrypoint cho Customer Account (`/account`)
+    │   ├── admin/
+    │   │   └── page.tsx                           # Server Component entrypoint cho Admin Dashboard (`/admin`)
     │   ├── checkout/
     │   │   └── page.tsx                           # Server Component entrypoint cho `/checkout` (kèm Suspense boundary)
     │   ├── library/
@@ -46,14 +52,17 @@ forma/
     │   ├── preview/
     │   │   └── [slug]/
     │   │       └── page.tsx                       # Server Component entrypoint cho Fullscreen Live Preview (`/preview/[slug]`)
-    │   └── products/
-    │       └── [slug]/
-    │           └── page.tsx                       # Server Component entrypoint cho Product Detail (`/products/[slug]`)
+    │   ├── products/
+    │   │   └── [slug]/
+    │   │       └── page.tsx                       # Server Component entrypoint cho Product Detail (`/products/[slug]`)
+    │   └── support/
+    │       └── page.tsx                           # Server Component entrypoint cho Hỗ trợ & FAQ (`/support`)
     ├── components/
     │   ├── layout/
     │   │   ├── demo-mode-bar.tsx                  # Thanh thông báo Demo Mode, đổi VI/EN, VND/USD và nút Reset
-    │   │   ├── footer.tsx                         # Footer 4 cột tối giản (đã nối `/library`, `/account`)
-    │   │   └── navbar.tsx                         # Thanh điều hướng sticky, Cart trigger, link sang `/account` & menu mobile
+    │   │   ├── footer.tsx                         # Footer 4 cột tối giản (đã nối `/library`, `/account`, `/admin`, `/about`, `/support`)
+    │   │   ├── navbar.tsx                         # Thanh điều hướng sticky, Cart trigger, link `/account`, badge `/admin`, `/about`, `/support`
+    │   │   └── secondary-views.tsx                # Giao diện song ngữ cho `/about`, `/support` và `not-found`
     │   ├── providers/
     │   │   └── app-hydration.tsx                  # Đồng bộ locale, currency, wishlist, cart và auth session sau mount
     │   └── ui/
@@ -64,6 +73,9 @@ forma/
     │   │   └── components/
     │   │       ├── account-view.tsx               # Minimal Customer Account (My Library, Orders, Wishlist, Settings)
     │   │       └── monaco-code-viewer.tsx         # Lazy-loaded Read-only Monaco Viewer (Tree, Search, Copy, Fullscreen)
+    │   ├── admin/
+    │   │   └── components/
+    │   │       └── admin-view.tsx                 # Sidebar Admin 7 mục (CRUD, Draft/Published, Metadata ZIP, Coupons, Analytics Mock)
     │   ├── auth/
     │   │   ├── use-auth-store.ts                  # Zustand store quản lý mock session, profile, orders & ownedProductIds
     │   │   └── components/
@@ -129,6 +141,6 @@ forma/
 
 ---
 
-## Các Thư mục Feature Dự kiến (Sẽ tạo ở Phase 1.6)
+## Trạng thái Feature Modules Phase 1
 
-- `src/features/admin/` — Admin Sidebar Dashboard, CRUD, đọc metadata ZIP, mock analytics (Phase 1.6)
+Toàn bộ các feature và route cho cửa hàng cá nhân (`catalog`, `preview`, `product-detail`, `wishlist`, `cart`, `checkout`, `auth`, `account`, `admin`, kèm `/about`, `/support`, `not-found.tsx` và `error.tsx`) đã được triển khai, rà soát QA và bàn giao hoàn chỉnh qua Phase 1.7 để chuẩn bị cho Phase 2 Backend.

@@ -22,7 +22,9 @@
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
   --accent-cyan: #00d8ff;
+  --accent-cyan-rgb: 0 216 255;
   --accent-cyan-hover: #38e2ff;
+  --accent-cyan-hover-rgb: 56 226 255;
 
   /* shadcn/ui dark theme HSL mappings */
   --background: 240 10% 2%;
@@ -69,6 +71,20 @@
   :focus-visible {
     outline: 2px solid var(--accent-cyan);
     outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 

@@ -30,6 +30,7 @@ import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useCartStore } from '@/features/cart/use-cart-store';
 import { useI18n } from '@/i18n/use-i18n-store';
 import { formatProductPrice } from '@/lib/format/currency';
+import { DEMO_RESET_EVENT } from '@/lib/storage/storage-keys';
 import { productRepository } from '@/services';
 import type { Product } from '@/types/domain';
 import { PreviewCanvas, resolvePreviewKind } from '../registry/preview-registry';
@@ -70,13 +71,25 @@ export function FullscreenPreviewView({
     let active = true;
     const syncProduct = async (): Promise<void> => {
       const latest = await productRepository.getBySlug(slug);
-      if (active && latest) {
-        setProduct(latest);
+      if (!active) {
+        return;
       }
+      if (!latest || latest.status === 'draft') {
+        setProduct(null);
+        return;
+      }
+      setProduct(latest);
     };
     void syncProduct();
+
+    const handleReset = (): void => {
+      void syncProduct();
+    };
+    window.addEventListener(DEMO_RESET_EVENT, handleReset);
+
     return () => {
       active = false;
+      window.removeEventListener(DEMO_RESET_EVENT, handleReset);
     };
   }, [slug]);
 

@@ -68,11 +68,20 @@ Nếu `JSON.parse` gặp lỗi, `version` lệch với `STORAGE_SCHEMA_VERSION`,
 
 ---
 
-## 6. Lộ trình Nâng cấp lên Phase 2 (Backend & MySQL)
+## 6. Ranh giới Ủy quyền (Authorization Boundary) cho `/admin` & Upload ZIP (Phase 1 vs Phase 2)
+
+- **Phase 1 (`/admin` Demo UI):** Cổng Role Gate (`session.user.role === 'admin'`) trong [admin-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/admin/components/admin-view.tsx) chỉ đóng vai trò điều hướng giao diện trên trình duyệt, đi kèm nút chuyển nhanh `admin@forma.demo` và cảnh báo bảo mật hiển thị rõ ràng. Mọi thao tác CRUD sản phẩm/coupon và chọn `.zip` chỉ cập nhật metadata tên file/dung lượng trong `localStorage` (`forma:v1:*`), tuyệt đối không đọc nhị phân hay thực thi file tải lên.
+- **Phase 2 (Production Authority):** Không bao giờ tin vai trò hay cờ boolean gửi từ trình duyệt:
+  1. **Next.js Middleware / Server Route Guard:** Kiểm tra session cookie ký số (HttpOnly) và đối chiếu trường `role` trong MySQL **trước khi** trả HTML của `/admin` hoặc thực thi bất kỳ Server Action / Route Handler nào.
+  2. **Backend Mutation RBAC:** Mọi API `POST/PATCH/DELETE` sản phẩm, bật/tắt `Draft`/`Published`, tạo coupon và cấp pre-signed upload URL lên S3/R2 bắt buộc phải xác thực `session.user.role === 'ADMIN'` ngay trên server (trả `401`/`403` nếu không hợp lệ).
+
+---
+
+## 7. Lộ trình Nâng cấp lên Phase 2 (Backend & MySQL)
 
 Khi bắt đầu Phase 2:
 1. **Database (MySQL + Prisma):** Thiết kế schema MySQL khớp với các entity trong `src/types/domain.ts` (`Product`, `User`, `Order`, `OrderItem`, `Coupon`, `UserEntitlement`).
 2. **Thay thế Repository:** Tạo `PrismaProductRepository`, `ServerOrderRepository`... gọi qua Next.js Server Actions / Route Handlers theo đúng các interface đã định nghĩa sẵn trong `src/services/repositories/interfaces.ts`.
-3. **Authentication:** Đánh giá và tích hợp auth provider tương thích tốt với MySQL + Prisma (ví dụ Auth.js v5 hoặc Better Auth kèm adapter MySQL).
+3. **Authentication & Server RBAC:** Đánh giá và tích hợp auth provider tương thích tốt với MySQL + Prisma (ví dụ Auth.js v5 hoặc Better Auth kèm adapter MySQL) và khóa quyền Admin ở tầng server.
 4. **Private Storage & Kiểm quyền trên Server:** Đưa file `.zip` lên object storage riêng tư (S3 / Cloudflare R2). Chỉ cấp link tải có thời hạn (signed URL) và trả full source code cho Monaco Viewer **sau khi server kiểm tra bảng quyền sở hữu trong MySQL**.
 5. **Tính tiền trên Server:** Tuyệt đối không tin giá tiền hoặc mã giảm giá gửi từ trình duyệt; server phải tự truy vấn giá gốc từ MySQL trước khi tạo phiên thanh toán.

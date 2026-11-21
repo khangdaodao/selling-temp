@@ -1,64 +1,111 @@
-# Nhật ký Tiến độ Dự án (`docs/PROGRESS.md`) — `forma/`
+# Nhật ký Tiến độ & Bàn giao Phase 1 (`docs/PROGRESS.md`) — `forma/`
 
 **Cập nhật lần cuối:** 2026-11-21  
-**Cột mốc hiện tại:** Phase 1.5 — Mock Auth + Customer Account + Code Viewer (**Hoàn thành** — chờ chủ dự án duyệt để sang Phase 1.6)
+**Cột mốc hiện tại:** **Phase 1.7 — QA + Handoff (Hoàn thành toàn bộ Phase 1 Frontend Demo-First)**  
+
+> ⚠️ **Tuyên bố Trạng thái (Non-Production Disclaimer):**  
+> Dự án **`forma/` hiện tại là bản Frontend Demo-First Prototype** vận hành hoàn toàn trên trình duyệt qua `localStorage` và dữ liệu seed. **Sản phẩm CHƯA phải bản Production-ready** — tuyệt đối không deploy phục vụ giao dịch thương mại thật cho đến khi hoàn thành **Phase 2 (Backend, MySQL + Prisma, Auth thật, Server RBAC, Private Object Storage & Payment Gateway)**.
 
 ---
 
-## Tổng quan Trạng thái các Phase
+## 1. Tổng quan Trạng thái Nghiệm thu Phase 1 (1.1 → 1.7)
 
-| Phase | Nội dung chính | Trạng thái |
+| Sub-phase | Phạm vi đã triển khai & Kiểm chứng | Trạng thái |
 | :--- | :--- | :--- |
-| **Phase 1.1** | Khởi tạo nền tảng, Design Tokens, 8 file tài liệu, StorageAdapter, i18n, Typed Repositories, 18 sản phẩm mẫu, App Shell | **Done (Đã xong)** |
-| **Phase 1.2** | Homepage (`/`), Library (`/library`), lọc/tìm kiếm/sắp xếp, tab Components/Templates, card tương tác mẫu & responsive | **Done (Đã xong)** |
-| **Phase 1.3** | Product Detail (`/products/[slug]`), Fullscreen Preview (`/preview/[slug]`), Controlled React Preview Registry, Static Iframe Previews (`Orbit`, `Northbound`), Mock Fallback & Wishlist | **Done (Đã xong)** |
-| **Phase 1.4** | Mock Auth (`/login`), Get Free claim flow, Cart Drawer trượt phải, One-Page Checkout (`/checkout`), Mock Coupons & Simulated Payment | **Done (Đã xong)** |
-| **Phase 1.5** | Customer Dashboard (`/account`: `My Library`, `Orders`, `Wishlist`, `Settings`), Mock Profile editing, Lazy Read-Only Monaco Viewer & Sample ZIP | **Done (Đã xong)** |
-| **Phase 1.6** | Admin Dashboard (`/admin`), Các trang phụ (`About`, `Support/FAQ`, `404`), Kiểm thử tổng thể | **Next (Tiếp theo)** |
-| **Phase 2** | Backend API, MySQL + Prisma, Auth Provider tương thích MySQL, Private Storage, Payment Gateway | **Blocked (Chờ hoàn tất Phase 1)** |
+| **Phase 1.1** | Nền tảng Next.js 15 App Router, TypeScript strict (`noUncheckedIndexedAccess`), Design Tokens Dark Minimalism + Cyan (`#00D8FF`), `StorageAdapter` (`forma:v1:*`), định dạng tiền số nguyên VND/USD, i18n `vi`/`en`, Typed Repository Contracts, Seed 18 sản phẩm / 2 tài khoản / 3 coupons, App Shell & 8 tài liệu Markdown | **Done (Đã xong)** |
+| **Phase 1.2** | Homepage (`/` bám sát ảnh thiết kế #1) + Library (`/library` bám sát ảnh thiết kế #2), lọc theo Category/Tier/Framework, tìm kiếm `⌘K`, sắp xếp, Empty/Loading state & responsive 3 viewport | **Done (Đã xong)** |
+| **Phase 1.3** | Product Detail (`/products/[slug]`), Fullscreen Preview (`/preview/[slug]`), Controlled React Preview Registry (`next/dynamic`), 2 static HTML templates sandboxed (`Orbit`, `Northbound`), Mock Fallback UI & Wishlist | **Done (Đã xong)** |
+| **Phase 1.4** | Mock Auth (`/login` bám sát ảnh thiết kế #3), `Get Free` claim flow, Cart Drawer trượt phải chống mua trùng, One-Page Checkout (`/checkout`), kiểm tra coupon (`FORMA20`, `WELCOME10`, `EXPIRED50`) & mô phỏng thanh toán `Success`/`Failure` | **Done (Đã xong)** |
+| **Phase 1.5** | Customer Dashboard (`/account`: `My Library`, `Orders`, `Wishlist`, `Settings` sửa Mock Profile không mật khẩu), Lazy-loaded Read-Only Monaco Code Viewer (Tree, Search, Copy, Fullscreen) & tải gói ZIP mẫu (`forma-sample-bundle.zip`) | **Done (Đã xong)** |
+| **Phase 1.6** | Admin Dashboard (`/admin`: Mock Role Gate, Sidebar 7 mục, Products CRUD + `Draft`/`Published` sync + Metadata-only `.zip`, Orders, Customers, Coupons CRUD, Mock Analytics, Settings `Reset All Demo Data`) | **Done (Đã xong)** |
+| **Phase 1.7** | **QA + Handoff:** Gỡ 3 package Radix thừa (`39` sub-packages), sửa token `accent-cyan-rgb` hỗ trợ toàn bộ alpha opacity `/10`–`/75`, bổ sung `prefers-reduced-motion` + `<MotionConfig reducedMotion="user">`, Skip-to-content link, đồng bộ `<html lang>` + fallback i18n, chặn Draft/deleted slug trên `/products/[slug]` & `/preview/[slug]`, dựng `/about`, `/support`, `not-found.tsx`, `error.tsx`, kiểm tra 12/12 routes trên Chrome DevTools & bàn giao tài liệu Phase 2 | **Done (Đã xong)** |
 
 ---
 
-## Checklist Nghiệm thu Phase 1.5 (2026-11-21)
+## 2. Bằng chứng Kiểm chứng Nghiệm thu Phase 1.7 (2026-11-21)
 
-- [x] **Cài đặt `@monaco-editor/react` (`^4.7.0`) & ghi nhận `ADR-006` trong `docs/DECISIONS.md`.**
-- [x] **Tạo file ZIP mẫu hợp lệ `public/demo-assets/forma-sample-bundle.zip` (647 bytes)** phục vụ nút tải ZIP trong `My Library`.
-- [x] **Bổ sung `updateDemoProfile` vào `IAuthRepository` / `MockAuthRepository` / `useAuthStore`:** Cho phép cập nhật tên hiển thị & email của phiên demo trong `localStorage` (tuyệt đối không lưu mật khẩu) và giữ nguyên tên đăng ký khi tạo tài khoản Demo.
-- [x] **Xây dựng Lazy-Loaded Read-Only Monaco Source Viewer (`src/features/account/components/monaco-code-viewer.tsx`):**
-  - Lazy-load bằng `next/dynamic(..., { ssr: false })` để không làm nặng SSR/route chính (`/account` chỉ `4.63 kB`).
-  - Có File Tree, thanh tìm kiếm trong code kèm số lượng khớp & jump-to-line, syntax highlighting, nút `Copy code`, `Fullscreen` modal (`Escape` để thoát), chế độ chỉ đọc (`readOnly: true`, `domReadOnly: true`) và ghi nhãn `Demo Source Fixture`.
-- [x] **Xây dựng Minimal Customer Account Dashboard (`/account` — `src/features/account/components/account-view.tsx`):**
-  - Cổng Auth Gate khi chưa đăng nhập (`/login?next=/account` hoặc đăng nhập nhanh Khách hàng Demo).
-  - 4 tab ngang: `My Library` (hiển thị sản phẩm đã mua / nhận miễn phí, mở `MonacoCodeViewer`, tải ZIP mẫu), `Orders` (lịch sử đơn hàng), `Wishlist` (quản lý danh sách lưu), `Settings` (sửa Mock Profile, đổi ngôn ngữ/tiền tệ, `Sign out`, `Reset All Demo Data`).
-- [x] **Tích hợp `MonacoCodeViewer` vào tab `Source Code` trên `/products/[slug]` khi sản phẩm đã sở hữu và nối link `/account` từ `Navbar` & `Footer`.**
-- [x] **Chạy `npm run typecheck`, `npm run lint`, và `npm run build` sau lần sửa cuối (exit code `0`; `/account` `4.63 kB`, 9/9 static pages + 2 dynamic routes).**
-- [x] **Kiểm thử trực tiếp trên Chrome (`npm run start` tại `http://localhost:3000`):**
-  - **Console & Network:** `<no console messages found>` sau lần chỉnh sửa cuối (0 lỗi JS, 0 lỗi hydration, 0 404, 0 cảnh báo DevTools `autocomplete`). Monaco worker files (`0.55.1` từ CDN) nạp `200 OK`.
-  - **Register & Mock Profile:** Đăng ký `"Test Register"` hiển thị đúng `TR` / `Test Register`; cập nhật tên trên tab `Settings` (`Alex Demo`) lưu bền vững vào `localStorage` qua reload.
-  - **My Library, Monaco Viewer & ZIP Download:** Đã test nhận miễn phí `Pulse` (`Get Free`) và mua `Orbit` (`Checkout`), mở `MonacoCodeViewer`, chuyển cây thư mục (`components/orbit.tsx` → `styles/orbit.tokens.css` → `README.md`), tìm `"forma"` + nhảy tới dòng `L4`, `Copy code` → `Copied ✓`, `Fullscreen` mở/đóng, và tải `forma-sample-bundle.zip`.
-  - **Orders, Wishlist, Logout & Reset Demo Data:** Kiểm thử đầy đủ các tab, đăng xuất quay về Auth Gate, và Reset toàn bộ dữ liệu demo về trạng thái sạch (`0 OWNED`, `0 ORDERS`, `0 WISHLIST`).
-  - **Responsive (`1440x900`, `768x1024`, `375x812`):** Không tràn ngang trên `/account` (kể cả khi mở `MonacoCodeViewer`).
+### Kiểm tra Tĩnh & Cấu trúc Codebase
+- **Quét Dependency thừa:** Đã gỡ `@radix-ui/react-dialog`, `@radix-ui/react-select`, `@radix-ui/react-tabs` không dùng trong `src/` khỏi [package.json](file:///c:/BusinessWeb/Selling_tem/package.json) (giữ lại `@radix-ui/react-slot` đang dùng cho [button.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/ui/button.tsx)).
+- **Audit Header Comment (`/**`) & Strict TS:** 100% file trong `src/` và root config (`next.config.ts`, `tailwind.config.ts`, `eslint.config.mjs`, `postcss.config.mjs`) đều có header comment đầu file; **0** sử dụng `any`; **0** gọi trực tiếp `window.localStorage` ngoài [storage-adapter.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/storage/storage-adapter.ts).
+- **`npm run typecheck` (`tsc --noEmit`):** Exit code `0` (sau lần sửa code cuối).
+- **`npm run lint` (`next lint`):** `✔ No ESLint warnings or errors`.
+- **`npm run build` (`next build`):** Thành công `12/12` routes (10 static + 2 dynamic):
+  - `/` (`3.03 kB`), `/_not-found` (`123 B`), `/about` (`166 B`), `/account` (`4.62 kB`), `/admin` (`12.8 kB`), `/checkout` (`5.81 kB`), `/icon.svg` (`0 B`), `/library` (`6.74 kB`), `/login` (`3.62 kB`), `/preview/[slug]` (`7.03 kB`), `/products/[slug]` (`5.13 kB`), `/support` (`167 B`).
 
----
-
-## Theo dõi các điểm `// TODO` trong Code
-
-- `src/components/layout/navbar.tsx`: `// TODO(Phase 1.6): Point About and Support links to dedicated routes once created.`
-- `src/components/layout/footer.tsx`: `// TODO(Phase 1.3): Update Account, Admin, About, and Support links as routes are implemented.` (Admin, About, Support sẽ hoàn tất ở Phase 1.6).
-- `src/features/auth/use-auth-store.ts`: `// TODO(Phase 2): Replace with server-verified session cookies and MySQL entitlement queries.`
-- `src/features/cart/use-cart-store.ts`: `// TODO(Phase 2): Synchronize cart with server session and ignore client-submitted prices.`
-- `src/features/wishlist/use-wishlist-store.ts`: `// TODO(Phase 2): Synchronize wishlist items with MySQL user wishlist table on the server.`
-- `src/lib/format/currency.ts`: `// TODO(Phase 2): Replace or augment with server-validated payment currency rules and minor-unit amounts required by the selected payment gateway.`
-- `src/mocks/accounts.seed.ts`: `// TODO(Phase 2): Replace with database-backed User records and real session verification.`
-- `src/mocks/coupons.seed.ts`: `// TODO(Phase 2): Validate and calculate coupon discounts strictly on the server inside a database transaction before creating a payment intent.`
-- `src/mocks/products.seed.ts`: `// TODO(Phase 2): Replace seed fixtures with MySQL + Prisma queries and private object storage ZIP URLs.`
-- `src/services/repositories/interfaces.ts`: `// TODO(Phase 2): Implement Prisma repositories backed by MySQL, server-side role checks, MySQL-compatible auth provider, server-side coupon validation, and signed private download URLs.`
-- `src/services/index.ts`: `// TODO(Phase 2): Bind interfaces to server-side MySQL + Prisma implementations.`
+### Kiểm thử Trực tiếp End-to-End trên Chrome (`http://localhost:3005`)
+- **Console trình duyệt:** `<no console messages found>` (`0` lỗi runtime, `0` lỗi React hydration, `0` warnings xuyên suốt tất cả các luồng).
+- **UI & Design Tokens:** Xác nhận bảng màu cyan alpha (`bg-accent-cyan/10`, `bg-accent-cyan/15`, `border-accent-cyan/30`, sparkline `Kinetic Metric Card`) và trang `404`, `/about`, `/support` hiển thị sắc nét, active nav indicator hoạt động đúng.
+- **Locale Fallback & Currency:** Kiểm thử 4 tổ hợp `VI+VND`, `VI+USD`, `EN+VND`, `EN+USD` (`Orbit`: `$39` ⇄ `890.000đ`, `Pulse`: `Free` ⇄ `Miễn phí`); đồng bộ `<html lang>` sau mount và fallback ngôn ngữ an toàn khi thiếu chuỗi.
+- **Search, Filter, Empty State & Preview:** `/library` lọc `"Signal"` (`1 / 18 items`), `"zzzz-nonexistent"` hiện Empty State + Reset về `18 / 18`; `/preview/orbit` chạy `<iframe sandbox="allow-scripts">` độc lập với chuyển đổi `Desktop` / `Mobile (375px)` và `Dark` / `Light`.
+- **Auth → Cart → Coupon → Purchase → Code Viewer → ZIP Download:** Thêm `Orbit` vào giỏ → `/checkout` yêu cầu Mock Auth → đăng nhập `Customer Demo` quay lại `/checkout` → kiểm tra coupon lỗi `INVALID`, `EXPIRED50`, coupon hợp lệ `FORMA20` (`$39` → `-$8` → `$31`) → thanh toán mô phỏng thành công → mở `/account` (`My Library`: `1 OWNED`, mở read-only `MonacoCodeViewer`, tìm `"tokens"`, copy code, link tải `/demo-assets/forma-sample-bundle.zip`).
+- **Admin Draft Guard & Reset:** Đặt `Orbit` sang `Draft` trong `/admin` → mở trực tiếp `/products/orbit` hiển thị màn hình `"Product Not Found"` ẩn sản phẩm nháp; bấm `Reset All Demo Data` khôi phục sạch về `Guest`, `18` sản phẩm (`18 Published • 0 Drafts`), `0` orders, `0` cart items.
+- **Responsive (`1440×900`, `768×1024`, `375×812`):** Xác nhận trực quan trên toàn bộ ảnh chụp đầy trang (`fullPage: true`) cho `/`, `/library`, `/about`, `/admin` không xảy ra tràn ngang (`overflow-x`).
 
 ---
 
-## Checklist Phase Tiếp theo — Phase 1.6 (Admin Dashboard + Secondary Pages + Final QA)
+## 3. Danh sách Giới hạn Hiện tại (Known Limitations — Phase 1)
 
-- [ ] Xây dựng **Admin Dashboard (`/admin`)** kiểu Sidebar: `Overview`, `Products CRUD` (`Draft`/`Published`, chọn file ZIP chỉ đọc metadata tên/dung lượng không nhét binary vào `localStorage`), `Orders`, `Customers`, `Coupons`, `Analytics` (gắn nhãn Mock rõ ràng) và `Settings` (`Reset Demo Data`).
-- [ ] Xây dựng các trang phụ: **About (`/about`)**, **Support/FAQ (`/support`)**, và **Error / 404 (`not-found.tsx` / `error.tsx`)**.
-- [ ] Cập nhật toàn bộ link còn lại trên `Navbar` & `Footer` (`/admin`, `/about`, `/support`), kiểm thử tổng thể `1440px` / `768px` / `375px`, bàn phím/A11y, `typecheck`, `lint`, `build`, và hoàn thiện docs kết thúc Phase 1.
+1. **Lưu trữ chỉ nằm trên Trình duyệt (`localStorage`):** Dữ liệu giỏ hàng, wishlist, đơn hàng mô phỏng, sản phẩm Admin sửa/thêm và coupon chỉ tồn tại trên 1 trình duyệt, chịu giới hạn ~5MB và người dùng có thể tự sửa qua DevTools.
+2. **Không có Bảo mật & Phân quyền Thật:** Mock Auth ([mock-auth.repository.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/mock-auth.repository.ts)), nút khóa Source Code ([product-detail-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/product-detail/components/product-detail-view.tsx)) và Role Gate của `/admin` ([admin-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/admin/components/admin-view.tsx)) đều chỉ mô phỏng giao diện phía client.
+3. **Không lưu/chạy File ZIP thật:** Chọn file `.zip` ở Admin chỉ trích xuất `file.name`, `sizeBytes`, `updatedAt` làm metadata; nút tải ZIP cho khách trỏ về gói mẫu tĩnh `/demo-assets/forma-sample-bundle.zip`.
+4. **Thanh toán & Analytics là Giả lập:** Không kết nối Stripe/VNPay/PayOS; số liệu doanh thu 6 tháng và phễu chuyển đổi trên tab `Analytics` của `/admin` là số liệu minh họa cứng.
+5. **Mã nguồn trong Monaco Viewer là Sample Fixture:** Bộ `codeBundle` trong `src/mocks/products.seed.ts` là snippet mẫu tối giản an toàn, không chứa full mã nguồn thương mại thật.
+6. **Ghi chú hiển thị nhỏ (Non-blocking):**
+   - Trên `/` ở `1440×900` và `768×1024`, hai card showcase chồng lớp (`orbit` & `northbound`) được cố ý xếp đè nhẹ một góc để giữ đúng bố cục ảnh thiết kế gốc (trên mobile `375px` tự động tách 2 dòng không đè nhau).
+   - Trên `/library` ở độ rộng `768px`, chữ placeholder tìm kiếm tự cắt dấu `...` sát huy hiệu phím tắt `⌘K`.
+
+---
+
+## 4. Phase 2 Backlog (Lộ trình Triển khai Backend & Production)
+
+Khi bắt đầu **Phase 2**, nhóm phát triển cần thực hiện theo đúng thứ tự ưu tiên bảo mật dưới đây (tận dụng các interface đã tách sẵn trong [interfaces.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/interfaces.ts)):
+
+1. **MySQL + Prisma Schema & Repository Implementation:**
+   - Thiết kế bảng `User`, `Product`, `ProductCodeFile`, `Coupon`, `Order`, `OrderItem`, `UserEntitlement` trong `prisma/schema.prisma`.
+   - Bảo toàn tiền tệ **số nguyên** (`priceVnd: Int`, `priceUsd: Int`, hoặc USD cents nếu gateway yêu cầu) và tạo các class `PrismaProductRepository`, `ServerOrderRepository`, `ServerCouponRepository` thay thế cho các `Mock*Repository` trong [src/services/index.ts](file:///c:/BusinessWeb/Selling_tem/src/services/index.ts).
+2. **Auth Provider Decision & Session Verification (Bắt buộc tương thích MySQL):**
+   - Chốt lựa chọn giữa **Auth.js v5 (Prisma Adapter)** hoặc **Better Auth (MySQL/Prisma)** — ưu tiên `HttpOnly`, `Secure`, `SameSite=Lax` session cookies, mã hóa mật khẩu bằng Argon2/bcrypt (nếu dùng email/password) và cấu hình Google OAuth thật bằng secret server-side.
+   - Xóa bỏ hoàn toàn nút đăng nhập nhanh `Preset Demo Accounts` (`customer@forma.demo`, `admin@forma.demo`) khỏi code Production.
+3. **Server Authorization Boundaries (RBAC):**
+   - Bảo vệ `/admin` bằng Next.js Middleware + kiểm tra session trong Server Components trước khi render HTML.
+   - Bắt buộc mọi Server Action / Route Handler (`POST/PATCH/DELETE` sản phẩm, bật `Published`/`Draft`, CRUD coupon) xác thực `session.user.role === 'ADMIN'` ngay trên server đối chiếu MySQL, trả `401`/`403` nếu không đủ quyền.
+4. **Private Object Storage (S3 / Cloudflare R2) & Asset Protection:**
+   - Upload gói `.zip` thật của Admin qua **Pre-signed PUT URL** lên private bucket (chỉ chấp nhận `application/zip`, giới hạn dung lượng).
+   - Thay link `/demo-assets/forma-sample-bundle.zip` bằng API tải cấp **Short-lived Pre-signed GET URL** (hết hạn sau ~60 giây) và chỉ trả mã nguồn Monaco từ API sau khi server truy vấn xác nhận `UserEntitlement` trong MySQL.
+5. **Payment Gateway & Server-Side Pricing:**
+   - Tích hợp cổng thanh toán thật (Stripe cho quốc tế / PayOS hoặc VNPay cho VND).
+   - Tuyệt đối không tin giỏ hàng hay phần trăm giảm giá từ trình duyệt: server tự đọc `priceVnd`/`priceUsd` từ MySQL, kiểm tra hạn & hiệu lực `Coupon` trong transaction rồi mới tạo payment session; mở khóa `UserEntitlement` chỉ khi nhận và xác thực chữ ký Webhook hợp lệ.
+6. **Production Security Hardening:**
+   - Bổ sung Content-Security-Policy (CSP), rate limiting trên các route `/api/auth`, `/api/coupons/validate`, `/api/checkout`, và audit log mọi thao tác Admin. Nếu mở preview cho code upload động trong tương lai, bắt buộc phục vụ từ **domain/origin cô lập riêng** ngoài domain chính.
+
+---
+
+## 5. Hướng dẫn Developer Chạy & Test Demo Nhanh
+
+```bash
+# 1. Cài đặt dependencies & build bản tối ưu
+npm install
+npm run typecheck && npm run lint && npm run build
+
+# 2. Chạy server local (mặc định http://localhost:3000)
+npm run start
+```
+
+- **Tài khoản mẫu trong `/login`:** `customer@forma.demo` (Customer) và `admin@forma.demo` (Admin — bấm 1 chạm trên `/login` hoặc Role Gate ở `/admin`).
+- **Mã giảm giá mẫu trong `/checkout`:** `FORMA20` (giảm 20%, active), `WELCOME10` (giảm 10%, active), `EXPIRED50` (tắt/hết hạn — dùng test báo lỗi).
+- **Khôi phục dữ liệu sạch:** Bấm nút **Đặt lại dữ liệu demo** trên thanh trên cùng hoặc vào `/admin` → `Settings & Reset`.
+
+---
+
+## 6. Danh mục `// TODO(Phase 2)` Đồng bộ trong Source Code
+
+- [navbar.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/navbar.tsx): `// TODO(Phase 2): Replace mock role badge checks with server-verified session data.`
+- [admin-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/admin/components/admin-view.tsx) & [admin/page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/admin/page.tsx): `// TODO(Phase 2): Protect /admin routes and all catalog/coupon mutations with Next.js server-side session verification, RBAC middleware, MySQL + Prisma, and signed S3/R2 asset uploads.`
+- [use-auth-store.ts](file:///c:/BusinessWeb/Selling_tem/src/features/auth/use-auth-store.ts): `// TODO(Phase 2): Replace with server-verified session cookies and MySQL entitlement queries.`
+- [use-cart-store.ts](file:///c:/BusinessWeb/Selling_tem/src/features/cart/use-cart-store.ts): `// TODO(Phase 2): Synchronize cart with server session and ignore client-submitted prices.`
+- [use-wishlist-store.ts](file:///c:/BusinessWeb/Selling_tem/src/features/wishlist/use-wishlist-store.ts): `// TODO(Phase 2): Synchronize wishlist items with MySQL user wishlist table on the server.`
+- [currency.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/format/currency.ts): `// TODO(Phase 2): Replace or augment with server-validated payment currency rules and minor-unit amounts required by the selected payment gateway.`
+- [accounts.seed.ts](file:///c:/BusinessWeb/Selling_tem/src/mocks/accounts.seed.ts): `// TODO(Phase 2): Replace with database-backed User records and real session verification.`
+- [coupons.seed.ts](file:///c:/BusinessWeb/Selling_tem/src/mocks/coupons.seed.ts): `// TODO(Phase 2): Validate and calculate coupon discounts strictly on the server inside a database transaction before creating a payment intent.`
+- [products.seed.ts](file:///c:/BusinessWeb/Selling_tem/src/mocks/products.seed.ts): `// TODO(Phase 2): Replace seed fixtures with MySQL + Prisma queries and private object storage ZIP URLs.`
+- [interfaces.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/interfaces.ts) & [src/services/index.ts](file:///c:/BusinessWeb/Selling_tem/src/services/index.ts): `// TODO(Phase 2): Bind interfaces to server-side MySQL + Prisma implementations with Server RBAC and signed private download URLs.`

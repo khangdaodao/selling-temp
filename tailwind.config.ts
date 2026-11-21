@@ -25,8 +25,8 @@ const config: Config = {
         accent: {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
-          cyan: 'var(--accent-cyan)',
-          cyanHover: 'var(--accent-cyan-hover)',
+          cyan: 'rgb(var(--accent-cyan-rgb) / <alpha-value>)',
+          cyanHover: 'rgb(var(--accent-cyan-hover-rgb) / <alpha-value>)',
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

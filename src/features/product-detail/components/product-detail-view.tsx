@@ -37,6 +37,7 @@ import { PreviewCanvas } from '@/features/preview/registry/preview-registry';
 import { useWishlistStore } from '@/features/wishlist/use-wishlist-store';
 import { pickLocalizedText, useI18n } from '@/i18n/use-i18n-store';
 import { formatProductPrice } from '@/lib/format/currency';
+import { DEMO_RESET_EVENT } from '@/lib/storage/storage-keys';
 import { productRepository } from '@/services';
 import type { Product } from '@/types/domain';
 
@@ -85,14 +86,26 @@ export function ProductDetailView({
 
     const syncData = async (): Promise<void> => {
       const latestProduct = await productRepository.getBySlug(slug);
-      if (active && latestProduct) {
-        setProduct(latestProduct);
+      if (!active) {
+        return;
       }
+      if (!latestProduct || latestProduct.status === 'draft') {
+        setProduct(null);
+        return;
+      }
+      setProduct(latestProduct);
     };
 
     void syncData();
+
+    const handleReset = (): void => {
+      void syncData();
+    };
+    window.addEventListener(DEMO_RESET_EVENT, handleReset);
+
     return () => {
       active = false;
+      window.removeEventListener(DEMO_RESET_EVENT, handleReset);
     };
   }, [slug]);
 

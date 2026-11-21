@@ -29,16 +29,17 @@
 
 ---
 
-## 4. Lộ trình 6 Sub-phases của Phase 1
+## 4. Lộ trình 7 Sub-phases của Phase 1
 
 | Chặng | Phạm vi tính năng | Trạng thái / Mục tiêu |
 | :--- | :--- | :--- |
-| **Phase 1.1** | App Shell, Design Tokens, Typed Repositories, StorageAdapter, i18n, Seed 18 sản phẩm & 8 tài liệu Markdown | Đã xong |
-| **Phase 1.2** | Homepage (`/` bám sát ảnh 1) + Library (`/library` bám sát ảnh 2) + Smart Hybrid Preview Registry & Fullscreen Viewport Switcher (`Desktop`/`Tablet`/`Mobile` + `Dark`/`Light` demo) | Kế tiếp |
-| **Phase 1.3** | Product Detail (`/products/[slug]` với khóa source mô phỏng UI), Mock Auth (`/login` bám sát ảnh 3: Login/Register/Forgot Password, tài khoản Demo chọn sẵn, Google UI demo), Wishlist | Chờ duyệt |
-| **Phase 1.4** | Cart Drawer trượt từ bên phải (chống trùng item, tính subtotal & discount số nguyên) + One-Page Checkout (`/checkout`, kiểm tra coupon, mô phỏng thanh toán Success/Failure) | Chờ duyệt |
-| **Phase 1.5** | Customer Dashboard (`/account`: tabs `My Library`, `Orders`, `Wishlist`, `Settings`), Lazy-loaded Monaco Viewer (file tree, search, copy, fullscreen, read-only), tải ZIP mẫu | Chờ duyệt |
-| **Phase 1.6** | Admin Dashboard (`/admin`: Overview, Products CRUD, Draft/Published, chọn file ZIP chỉ đọc metadata, Orders, Customers, Coupons, Mock Analytics, Settings/Reset), `About`, `Support/FAQ`, `404/Error`, QA tổng thể | Chờ duyệt |
+| **Phase 1.1** | App Shell, Design Tokens, Typed Repositories, StorageAdapter, i18n, Seed 18 sản phẩm & 8 tài liệu Markdown | Đã xong (Done) |
+| **Phase 1.2** | Homepage (`/` bám sát ảnh 1) + Library (`/library` bám sát ảnh 2), tìm kiếm/lọc/sắp xếp & card tương tác | Đã xong (Done) |
+| **Phase 1.3** | Product Detail (`/products/[slug]`), Fullscreen Live Preview (`/preview/[slug]`), Controlled Registry, Static Iframe (`Orbit`, `Northbound`) & Wishlist | Đã xong (Done) |
+| **Phase 1.4** | Mock Auth (`/login` bám sát ảnh 3), Cart Drawer chống trùng, One-Page Checkout (`/checkout`), Mock Coupons & Simulated Payment | Đã xong (Done) |
+| **Phase 1.5** | Customer Dashboard (`/account`: `My Library`, `Orders`, `Wishlist`, `Settings`), Lazy Read-Only Monaco Viewer & Sample ZIP | Đã xong (Done) |
+| **Phase 1.6** | Admin Dashboard (`/admin`: Overview, Products CRUD, Draft/Published, Metadata-only `.zip`, Orders, Customers, Coupons, Mock Analytics, Reset) | Đã xong (Done) |
+| **Phase 1.7** | QA + Handoff (`/about`, `/support`, `404`/`error.tsx`, Audit UI/Tokens/Accessibility/Reduced Motion, Prune Deps & Đồng bộ Docs Bàn giao) | Đã xong (Done) |
 
 ---
 

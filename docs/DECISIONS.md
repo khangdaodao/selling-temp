@@ -64,3 +64,18 @@
   - Nạp lười bằng `next/dynamic` giúp tách Monaco khỏi bundle ban đầu của `/account` (route `/account` giữ gọn ở mức `4.63 kB`) và chỉ tải worker khi người dùng bấm `Xem Mã nguồn`.
   - Hỗ trợ sẵn `readOnly: true`, `domReadOnly: true`, và tự nạp language worker cho TypeScript/CSS/Markdown.
 - **Đánh đổi:** Thêm 1 package UI editor và tải worker từ CDN khi người dùng mở khung xem code; hoàn toàn chấp nhận được vì không ảnh hưởng tới tốc độ tải của các trang công khai (`/` và `/library`).
+
+---
+
+## ADR-007: Admin Dashboard Mock, Upload ZIP Metadata-Only & Ranh giới Ủy quyền Production
+
+- **Trạng thái:** Đã duyệt (Phase 1.6)
+- **Bối cảnh:** Cửa hàng cá nhân `forma/` cần khu vực `/admin` cho phép chủ cửa hàng quản lý sản phẩm (`Draft`/`Published`), coupon, xem đơn hàng và thử thao tác chọn file nguồn `.zip` trong môi trường Phase 1 Frontend-only.
+- **Quyết định:**
+  - Dùng lại `MockProductRepository` và `MockCouponRepository` qua `StorageAdapter` (`forma:v1:*`) để toàn bộ thay đổi ở `/admin` phản ánh tức thì sang `/library` và `/checkout`, đồng thời phục hồi sạch qua `Reset All Demo Data`.
+  - Khi chọn file `.zip` trên form sản phẩm ở Admin, chỉ trích xuất `file.name`, `file.size`, `updatedAt` lưu vào `zipMetadata`; tuyệt đối không đọc nhị phân bằng `FileReader` hay lưu nội dung ZIP vào `localStorage`.
+  - Giới hạn truy cập `/admin` ở Phase 1 bằng **Mock Role Gate** phía UI có cảnh báo minh bạch rằng đây không phải cơ chế bảo mật thật.
+- **Lý do:**
+  - `localStorage` giới hạn ~5MB và dễ tràn quota hoặc đơ trình duyệt nếu lưu binary archive; đồng thời không được chạy code chưa kiểm duyệt từ file ZIP upload (kế thừa `ADR-004`).
+  - Phân tách rõ ranh giới UI gating vs Server RBAC giúp không tạo ảo giác an toàn trước khi triển khai Next.js Middleware + Server Session Verification + MySQL RBAC ở Phase 2.
+- **Đánh đổi:** Các thao tác upload ZIP thật lên S3/R2 và bảo vệ route `/admin` thực sự chỉ kích hoạt khi lên Phase 2 backend.

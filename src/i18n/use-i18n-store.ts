@@ -41,6 +41,12 @@ function detectBrowserLocale(): Locale {
   return preferred.startsWith('vi') ? 'vi' : 'en';
 }
 
+function syncDocumentLanguage(locale: Locale): void {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = locale;
+  }
+}
+
 /**
  * Global Zustand store for active UI locale and fixed catalog display currency.
  * Starts with deterministic defaults (`vi` / `VND`) during SSR and synchronizes
@@ -53,6 +59,7 @@ export const useI18nStore = create<I18nState>((set, get) => ({
 
   setLocale: (locale, syncCurrency = false) => {
     writeStorage(STORAGE_KEYS.locale, locale);
+    syncDocumentLanguage(locale);
     if (syncCurrency) {
       const nextCurrency: CurrencyCode = locale === 'vi' ? 'VND' : 'USD';
       writeStorage(STORAGE_KEYS.currency, nextCurrency);
@@ -94,6 +101,8 @@ export const useI18nStore = create<I18nState>((set, get) => ({
       writeStorage(STORAGE_KEYS.currency, resolvedCurrency);
     }
 
+    syncDocumentLanguage(detectedLocale);
+
     set({
       locale: detectedLocale,
       currency: resolvedCurrency,
@@ -106,6 +115,7 @@ if (typeof window !== 'undefined') {
   window.addEventListener(DEMO_RESET_EVENT, () => {
     const detectedLocale = detectBrowserLocale();
     const defaultCurrency: CurrencyCode = detectedLocale === 'vi' ? 'VND' : 'USD';
+    syncDocumentLanguage(detectedLocale);
     useI18nStore.setState({
       locale: detectedLocale,
       currency: defaultCurrency,
@@ -147,12 +157,15 @@ export function useI18n(): {
 }
 
 /**
- * Selects the localized string from a bilingual `LocalizedText` object.
+ * Selects the localized string from a bilingual `LocalizedText` object,
+ * gracefully falling back to the alternate language if the active string is empty.
  *
  * @param text - Bilingual text field containing `vi` and `en` variants.
  * @param locale - Active UI locale.
  * @returns Localized string.
  */
 export function pickLocalizedText(text: LocalizedText, locale: Locale): string {
-  return locale === 'vi' ? text.vi : text.en;
+  const primary = locale === 'vi' ? text.vi : text.en;
+  const fallback = locale === 'vi' ? text.en : text.vi;
+  return primary.trim() ? primary : fallback;
 }

@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'motion/react';
+import { MotionConfig, motion } from 'motion/react';
 import { ArrowUpRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { pickLocalizedText, useI18n } from '@/i18n/use-i18n-store';
@@ -61,7 +61,8 @@ export function HomepageView({
   }, []);
 
   return (
-    <div className="forma-grid-bg">
+    <MotionConfig reducedMotion="user">
+      <div className="forma-grid-bg">
       {/* 2-Column Hero Section */}
       <section className="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 lg:pb-24 lg:pt-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
@@ -212,6 +213,7 @@ export function HomepageView({
           })}
         </div>
       </section>
-    </div>
+      </div>
+    </MotionConfig>
   );
 }
