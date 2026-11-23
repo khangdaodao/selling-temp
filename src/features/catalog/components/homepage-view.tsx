@@ -19,6 +19,7 @@ import { DEMO_RESET_EVENT } from '@/lib/storage/storage-keys';
 import { productRepository } from '@/services';
 import type { Product } from '@/types/domain';
 import { HomeHeroShowcase } from './home-hero-showcase';
+import { Metrics } from './home-metrics-strip';
 import { ProductCardVisual } from './product-card-visual';
 
 interface HomepageViewProps {
@@ -116,24 +117,8 @@ export function HomepageView({
         </div>
       </section>
 
-      {/* Social Proof / Target Audience Strip */}
-      <section className="border-y border-white/[0.08] bg-[#070709]/90">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-500">
-            {t.home.audienceLabel}
-          </p>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:gap-10">
-            {t.home.audiences.map((audience) => (
-              <span
-                key={audience}
-                className="text-sm font-medium text-zinc-300 transition-colors hover:text-white"
-              >
-                {audience}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Metrics Strip (Owner Custom Concept replacing Audience Strip) */}
+      <Metrics />
 
       {/* Featured 3x2 Showcase Section: "Sản phẩm của chúng tôi" */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
@@ -149,11 +134,10 @@ export function HomepageView({
           </Button>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] pb-3 text-xs">
+        <div className="mt-6 flex items-center justify-between border-b border-white/[0.08] pb-3 text-xs">
           <span className="font-mono font-medium uppercase tracking-wider text-zinc-400">
             {t.home.showcaseEyebrow}
           </span>
-          <span className="text-zinc-500">{t.home.showcaseSubnote}</span>
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -169,44 +153,38 @@ export function HomepageView({
                 key={product.id}
                 className="forma-surface group flex flex-col justify-between rounded-xl p-4 transition-all hover:border-white/25"
               >
+                {/* Top Header (Product Name + Short Description) & Visual Preview */}
                 <Link href={`/products/${product.slug}`} className="block">
-                  <ProductCardVisual product={product} />
-
-                  <div className="mt-4 flex items-baseline justify-between gap-3 px-0.5">
-                    <h3 className="text-base font-semibold text-white transition-colors group-hover:text-accent-cyan">
+                  <div className="px-0.5">
+                    <h3 className="text-base font-semibold tracking-tight text-white transition-colors group-hover:text-accent-cyan">
                       {product.name}
                     </h3>
-                    <span
-                      className={`font-mono text-sm font-medium ${
-                        product.tier === 'free' ? 'text-accent-cyan' : 'text-zinc-200'
-                      }`}
-                    >
-                      {priceText}
-                    </span>
+                    <p className="mt-1 line-clamp-2 min-h-[2.5rem] text-sm text-zinc-400">
+                      {pickLocalizedText(product.shortDescription, locale)}
+                    </p>
                   </div>
 
-                  <p className="mt-1 line-clamp-2 px-0.5 text-sm text-zinc-400">
-                    {pickLocalizedText(product.shortDescription, locale)}
-                  </p>
+                  <div className="mt-3.5">
+                    <ProductCardVisual product={product} />
+                  </div>
                 </Link>
 
-                <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] px-0.5 pt-3 text-xs text-zinc-500">
-                  <span className="font-mono">{product.frameworks.join(' · ')}</span>
-                  <div className="flex items-center gap-3">
-                    <Link
-                      href={`/preview/${product.slug}`}
-                      className="text-zinc-400 transition-colors hover:text-accent-cyan"
-                    >
-                      {t.library.openPreviewLabel}
-                    </Link>
-                    <Link
-                      href={`/products/${product.slug}`}
-                      className="inline-flex items-center gap-1 text-zinc-200 transition-colors hover:text-white"
-                    >
-                      {t.library.viewDetailsLabel}
-                      <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-                    </Link>
-                  </div>
+                {/* Bottom Bar: Price (left) + Preview Action Button (right) */}
+                <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] px-0.5 pt-3">
+                  <span
+                    className={`font-mono text-sm font-semibold ${
+                      product.tier === 'free' ? 'text-accent-cyan' : 'text-white'
+                    }`}
+                  >
+                    {priceText}
+                  </span>
+                  <Link
+                    href={`/preview/${product.slug}`}
+                    className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-[#141418] px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors hover:border-accent-cyan/50 hover:text-accent-cyan"
+                  >
+                    <span>{t.library.openPreviewLabel}</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Link>
                 </div>
               </article>
             );

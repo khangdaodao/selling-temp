@@ -90,6 +90,7 @@ forma/
     │   │   └── components/
     │   │       ├── catalog-product-card.tsx       # Thẻ sản phẩm Library nối Product Detail, Preview, Wishlist & Cart
     │   │       ├── home-hero-showcase.tsx         # Khối showcase 2 card chồng (Orbit + Northbound) ở Hero Homepage
+    │   │       ├── home-metrics-strip.tsx         # Dải Metrics 3 cột nền trắng với Counter & Toggle theo mẫu chủ dự án
     │   │       ├── homepage-view.tsx              # Toàn bộ giao diện Homepage
     │   │       ├── library-skeleton.tsx           # Skeleton loading state cho Suspense và lúc tải dữ liệu repository
     │   │       ├── library-view.tsx               # Toàn bộ trang Library (Tabs, Search ⌘K, Sort, Sidebar Filter, Empty State)

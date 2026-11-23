@@ -4,6 +4,24 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.7.3] — 2026-11-23 — UI Polish: Tái cấu trúc Product Card phần `Our Products`
+
+### Đã chỉnh sửa (Changed)
+- **Tối giản mục `Our Products` trong [homepage-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/homepage-view.tsx):**
+  - Xóa bỏ hoàn toàn dòng phụ `"Selected from 18 Components & Templates in the Library"` ở hàng `FEATURED RELEASES`.
+  - Đảo bố cục thẻ sản phẩm trên Homepage: đưa **Tên sản phẩm + mô tả ngắn** lên phần đầu thẻ (phía trên khung thumbnail), thay dòng tech stack ở chân thẻ bằng **Giá tiền** (`VND`/`USD` hoặc `Miễn phí`/`Free`), và bỏ nút `Chi tiết` chỉ giữ lại nút **`Preview ↗`**.
+
+---
+
+## [0.7.2] — 2026-11-23 — UI Polish: Thay Audience Strip thành Metrics 3 cột
+
+### Đã thay thế (Changed)
+- **Tạo [home-metrics-strip.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/home-metrics-strip.tsx) & gắn vào [homepage-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/homepage-view.tsx):**
+  - Thay thế dải Audience Strip giữa khối Hero và mục `Our Products` bằng khối `Metrics` 3 cột nền trắng (`bg-white`), giữ nguyên số liệu/nội dung tiếng Anh (`95%`, `1.9M+`, `10K+`), hiệu ứng spring count-up `Counter`, pill toggle chuyển động và cụm avatar từ `randomuser.me`.
+  - Chuẩn hóa import sang `motion/react`, khoảng âm Tailwind v3 (`-ml-[18px]`), tôn trọng `prefers-reduced-motion` và giữ nguyên mọi phần còn lại của trang chủ.
+
+---
+
 ## [0.7.1] — 2026-11-23 — UI Polish: Gọn Header & Custom Icon Switchers
 
 ### Đã tinh chỉnh (Changed / Removed)

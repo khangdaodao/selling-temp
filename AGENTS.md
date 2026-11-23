@@ -4,6 +4,15 @@
 
 ---
 
+## 0. Nguyên tắc Tuyệt đối Khi Chỉnh sửa (Strict Edit Discipline)
+
+- **Sửa đúng phần được yêu cầu (Scoped Edits Only):** Chủ dự án yêu cầu sửa phần nào thì CHỈ sửa đúng phần đó; TUYỆT ĐỐI không tự ý sửa đổi, thay đổi hành vi hay xóa các phần/tính năng không liên quan ("không sửa lung tung").
+- **Chuẩn hóa & Có cấu trúc (Standardized & Structured):** Mọi chỉnh sửa phải tuân theo cấu trúc Feature-First, TypeScript strict, đặt tên thống nhất và tách component/helper gọn gàng thay vì chắp vá ad-hoc.
+- **Ghi chú rõ ràng để đọc hiểu (Readable Comments):** Luôn giữ và bổ sung header comment, TSDoc và chú thích lý do rõ ràng, mạch lạc để chủ dự án đọc code hay theo dõi toàn bộ dự án đều hiểu ngay.
+- **Bảo toàn bố cục giao diện (Layout Integrity):** TUYỆT ĐỐI không chèn bậy thành phần gây xô lệch, mất cân đối hoặc làm hư layout trên cả 3 kích thước `1440px`, `768px` và `375px`.
+
+---
+
 ## 1. Phạm vi Phase & Ranh giới Tuyệt đối
 
 - **Phạm vi hiện tại:** **Phase 1 (Frontend Demo-First)**.
