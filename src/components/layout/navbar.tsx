@@ -14,6 +14,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowUpRight, LogOut, Menu, ShoppingBag, X } from 'lucide-react';
+import { HeaderSwitchers } from '@/components/layout/header-switchers';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useCartStore } from '@/features/cart/use-cart-store';
@@ -24,7 +25,7 @@ import { useI18n } from '@/i18n/use-i18n-store';
  */
 export function Navbar(): React.JSX.Element {
   const pathname = usePathname();
-  const { t, locale, currency, setLocale, setCurrency } = useI18n();
+  const { t } = useI18n();
   const session = useAuthStore((state) => state.session);
   const signOut = useAuthStore((state) => state.signOut);
   const cartItems = useCartStore((state) => state.items);
@@ -87,12 +88,14 @@ export function Navbar(): React.JSX.Element {
         </nav>
 
         {/* Desktop Actions */}
-        <div className="hidden items-center gap-2.5 md:flex">
+        <div className="hidden items-center gap-2 md:flex lg:gap-2.5">
+          <HeaderSwitchers />
+
           <button
             type="button"
             onClick={openDrawer}
             aria-label={t.cart.title}
-            className="relative inline-flex h-9 items-center gap-1.5 rounded-md border border-white/10 bg-surface px-2.5 text-xs font-medium text-zinc-200 transition-colors hover:border-white/25 hover:text-white"
+            className="relative inline-flex h-8 items-center gap-1.5 rounded-full border border-white/10 bg-surface px-2.5 text-xs font-medium text-zinc-200 transition-colors hover:border-white/25 hover:text-white lg:h-9 lg:px-3"
           >
             <ShoppingBag className="h-3.5 w-3.5 text-accent-cyan" aria-hidden="true" />
             <span className="font-mono">{cartItems.length}</span>
@@ -146,12 +149,14 @@ export function Navbar(): React.JSX.Element {
         </div>
 
         {/* Mobile Actions & Menu Trigger */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1.5 md:hidden">
+          <HeaderSwitchers />
+
           <button
             type="button"
             onClick={openDrawer}
             aria-label={t.cart.title}
-            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-white/10 bg-surface px-2.5 text-xs font-medium text-zinc-200"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-white/10 bg-surface px-2.5 text-xs font-medium text-zinc-200"
           >
             <ShoppingBag className="h-3.5 w-3.5 text-accent-cyan" aria-hidden="true" />
             <span className="font-mono">{cartItems.length}</span>
@@ -162,7 +167,7 @@ export function Navbar(): React.JSX.Element {
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-expanded={mobileMenuOpen}
             aria-label={mobileMenuOpen ? t.nav.menuClose : t.nav.menuOpen}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-surface text-zinc-200 transition-colors hover:border-white/25 hover:text-white"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-surface text-zinc-200 transition-colors hover:border-white/25 hover:text-white"
           >
             {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
@@ -188,40 +193,6 @@ export function Navbar(): React.JSX.Element {
               </Link>
             ))}
           </nav>
-
-          {/* Mobile quick locale & currency switchers */}
-          <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.08] pt-4">
-            <div className="inline-flex rounded-md border border-white/10 bg-surface p-0.5">
-              {(['vi', 'en'] as const).map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  onClick={() => setLocale(lang, true)}
-                  className={`rounded px-2.5 py-1 text-xs font-medium uppercase ${
-                    locale === lang ? 'bg-white text-zinc-950' : 'text-zinc-400'
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-            <div className="inline-flex rounded-md border border-white/10 bg-surface p-0.5">
-              {(['VND', 'USD'] as const).map((unit) => (
-                <button
-                  key={unit}
-                  type="button"
-                  onClick={() => setCurrency(unit)}
-                  className={`rounded px-2.5 py-1 text-xs font-medium ${
-                    currency === unit
-                      ? 'bg-accent-cyan text-zinc-950 font-semibold'
-                      : 'text-zinc-400'
-                  }`}
-                >
-                  {unit}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="mt-4 flex flex-col gap-2 border-t border-white/[0.08] pt-4">
             {session ? (

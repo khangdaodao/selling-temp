@@ -4,6 +4,16 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.7.1] — 2026-11-23 — UI Polish: Gọn Header & Custom Icon Switchers
+
+### Đã tinh chỉnh (Changed / Removed)
+- **Xóa thanh `DemoModeBar` trên cùng:** Gỡ bỏ `<DemoModeBar />` khỏi [layout.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/layout.tsx) và xóa file `src/components/layout/demo-mode-bar.tsx` để phần đầu trang thoáng gọn (chức năng Reset dữ liệu demo vẫn giữ nguyên trong `/account`, `/admin` và `error.tsx`).
+- **Custom Icon Switchers ngay bên trái Giỏ hàng ([header-switchers.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/header-switchers.tsx), [navbar.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/navbar.tsx)):**
+  - Chuyển nút đổi Tiền tệ (`Coins` — `VND ₫` / `USD $`) và Ngôn ngữ (`Globe` — `Tiếng Việt` / `English`) thành 2 nút icon tròn đặt ngay bên trái nút Giỏ hàng trên cả Desktop, Tablet và Mobile.
+  - Thiết kế đồng bộ Dark Minimalism + Cyan Accent: trạng thái mở sáng viền/nền `#00D8FF` (`shadow-cyanGlow`), mở popover kính tối (`#0c0c0f/95` + `backdrop-blur-xl`) với dấu tick xanh cyan ở lựa chọn hiện tại, hỗ trợ đóng bằng phím `Escape` hoặc click ra ngoài.
+
+---
+
 ## [0.7.0] — 2026-11-21 — Phase 1.7: QA + Handoff
 
 ### Đã thêm mới & Cải thiện (Added / Fixed / Audited)

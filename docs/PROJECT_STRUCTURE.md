@@ -59,9 +59,9 @@ forma/
     │       └── page.tsx                           # Server Component entrypoint cho Hỗ trợ & FAQ (`/support`)
     ├── components/
     │   ├── layout/
-    │   │   ├── demo-mode-bar.tsx                  # Thanh thông báo Demo Mode, đổi VI/EN, VND/USD và nút Reset
     │   │   ├── footer.tsx                         # Footer 4 cột tối giản (đã nối `/library`, `/account`, `/admin`, `/about`, `/support`)
-    │   │   ├── navbar.tsx                         # Thanh điều hướng sticky, Cart trigger, link `/account`, badge `/admin`, `/about`, `/support`
+    │   │   ├── header-switchers.tsx               # 2 nút icon tròn Tiền tệ (Coins) & Ngôn ngữ (Globe) kèm popover menu Dark-Cyan
+    │   │   ├── navbar.tsx                         # Thanh điều hướng sticky, Icon Switchers, Cart trigger, `/account`, `/admin`, `/about`, `/support`
     │   │   └── secondary-views.tsx                # Giao diện song ngữ cho `/about`, `/support` và `not-found`
     │   ├── providers/
     │   │   └── app-hydration.tsx                  # Đồng bộ locale, currency, wishlist, cart và auth session sau mount

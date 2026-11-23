@@ -1,7 +1,7 @@
 /**
  * Customized shadcn/ui Badge primitive for tier, framework, and demo-mode indicators.
  *
- * Related: src/lib/utils.ts, src/components/layout/demo-mode-bar.tsx
+ * Related: src/lib/utils.ts, src/components/layout/navbar.tsx
  */
 
 import * as React from 'react';

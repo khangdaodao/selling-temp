@@ -1,7 +1,7 @@
 /**
  * Root Next.js App Router layout for forma/.
  * Loads Google Fonts (`Inter` and `JetBrains Mono`), applies dark minimalism surface defaults,
- * mounts client hydration coordinators, and wraps routes with DemoModeBar, Navbar, and Footer.
+ * mounts client hydration coordinators, and wraps routes with Navbar, CartDrawer, and Footer.
  *
  * Related: src/app/globals.css, src/components/layout/*
  */
@@ -10,7 +10,6 @@ import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { Footer } from '@/components/layout/footer';
 import { Navbar } from '@/components/layout/navbar';
-import { DemoModeBar } from '@/components/layout/demo-mode-bar';
 import { AppHydration } from '@/components/providers/app-hydration';
 import { CartDrawer } from '@/features/cart/components/cart-drawer';
 import './globals.css';
@@ -57,7 +56,6 @@ export default function RootLayout({
         <AppHydration />
         <CartDrawer />
         <div className="flex min-h-screen flex-col">
-          <DemoModeBar />
           <Navbar />
           <main id="main-content" className="flex-1">
             {children}
