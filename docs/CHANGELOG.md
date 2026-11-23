@@ -4,6 +4,39 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.7.8] — 2026-11-23 — QA & Audit: Sửa lồng thẻ `<Link>` cho card tương tác, tự đóng Mobile Drawer khi đổi route & đồng bộ tài liệu
+
+### Đã sửa lỗi & Đồng bộ (Fixed)
+- **Tách thẻ `<Link>` khỏi khung preview `interactive-card` trong [homepage-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/homepage-view.tsx):**
+  - Ngăn lỗi lồng thẻ `<button>` bên trong `<a>` (`<Link>`) nếu một sản phẩm dạng `interactive-card` được đưa vào danh sách nổi bật trên trang chủ, trong khi các card thumbnail tĩnh vẫn bấm trực tiếp vào ảnh để sang trang chi tiết.
+- **Tự động đóng menu Mobile khi điều hướng trong [navbar.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/navbar.tsx):**
+  - Bổ sung `useEffect` lắng nghe `pathname` để tự đóng `mobileMenuOpen` cả khi người dùng dùng nút Back/Forward của trình duyệt.
+- **Đồng bộ tài liệu ([README.md](file:///c:/BusinessWeb/Selling_tem/README.md), [PROGRESS.md](file:///c:/BusinessWeb/Selling_tem/docs/PROGRESS.md), [PROJECT_STRUCTURE.md](file:///c:/BusinessWeb/Selling_tem/docs/PROJECT_STRUCTURE.md), [AGENTS.md](file:///c:/BusinessWeb/Selling_tem/AGENTS.md)):**
+  - Cập nhật các tham chiếu cũ của `DemoModeBar` sang `HeaderSwitchers` (`Coins` + `Globe`) và mô tả mới của `Homepage` / `Footer`.
+
+---
+
+## [0.7.7] — 2026-11-23 — UI Polish: Refactor `Footer` với Newsletter row & Motion entrance
+
+### Đã tinh chỉnh (Changed)
+- **Refactor toàn bộ [footer.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/footer.tsx):**
+  - Chuyển thể concept Footer mới sang hệ `forma/` trên nền `#050505` và container `max-w-7xl`: giữ cụm Newsletter phía trên (tiêu đề trái, input email viền `0px` + icon `Mail` và nút trắng vuông `0px` `Subscribe →` kèm trạng thái phản hồi `Subscribed!` / `Đã đăng ký!` 3 giây ở chế độ Demo Phase 1).
+  - Bổ sung đường ngăn ngang, lưới giữa 12 cột (`forma/` wordmark + tagline bên trái 5 cột; 3 cột link route thật `/library`, `/about`, `/support`, `/account`, `/admin` bên phải 7 cột) và thanh copyright + ranh giới Demo Phase 1 ở đáy.
+  - Chuyển đổi sang `motion/react` (`useInView`, `useReducedMotion`) và dọn sạch timer khi unmount.
+- **Mở rộng từ điển song ngữ ([types.ts](file:///c:/BusinessWeb/Selling_tem/src/i18n/types.ts), [vi.ts](file:///c:/BusinessWeb/Selling_tem/src/i18n/dictionaries/vi.ts), [en.ts](file:///c:/BusinessWeb/Selling_tem/src/i18n/dictionaries/en.ts)):**
+  - Thêm nhóm khóa `footer.newsletter` cho cả tiếng Việt và tiếng Anh.
+
+---
+
+## [0.7.6] — 2026-11-23 — UI Polish: Thu gọn `Tech Stack` & thay Prisma bằng JavaScript
+
+### Đã tinh chỉnh (Changed)
+- **Thu gọn [home-tech-stack-strip.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/home-tech-stack-strip.tsx):**
+  - Giảm chiều cao tổng thể xuống tương đồng với `Metrics` strip (`py-8 md:py-10`, tiêu đề `text-2xl sm:text-3xl`, nút pill `mt-4 px-5 py-2`, hàng marquee `mt-6`, ô icon gọn `h-12 w-12 sm:h-14 sm:w-14`).
+  - Xóa logo `Prisma` khỏi danh sách `TECH_STACK_ITEMS` và thay thế bằng icon vector **JavaScript (`#F7DF1E`)**.
+
+---
+
 ## [0.7.5] — 2026-11-23 — UI Polish: Thêm phần `Tech Stack` 1 hàng chạy ngang giữa `Our Products` và `Footer`
 
 ### Đã thêm mới (Added)

@@ -34,6 +34,13 @@ export interface TranslationDictionary {
     comingSoonNote: string;
   };
   footer: {
+    newsletter: {
+      heading: string;
+      emailPlaceholder: string;
+      emailLabel: string;
+      subscribe: string;
+      subscribed: string;
+    };
     tagline: string;
     columns: {
       productsTitle: string;

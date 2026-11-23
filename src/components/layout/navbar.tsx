@@ -10,7 +10,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowUpRight, LogOut, Menu, ShoppingBag, X } from 'lucide-react';
@@ -32,6 +32,10 @@ export function Navbar(): React.JSX.Element {
   const openDrawer = useCartStore((state) => state.openDrawer);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   const navItems = [
     { label: t.nav.home, href: '/', active: pathname === '/' },

@@ -1,10 +1,10 @@
 /**
- * Single-row Tech Stack horizontal marquee section positioned between "Our Products" and Footer.
+ * Compact single-row Tech Stack horizontal marquee section positioned between "Our Products" and Footer.
  * Follows the owner's white-surface reference (`bg-white`, centered heading, dark pill CTA button,
- * and floating white rounded-square logo cards) adapted strictly to 1 seamless horizontal row.
+ * and floating white rounded-square logo cards) kept compact to match the vertical scale of `Metrics`.
  *
  * Cấu trúc dễ tự chỉnh tay:
- * Thay đổi kích thước section, cỡ chữ, kích thước ô icon trong `TECH_STACK_SIZE_CONFIG`.
+ * Thay đổi kích thước section, cỡ chữ, nút pill và ô icon trong `TECH_STACK_SIZE_CONFIG`.
  *
  * Related: src/features/catalog/components/homepage-view.tsx, src/app/globals.css
  */
@@ -15,17 +15,19 @@ import Link from 'next/link';
 import { useI18n } from '@/i18n/use-i18n-store';
 
 /**
- * Bảng cấu hình kích thước dễ chỉnh tay cho khối Tech Stack.
+ * Bảng cấu hình kích thước gọn gàng dễ chỉnh tay cho khối Tech Stack.
  */
 const TECH_STACK_SIZE_CONFIG = {
-  /** Khoảng đệm trên/dưới của dải nền trắng Tech Stack. */
-  sectionPadding: 'py-16 sm:py-20',
+  /** Khoảng đệm trên/dưới của dải nền trắng Tech Stack (đồng bộ độ gọn với Metrics strip). */
+  sectionPadding: 'py-8 md:py-10',
   /** Cỡ chữ tiêu đề chính giữa khối. */
-  headingText: 'mx-auto max-w-md px-4 text-center text-3xl font-semibold leading-[1.16] tracking-tight text-[#101111] sm:text-4xl',
+  headingText: 'mx-auto max-w-md px-4 text-center text-2xl font-semibold leading-tight tracking-tight text-[#101111] sm:text-3xl',
   /** Kích thước & kiểu nút pill đen ở giữa. */
-  ctaPill: 'mt-6 inline-flex items-center justify-center rounded-full bg-[#242426] px-6 py-2.5 text-xs font-medium text-white shadow-sm transition-all hover:scale-[1.02] hover:bg-[#101111]',
+  ctaPill: 'mt-4 inline-flex items-center justify-center rounded-full bg-[#242426] px-5 py-2 text-xs font-medium text-white shadow-sm transition-all hover:scale-[1.02] hover:bg-[#101111]',
+  /** Khoảng cách từ nút pill xuống hàng icon chạy ngang. */
+  marqueeTopGap: 'mt-6',
   /** Kích thước mỗi ô icon vuông bo tròn bên trong hàng chạy ngang. */
-  iconTile: 'flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-black/[0.06] bg-white shadow-[0_2px_14px_-4px_rgba(0,0,0,0.08)] transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_18px_-4px_rgba(0,0,0,0.12)] sm:h-[72px] sm:w-[72px]',
+  iconTile: 'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-black/[0.06] bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)] transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_-4px_rgba(0,0,0,0.12)] sm:h-14 sm:w-14',
 } as const;
 
 interface TechStackItem {
@@ -39,7 +41,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'nextjs',
     name: 'Next.js',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <circle cx="12" cy="12" r="10" fill="#111111" />
         <path
           d="M9 16V8l7.4 9.5M15 8v4.5"
@@ -56,7 +58,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'react',
     name: 'React',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden="true">
         <circle cx="12" cy="12" r="2" fill="#00B8D9" />
         <ellipse cx="12" cy="12" rx="9" ry="3.6" stroke="#00B8D9" strokeWidth="1.5" />
         <ellipse
@@ -81,10 +83,27 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     ),
   },
   {
+    id: 'javascript',
+    name: 'JavaScript',
+    renderIcon: () => (
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+        <rect x="2.5" y="2.5" width="19" height="19" rx="3.5" fill="#F7DF1E" />
+        <path
+          d="M11 11.5v4.6c0 1.3-.7 2-1.8 2-.8 0-1.4-.4-1.7-1M14.2 17c.4.7 1.1 1.1 2 1.1 1.1 0 1.8-.6 1.8-1.5 0-1-.7-1.4-1.9-1.9l-.6-.3c-1.1-.4-1.6-1-1.6-2 0-1 .8-1.8 2-1.8.9 0 1.6.3 2 1"
+          stroke="#18181B"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </svg>
+    ),
+  },
+  {
     id: 'typescript',
     name: 'TypeScript',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <rect x="2.5" y="2.5" width="19" height="19" rx="3.5" fill="#3178C6" />
         <path
           d="M7.5 11.5h5M10 11.5v6.5M14.5 13.3c0-1 .8-1.8 2-1.8 1 0 1.8.5 2 1.2m-4 4.1c.3.7 1.1 1.2 2.1 1.2 1.2 0 2-.7 2-1.7 0-2.1-4-1.1-4-3"
@@ -101,7 +120,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'tailwind',
     name: 'Tailwind CSS',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <path
           d="M12 6c-2.67 0-4.33 1.33-5 4 1-1.33 2.17-1.83 3.5-1.5.76.19 1.3.74 1.9 1.35.98 1 2.12 2.15 4.6 2.15 2.67 0 4.33-1.33 5-4-1 1.33-2.17 1.83-3.5 1.5-.76-.19-1.3-.74-1.9-1.35C15.62 7.15 14.48 6 12 6Zm-5 6c-2.67 0-4.33 1.33-5 4 1-1.33 2.17-1.83 3.5-1.5.76.19 1.3.74 1.9 1.35.98 1 2.12 2.15 4.6 2.15 2.67 0 4.33-1.33 5-4-1 1.33-2.17 1.83-3.5 1.5-.76-.19-1.3-.74-1.9-1.35C10.62 13.15 9.48 12 7 12Z"
           fill="#06B6D4"
@@ -113,7 +132,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'figma',
     name: 'Figma',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <path d="M8.5 3h3.5v6H8.5a3 3 0 0 1 0-6Z" fill="#F24E1E" />
         <path d="M12 3h3.5a3 3 0 0 1 0 6H12V3Z" fill="#FF7262" />
         <path d="M12 9h3.5a3 3 0 1 1 0 6H12V9Z" fill="#1ABCFE" />
@@ -126,9 +145,16 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'motion',
     name: 'Motion',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <rect x="3" y="3" width="18" height="18" rx="4" fill="#FFF04B" />
-        <path d="M7 15V9l3.5 3.5L14 9v6" stroke="#111111" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path
+          d="M7 15V9l3.5 3.5L14 9v6"
+          stroke="#111111"
+          strokeWidth="2.1"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
         <circle cx="17" cy="14" r="1.4" fill="#111111" />
       </svg>
     ),
@@ -137,7 +163,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'github',
     name: 'GitHub',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" fill="#181717" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="#181717" aria-hidden="true">
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -150,21 +176,8 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'vercel',
     name: 'Vercel',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
         <path d="M12 4L21 20H3L12 4Z" fill="#111111" />
-      </svg>
-    ),
-  },
-  {
-    id: 'prisma',
-    name: 'Prisma',
-    renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
-        <path
-          d="M12.2 3.2L4.8 15.8c-.3.5-.1 1.1.4 1.4l6.6 3.7c.4.2.9.2 1.3-.1l5.8-4c.4-.3.6-.8.4-1.3L13.7 3.3c-.3-.6-1.2-.7-1.5-.1Z"
-          fill="#0C344B"
-        />
-        <path d="M12.7 6.3l4.3 9.7-4.3 2.9V6.3Z" fill="#5A67D8" />
       </svg>
     ),
   },
@@ -172,7 +185,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'mysql',
     name: 'MySQL',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden="true">
         <ellipse cx="12" cy="6.5" rx="7.5" ry="3" stroke="#00758F" strokeWidth="1.8" />
         <path
           d="M4.5 6.5v11c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-11"
@@ -191,7 +204,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'stripe',
     name: 'Stripe',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <rect x="3" y="3" width="18" height="18" rx="4.5" fill="#635BFF" />
         <path
           d="M14.7 10.1c-.9-.45-2-.65-2.9-.65-1.45 0-2.3.65-2.3 1.7 0 2.15 4.9 1.3 4.9 4.05 0 1.7-1.4 2.75-3.45 2.75-1.2 0-2.4-.3-3.25-.75v-2.1c.85.55 2 .9 3.1.9 1.05 0 1.6-.4 1.6-1.05 0-1.9-4.9-1.15-4.9-3.95 0-1.7 1.3-2.85 3.35-2.85 1.1 0 2.1.2 2.85.55v1.4Z"
@@ -204,7 +217,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
     id: 'vscode',
     name: 'VS Code',
     renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden="true">
         <path
           d="M16.8 3.5L20.5 5.3v13.4l-3.7 1.8L8.4 12.8l-3.6 2.7-1.8-.9V9.4l1.8-.9 3.6 2.7 8.4-7.7Z"
           fill="#007ACC"
@@ -216,7 +229,7 @@ const TECH_STACK_ITEMS: readonly TechStackItem[] = [
 ];
 
 /**
- * Single-row Tech Stack infinite marquee section rendered above Footer.
+ * Compact single-row Tech Stack infinite marquee section rendered above Footer.
  */
 export function TechStackMarquee(): React.JSX.Element {
   const { t } = useI18n();
@@ -237,7 +250,9 @@ export function TechStackMarquee(): React.JSX.Element {
       </div>
 
       {/* Single horizontal marquee row with smooth edge fade gradients */}
-      <div className="group relative mt-10 w-full overflow-hidden py-2">
+      <div
+        className={`group relative w-full overflow-hidden py-1.5 ${TECH_STACK_SIZE_CONFIG.marqueeTopGap}`}
+      >
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white to-transparent sm:w-28"
@@ -249,7 +264,7 @@ export function TechStackMarquee(): React.JSX.Element {
 
         <div className="animate-forma-marquee flex w-max group-hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:justify-center">
           {/* Primary track */}
-          <div className="flex shrink-0 items-center gap-4 pr-4 sm:gap-5 sm:pr-5 motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:px-4">
+          <div className="flex shrink-0 items-center gap-3.5 pr-3.5 sm:gap-4 sm:pr-4 motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:px-4">
             {TECH_STACK_ITEMS.map((item) => (
               <div
                 key={item.id}
@@ -265,7 +280,7 @@ export function TechStackMarquee(): React.JSX.Element {
           {/* Seamless duplicate track for continuous single-row marquee loop */}
           <div
             aria-hidden="true"
-            className="flex shrink-0 items-center gap-4 pr-4 sm:gap-5 sm:pr-5 motion-reduce:hidden"
+            className="flex shrink-0 items-center gap-3.5 pr-3.5 sm:gap-4 sm:pr-4 motion-reduce:hidden"
           >
             {TECH_STACK_ITEMS.map((item) => (
               <div

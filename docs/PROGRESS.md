@@ -1,7 +1,7 @@
 # Nhật ký Tiến độ & Bàn giao Phase 1 (`docs/PROGRESS.md`) — `forma/`
 
-**Cập nhật lần cuối:** 2026-11-21  
-**Cột mốc hiện tại:** **Phase 1.7 — QA + Handoff (Hoàn thành toàn bộ Phase 1 Frontend Demo-First)**  
+**Cập nhật lần cuối:** 2026-11-23  
+**Cột mốc hiện tại:** **Phase 1.7 + UI Polish & Full QA (`0.7.8` — Hoàn thành toàn bộ Phase 1 Frontend Demo-First)**  
 
 > ⚠️ **Tuyên bố Trạng thái (Non-Production Disclaimer):**  
 > Dự án **`forma/` hiện tại là bản Frontend Demo-First Prototype** vận hành hoàn toàn trên trình duyệt qua `localStorage` và dữ liệu seed. **Sản phẩm CHƯA phải bản Production-ready** — tuyệt đối không deploy phục vụ giao dịch thương mại thật cho đến khi hoàn thành **Phase 2 (Backend, MySQL + Prisma, Auth thật, Server RBAC, Private Object Storage & Payment Gateway)**.
@@ -18,11 +18,11 @@
 | **Phase 1.4** | Mock Auth (`/login` bám sát ảnh thiết kế #3), `Get Free` claim flow, Cart Drawer trượt phải chống mua trùng, One-Page Checkout (`/checkout`), kiểm tra coupon (`FORMA20`, `WELCOME10`, `EXPIRED50`) & mô phỏng thanh toán `Success`/`Failure` | **Done (Đã xong)** |
 | **Phase 1.5** | Customer Dashboard (`/account`: `My Library`, `Orders`, `Wishlist`, `Settings` sửa Mock Profile không mật khẩu), Lazy-loaded Read-Only Monaco Code Viewer (Tree, Search, Copy, Fullscreen) & tải gói ZIP mẫu (`forma-sample-bundle.zip`) | **Done (Đã xong)** |
 | **Phase 1.6** | Admin Dashboard (`/admin`: Mock Role Gate, Sidebar 7 mục, Products CRUD + `Draft`/`Published` sync + Metadata-only `.zip`, Orders, Customers, Coupons CRUD, Mock Analytics, Settings `Reset All Demo Data`) | **Done (Đã xong)** |
-| **Phase 1.7** | **QA + Handoff:** Gỡ 3 package Radix thừa (`39` sub-packages), sửa token `accent-cyan-rgb` hỗ trợ toàn bộ alpha opacity `/10`–`/75`, bổ sung `prefers-reduced-motion` + `<MotionConfig reducedMotion="user">`, Skip-to-content link, đồng bộ `<html lang>` + fallback i18n, chặn Draft/deleted slug trên `/products/[slug]` & `/preview/[slug]`, dựng `/about`, `/support`, `not-found.tsx`, `error.tsx`, kiểm tra 12/12 routes trên Chrome DevTools & bàn giao tài liệu Phase 2 | **Done (Đã xong)** |
+| **Phase 1.7** | **QA + Handoff & UI Polish (`0.7.0` → `0.7.8`):** Gỡ 3 package Radix thừa (`39` sub-packages), sửa token `accent-cyan-rgb` hỗ trợ toàn bộ alpha opacity `/10`–`/75`, bổ sung `prefers-reduced-motion` + `<MotionConfig reducedMotion="user">`, thay `DemoModeBar` bằng 2 nút icon tròn `HeaderSwitchers` (`Coins` + `Globe`) trên `Navbar`, thêm dải `Metrics` 3 cột nền trắng, tái cấu trúc card `Our Products` kèm hiệu ứng hover scale & quick actions (Wishlist/Cart), thêm dải `TechStackMarquee` 1 hàng chạy ngang, refactor `Footer` kèm form Newsletter demo, dựng `/about`, `/support`, `not-found.tsx`, `error.tsx`, kiểm tra 12/12 routes trên Chrome DevTools & bàn giao tài liệu Phase 2 | **Done (Đã xong)** |
 
 ---
 
-## 2. Bằng chứng Kiểm chứng Nghiệm thu Phase 1.7 (2026-11-21)
+## 2. Bằng chứng Kiểm chứng Nghiệm thu Phase 1.7 & UI Polish (2026-11-23)
 
 ### Kiểm tra Tĩnh & Cấu trúc Codebase
 - **Quét Dependency thừa:** Đã gỡ `@radix-ui/react-dialog`, `@radix-ui/react-select`, `@radix-ui/react-tabs` không dùng trong `src/` khỏi [package.json](file:///c:/BusinessWeb/Selling_tem/package.json) (giữ lại `@radix-ui/react-slot` đang dùng cho [button.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/ui/button.tsx)).
@@ -30,7 +30,7 @@
 - **`npm run typecheck` (`tsc --noEmit`):** Exit code `0` (sau lần sửa code cuối).
 - **`npm run lint` (`next lint`):** `✔ No ESLint warnings or errors`.
 - **`npm run build` (`next build`):** Thành công `12/12` routes (10 static + 2 dynamic):
-  - `/` (`3.03 kB`), `/_not-found` (`123 B`), `/about` (`166 B`), `/account` (`4.62 kB`), `/admin` (`12.8 kB`), `/checkout` (`5.81 kB`), `/icon.svg` (`0 B`), `/library` (`6.74 kB`), `/login` (`3.62 kB`), `/preview/[slug]` (`7.03 kB`), `/products/[slug]` (`5.13 kB`), `/support` (`167 B`).
+  - `/` (`9.38 kB`), `/_not-found` (`123 B`), `/about` (`166 B`), `/account` (`5.26 kB`), `/admin` (`12.2 kB`), `/checkout` (`5.39 kB`), `/icon.svg` (`0 B`), `/library` (`6.13 kB`), `/login` (`3.12 kB`), `/preview/[slug]` (`6.59 kB`), `/products/[slug]` (`5.65 kB`), `/support` (`167 B`).
 
 ### Kiểm thử Trực tiếp End-to-End trên Chrome (`http://localhost:3005`)
 - **Console trình duyệt:** `<no console messages found>` (`0` lỗi runtime, `0` lỗi React hydration, `0` warnings xuyên suốt tất cả các luồng).
@@ -93,7 +93,7 @@ npm run start
 
 - **Tài khoản mẫu trong `/login`:** `customer@forma.demo` (Customer) và `admin@forma.demo` (Admin — bấm 1 chạm trên `/login` hoặc Role Gate ở `/admin`).
 - **Mã giảm giá mẫu trong `/checkout`:** `FORMA20` (giảm 20%, active), `WELCOME10` (giảm 10%, active), `EXPIRED50` (tắt/hết hạn — dùng test báo lỗi).
-- **Khôi phục dữ liệu sạch:** Bấm nút **Đặt lại dữ liệu demo** trên thanh trên cùng hoặc vào `/admin` → `Settings & Reset`.
+- **Khôi phục dữ liệu sạch:** Vào `/account` → tab `Settings` hoặc `/admin` → `Settings & Reset` và bấm nút **Đặt lại dữ liệu demo**.
 
 ---
 

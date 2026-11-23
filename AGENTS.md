@@ -31,7 +31,7 @@
   - `src/app/`: Chỉ chứa routes, layouts, metadata và entrypoints mỏng của Next.js App Router.
   - `src/features/*`: Các domain nghiệp vụ độc lập (`catalog`, `preview`, `product-detail`, `cart`, `checkout`, `auth`, `wishlist`, `account`, `admin`).
   - `src/components/ui/`: Các UI primitives tái sử dụng tùy biến từ `shadcn/ui`.
-  - `src/components/layout/`: Khung giao diện toàn cục (`Navbar`, `Footer`, `DemoModeBar`).
+  - `src/components/layout/`: Khung giao diện toàn cục (`Navbar`, `HeaderSwitchers`, `Footer`, `SecondaryViews`).
   - `src/services/`: Repository interfaces (`IProductRepository`, `IAuthRepository`, `IOrderRepository`, `ICouponRepository`) và mock implementations cho Phase 1.
   - `src/mocks/`: Dữ liệu gốc (`products.seed.ts`, `accounts.seed.ts`, `coupons.seed.ts`). Tuyệt đối không hardcode mảng sản phẩm giả trực tiếp trong UI component.
   - `src/lib/`: Công cụ hạ tầng dùng chung (`storage/storage-adapter.ts`, `format/currency.ts`, `utils.ts`).

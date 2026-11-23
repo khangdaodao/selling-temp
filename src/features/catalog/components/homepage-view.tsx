@@ -137,8 +137,8 @@ function HomeProductCard({ product }: HomeProductCardProps): React.JSX.Element {
       </div>
 
       {/* Top Header (Product Name + Short Description) & Visual Preview */}
-      <Link href={`/products/${product.slug}`} className="block">
-        <div className="px-0.5">
+      <div>
+        <Link href={`/products/${product.slug}`} className="block px-0.5">
           {/* Reserve top-right space so title never overlaps the hover Heart/Cart buttons */}
           <h3 className="pr-16 text-base font-semibold tracking-tight text-white transition-colors group-hover:text-accent-cyan">
             {product.name}
@@ -146,12 +146,22 @@ function HomeProductCard({ product }: HomeProductCardProps): React.JSX.Element {
           <p className="mt-1 line-clamp-2 min-h-[2.5rem] text-sm text-zinc-400">
             {pickLocalizedText(product.shortDescription, locale)}
           </p>
-        </div>
+        </Link>
 
         <div className="mt-3.5">
-          <ProductCardVisual product={product} />
+          {product.previewMode === 'interactive-card' ? (
+            <ProductCardVisual product={product} />
+          ) : (
+            <Link
+              href={`/products/${product.slug}`}
+              aria-label={product.name}
+              className="block"
+            >
+              <ProductCardVisual product={product} />
+            </Link>
+          )}
         </div>
-      </Link>
+      </div>
 
       {/* Bottom Bar: Price (left) + Preview Action Button (right) */}
       <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] px-0.5 pt-3">

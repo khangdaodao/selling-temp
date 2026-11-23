@@ -35,7 +35,7 @@ Phase 1 chạy 100% trên trình duyệt bằng dữ liệu mẫu cố định (
 
 | Route | Mô tả chức năng |
 | :--- | :--- |
-| `/` | Trang chủ Dark Minimalism, Hero interactive showcase (`Orbit` + `Northbound`) và lưới 6 sản phẩm nổi bật |
+| `/` | Trang chủ Dark Minimalism: Hero showcase (`Orbit` + `Northbound`), dải `Metrics`, lưới 6 sản phẩm nổi bật (`Our Products`), dải `Tech Stack` chạy ngang và `Footer` Newsletter |
 | `/library` | Kho 18 sản phẩm (`11 Components` + `7 Templates`), lọc danh mục/framework/giá, tab, tìm kiếm `⌘K` & card tương tác |
 | `/products/[slug]` | Chi tiết sản phẩm, Live Demo inline/stage, Wishlist, `Get Free`/`Add to Cart` và Monaco Source Viewer (khi đã sở hữu) |
 | `/preview/[slug]` | Fullscreen Live Preview với preset `Desktop`/`Tablet`/`Mobile`, `Dark`/`Light`, `Refresh` & iframe sandbox (`Orbit`, `Northbound`) |
@@ -51,12 +51,12 @@ Phase 1 chạy 100% trên trình duyệt bằng dữ liệu mẫu cố định (
 ## Hướng dẫn Developer Chạy & Kiểm thử Demo (Demo Runbook)
 
 1. Khởi chạy server: `npm install && npm run build && npm run start` (hoặc `npm run dev`), sau đó mở `http://localhost:3000`.
-2. Đổi ngôn ngữ (`VI` / `EN`) và tiền tệ (`VND` / `USD`) bất kỳ lúc nào trên thanh **Demo Mode Bar** đầu trang.
+2. Đổi ngôn ngữ (`VI` / `EN`) và tiền tệ (`VND` / `USD`) bất kỳ lúc nào qua 2 nút icon tròn **Tiền tệ (`Coins`)** và **Ngôn ngữ (`Globe`)** trên thanh `Navbar` (hoặc trong `/account` → tab `Settings`).
 3. Mở `/library` → tìm kiếm (`⌘K`), thử tương tác trực tiếp card (`Signal Button`, `Prism Switch`, `Kinetic Metric Card`, `Voices`), bấm vào **Orbit** → **Live Preview** (`/preview/orbit`) để thử viewport Mobile/Tablet và iframe sandbox.
 4. Thêm sản phẩm trả phí vào **Cart** → bấm **Checkout** (`/checkout`) → hệ thống chặn ở Auth Gate → chuyển sang `/login` chọn tài khoản **Customer Demo** (`customer@forma.demo`) → quay lại Checkout → nhập mã **`FORMA20`** (giảm 20%) hoặc thử mã lỗi **`EXPIRED50`** → bấm **Mô phỏng Thanh toán Thành công**.
 5. Vào `/account` tab **My Library** → bấm **Xem Mã nguồn (Monaco)** để xem cây thư mục, tìm từ khóa trong code, copy code; bấm **Tải gói ZIP mới nhất** để tải `/demo-assets/forma-sample-bundle.zip`.
 6. Vào `/admin` → bấm chuyển nhanh sang **Admin Demo** (`admin@forma.demo`) → thử chuyển **Orbit** sang `Draft` (kiểm tra `/library` còn 17 sản phẩm và `/products/orbit` tự ẩn) → thử tạo sản phẩm/coupon mới rồi nhấn `F5` kiểm chứng dữ liệu giữ nguyên trong `localStorage`.
-7. Khi cần đưa ứng dụng về trạng thái sạch ban đầu, bấm **Đặt lại dữ liệu demo** (`Reset demo data`) trên thanh đầu trang hoặc trong `/admin` → `Settings & Reset`.
+7. Khi cần đưa ứng dụng về trạng thái sạch ban đầu, vào `/account` → `Settings` hoặc `/admin` → `Settings & Reset` và bấm **Đặt lại dữ liệu demo** (`Reset demo data`).
 
 ---
 
@@ -70,4 +70,4 @@ Phase 1 chạy 100% trên trình duyệt bằng dữ liệu mẫu cố định (
 | [docs/PROJECT_STRUCTURE.md](./docs/PROJECT_STRUCTURE.md) | Cây thư mục thực tế của toàn bộ dự án |
 | [docs/PROGRESS.md](./docs/PROGRESS.md) | Báo cáo nghiệm thu Phase 1.1 → 1.7, **Known Limitations**, **Phase 2 Backlog** và **Developer Demo Runbook** |
 | [docs/DECISIONS.md](./docs/DECISIONS.md) | Các quyết định kiến trúc (ADR-001 đến ADR-007) |
-| [docs/CHANGELOG.md](./docs/CHANGELOG.md) | Lịch sử các thay đổi đã hoàn thành (`0.1.0` đến `0.7.0`) |
+| [docs/CHANGELOG.md](./docs/CHANGELOG.md) | Lịch sử các thay đổi đã hoàn thành (`0.1.0` đến `0.7.8`) |

@@ -36,6 +36,13 @@ export const enDictionary: TranslationDictionary = {
     comingSoonNote: 'This route unlocks in an upcoming Phase 1 sub-phase.',
   },
   footer: {
+    newsletter: {
+      heading: 'Join our newsletter to keep up to date with us!',
+      emailPlaceholder: 'Enter your email',
+      emailLabel: 'Newsletter email address',
+      subscribe: 'Subscribe',
+      subscribed: 'Subscribed!',
+    },
     tagline:
       'Minimalist UI Components and Website Templates designed for a demo-first interactive experience before purchase.',
     columns: {
@@ -606,7 +613,7 @@ export const enDictionary: TranslationDictionary = {
       },
       {
         q: 'How do I restore all products, coupons, and cart state to defaults?',
-        a: 'Click "Reset demo data" in the top Demo Mode bar on any page or open Settings inside /account or /admin.',
+        a: 'Open the Settings tab inside /account or /admin and click "Reset demo data" ("Reset All Demo Data") to restore all browser state back to seed defaults.',
       },
     ],
     demoTipsTitle: 'Customer & Admin Demo Workspaces',

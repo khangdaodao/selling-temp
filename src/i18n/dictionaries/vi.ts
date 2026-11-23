@@ -36,6 +36,13 @@ export const viDictionary: TranslationDictionary = {
     comingSoonNote: 'Trang này sẽ mở khóa ở các phase tiếp theo.',
   },
   footer: {
+    newsletter: {
+      heading: 'Đăng ký nhận bản tin để cập nhật mẫu thiết kế mới nhất!',
+      emailPlaceholder: 'Nhập email của bạn',
+      emailLabel: 'Địa chỉ email nhận bản tin',
+      subscribe: 'Đăng ký',
+      subscribed: 'Đã đăng ký!',
+    },
     tagline:
       'Kho UI Components và Website Templates theo chuẩn thiết kế tối giản, tối ưu trải nghiệm tương tác trước khi mua.',
     columns: {
@@ -606,7 +613,7 @@ export const viDictionary: TranslationDictionary = {
       },
       {
         q: 'Làm sao đưa dữ liệu thử nghiệm về trạng thái ban đầu?',
-        a: 'Bấm nút "Đặt lại dữ liệu demo" (Reset demo data) trên thanh Demo Mode ở đầu mọi trang hoặc vào tab Settings trong /account và /admin.',
+        a: 'Bạn mở tab Settings trong /account hoặc /admin và bấm nút "Đặt lại dữ liệu demo" (Reset demo data) để khôi phục toàn bộ trạng thái về mặc định.',
       },
     ],
     demoTipsTitle: 'Khu vực Tài khoản & Quản trị (Demo)',
