@@ -87,6 +87,8 @@ export const enDictionary: TranslationDictionary = {
     showcaseEyebrow: 'FEATURED RELEASES',
     showcaseSubnote: 'Selected from 18 Components & Templates in the Library',
     viewInLibrary: 'View in Library',
+    techStackTitle: 'Built with your entire modern tech stack',
+    techStackCta: 'Explore All Integrations',
   },
   library: {
     tabAll: 'All',

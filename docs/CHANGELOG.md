@@ -4,6 +4,25 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.7.5] — 2026-11-23 — UI Polish: Thêm phần `Tech Stack` 1 hàng chạy ngang giữa `Our Products` và `Footer`
+
+### Đã thêm mới (Added)
+- **Tạo [home-tech-stack-strip.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/home-tech-stack-strip.tsx) & tích hợp vào [homepage-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/homepage-view.tsx):**
+  - Thêm section nền trắng (`bg-white`) giữa `Our Products` và `Footer` gồm tiêu đề căn giữa song ngữ VI/EN, nút pill đen trỏ về `/library` và **duy nhất 1 hàng icon Tech Stack chạy ngang vô tận** (`Next.js`, `React`, `TypeScript`, `Tailwind CSS`, `Figma`, `Motion`, `GitHub`, `Vercel`, `Prisma`, `MySQL`, `Stripe`, `VS Code`).
+  - Dùng SVG vector nội bộ sắc nét, tự tạm dừng khi hover (`group-hover:[animation-play-state:paused]`), làm mờ 2 mép trái/phải mượt mắt và tôn trọng `prefers-reduced-motion`.
+  - Bổ sung `@keyframes forma-marquee` trong [globals.css](file:///c:/BusinessWeb/Selling_tem/src/app/globals.css) và khóa i18n `techStackTitle`, `techStackCta` trong `src/i18n/`.
+
+---
+
+## [0.7.4] — 2026-11-23 — UI Polish: Hover Scale & Quick Actions cho Card `Our Products`
+
+### Đã chỉnh sửa (Changed)
+- **Tách `HomeProductCard` và bổ sung tương tác hover trong [homepage-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/homepage-view.tsx):**
+  - Thêm hiệu ứng phóng nhẹ khi hover card (`hover:scale-[1.02] hover:z-10 hover:shadow-card`) kèm `motion-reduce:hover:scale-100`.
+  - Bổ sung cụm 2 nút góc trên bên phải (**Tim / Wishlist** dùng `useWishlistStore` và **Thêm vào Giỏ hàng / Nhận Free / Đã sở hữu** dùng `useCartStore` & `useAuthStore`) tự ẩn khi đứng yên trên desktop và hiện mượt khi hover hoặc keyboard `focus-within`, đồng thời chừa `pr-16` trên tiêu đề để không bao giờ che chữ.
+
+---
+
 ## [0.7.3] — 2026-11-23 — UI Polish: Tái cấu trúc Product Card phần `Our Products`
 
 ### Đã chỉnh sửa (Changed)

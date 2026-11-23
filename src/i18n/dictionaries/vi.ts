@@ -87,6 +87,8 @@ export const viDictionary: TranslationDictionary = {
     showcaseEyebrow: 'NỔI BẬT NHẤT',
     showcaseSubnote: 'Chọn lọc từ 18 Components & Templates trong Library',
     viewInLibrary: 'Xem trong Library',
+    techStackTitle: 'Tương thích trọn bộ tech stack của bạn',
+    techStackCta: 'Khám phá toàn bộ Library',
   },
   library: {
     tabAll: 'Tất cả',

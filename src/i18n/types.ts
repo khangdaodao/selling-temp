@@ -78,6 +78,8 @@ export interface TranslationDictionary {
     showcaseEyebrow: string;
     showcaseSubnote: string;
     viewInLibrary: string;
+    techStackTitle: string;
+    techStackCta: string;
   };
   library: {
     tabAll: string;
