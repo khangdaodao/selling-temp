@@ -4,6 +4,22 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.7.9] — 2026-11-24 — UI Polish: Bố cục Library tràn viền sát mép, bỏ tab `Tất cả` & thiết kế lại Card Library
+
+### Đã tinh chỉnh (Changed)
+- **Tái cấu trúc không gian Library tràn viền trong [library-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/library-view.tsx) & [library-skeleton.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/library-skeleton.tsx):**
+  - Giữ nguyên thanh `Navbar` và `Footer` toàn site; chuyển toàn bộ phần dưới (`Sub-header`, `Left Sidebar`, `Right Grid`) sang bố cục `w-full` sát mép màn hình (loại bỏ `max-w-7xl`).
+  - Xóa bỏ tab `Tất cả` (`All`), chỉ giữ lại 2 tab **Components (`11`)** và **Templates (`7`)**, đồng thời căn giữa ô tìm kiếm `⌘K` trong thanh sub-header trên tablet/desktop.
+  - Ẩn `Footer` riêng trên tuyến `/library` trong [footer.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/footer.tsx) để không gian Library trải dài sạch hết màn hình mà vẫn giữ nguyên `Footer` trên mọi trang khác.
+  - Đưa `Sidebar` sát mép trái có vạch ngăn dọc (`border-r`), khóa khung desktop ở `calc(100vh - 65px)` để `Sub-header` và `Sidebar` cố định khi cuộn lưới sản phẩm bên phải, đồng thời bổ sung thanh cuộn riêng mỏng gọn (`.forma-scrollbar` trong [globals.css](file:///c:/BusinessWeb/Selling_tem/src/app/globals.css)) cho Sidebar; dùng pill count badge bo tròn và bỏ hộp Promo ở đáy Sidebar.
+  - Gọn lại hàng tiêu đề bên phải với tiêu đề + bộ đếm bên trái và `Clear filters` + dropdown `Sắp xếp` trên cùng 1 dòng.
+- **Thiết kế lại Card Library ([catalog-product-card.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/catalog-product-card.tsx), [product-card-visual.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/product-card-visual.tsx)):**
+  - Header tối phía trên gồm Tên sản phẩm + Category phụ chú bên trái và cụm 2 nút hover/focus (Tim Wishlist + Giỏ hàng/Nhận Free) ở góc trên phải; khung preview mở rộng sát viền thẻ (`flush`) ở giữa (giữ card tương tác không lồng thẻ `<a>`); đáy card hiển thị giá tiền + framework trái và nút `Preview ↗` bên phải.
+- **Cập nhật hợp đồng lọc & đếm ([types.ts](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/types.ts), [catalog-utils.ts](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/catalog-utils.ts)):**
+  - Chuyển `CatalogTab` sang `'component' | 'template'` (mặc định `'component'`), bổ sung `countProductsByTier()` và giữ nguyên tab đang chọn khi bấm `Xóa bộ lọc`.
+
+---
+
 ## [0.7.8] — 2026-11-23 — QA & Audit: Sửa lồng thẻ `<Link>` cho card tương tác, tự đóng Mobile Drawer khi đổi route & đồng bộ tài liệu
 
 ### Đã sửa lỗi & Đồng bộ (Fixed)

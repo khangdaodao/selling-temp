@@ -11,7 +11,7 @@ import { HomepageView } from '@/features/catalog/components/homepage-view';
 import { SEED_PRODUCTS } from '@/mocks/products.seed';
 
 export const metadata: Metadata = {
-  title: 'forma/ — UI Components & Website Templates',
+  title: 'Forma/ — UI Components & Website Templates',
   description:
     'Kho UI Components và Website Templates tối giản cho Next.js & React theo chiến lược Demo-first.',
 };

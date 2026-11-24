@@ -85,17 +85,17 @@ forma/
     │   │   └── components/
     │   │       └── cart-drawer.tsx                # Ngăn kéo giỏ hàng trượt phải
     │   ├── catalog/
-    │   │   ├── catalog-utils.ts                   # Hàm lọc, tìm kiếm, sắp xếp và đếm danh mục thuần khiết
-    │   │   ├── types.ts                           # Kiểu dữ liệu bộ lọc CatalogFilterState, CatalogTab, CatalogSortOption
+    │   │   ├── catalog-utils.ts                   # Hàm lọc, tìm kiếm, sắp xếp và đếm danh mục/mức giá theo tab
+    │   │   ├── types.ts                           # Kiểu dữ liệu bộ lọc CatalogFilterState, CatalogTab ('component' | 'template'), CatalogSortOption
     │   │   └── components/
-    │   │       ├── catalog-product-card.tsx       # Thẻ sản phẩm Library nối Product Detail, Preview, Wishlist & Cart
+    │   │       ├── catalog-product-card.tsx       # Thẻ sản phẩm Library tràn viền (Header + Preview sát mép + Giá/Preview ↗ + Hover Wishlist/Cart)
     │   │       ├── home-hero-showcase.tsx         # Khối showcase 2 card chồng (Orbit + Northbound) ở Hero Homepage
     │   │       ├── home-metrics-strip.tsx         # Dải Metrics 3 cột nền trắng với Counter & Toggle theo mẫu chủ dự án
     │   │       ├── home-tech-stack-strip.tsx      # Dải Tech Stack 1 hàng chạy ngang nền trắng giữa Our Products & Footer
     │   │       ├── homepage-view.tsx              # Toàn bộ giao diện Homepage
-    │   │       ├── library-skeleton.tsx           # Skeleton loading state cho Suspense và lúc tải dữ liệu repository
-    │   │       ├── library-view.tsx               # Toàn bộ trang Library (Tabs, Search ⌘K, Sort, Sidebar Filter, Empty State)
-    │   │       └── product-card-visual.tsx        # Artwork thu nhỏ & gọi shared interactive demos từ Preview Registry
+    │   │       ├── library-skeleton.tsx           # Skeleton loading tràn viền khớp Sidebar & Grid của Library
+    │   │       ├── library-view.tsx               # Trang Library tràn viền (2 tab Components/Templates, Search ⌘K, Sidebar cuộn độc lập, 1-line Sort Header)
+    │   │       └── product-card-visual.tsx        # Artwork thu nhỏ (hỗ trợ flush sát mép) & gọi shared interactive demos từ Preview Registry
     │   ├── checkout/
     │   │   └── components/
     │   │       └── checkout-view.tsx              # One-Page Checkout, Mock Auth gate, Coupon check, Simulated Payment & Orders

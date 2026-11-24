@@ -118,4 +118,27 @@
   .animate-forma-marquee {
     animation: forma-marquee 32s linear infinite;
   }
+
+  .forma-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  }
+
+  .forma-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .forma-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .forma-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .forma-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 }

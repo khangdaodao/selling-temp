@@ -25,6 +25,18 @@ interface ProductCardVisualProps {
   product: Product;
   /** Compact height variant used in Library cards vs taller Homepage cards. */
   compact?: boolean;
+  /** Renders edge-to-edge without outer border or rounded corners (used in Library cards). */
+  flush?: boolean;
+}
+
+function getVisualFrameClass(
+  heightClass: string,
+  flush: boolean,
+  defaultBorderClass: string,
+): string {
+  return flush
+    ? `${heightClass} w-full overflow-hidden`
+    : `${heightClass} w-full overflow-hidden rounded-lg border ${defaultBorderClass}`;
 }
 
 /**
@@ -33,6 +45,7 @@ interface ProductCardVisualProps {
 export function ProductCardVisual({
   product,
   compact = false,
+  flush = false,
 }: ProductCardVisualProps): React.JSX.Element {
   const { t } = useI18n();
   const heightClass = compact ? 'h-44' : 'h-44 sm:h-48';
@@ -40,7 +53,9 @@ export function ProductCardVisual({
   if (product.previewComponentKey === null) {
     return (
       <div
-        className={`flex ${heightClass} w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-white/15 bg-[#09090c] px-4 text-center`}
+        className={`flex ${heightClass} w-full flex-col items-center justify-center gap-2 bg-[#09090c] px-4 text-center ${
+          flush ? '' : 'rounded-lg border border-dashed border-white/15'
+        }`}
       >
         <Terminal className="h-5 w-5 text-accent-cyan" aria-hidden="true" />
         <p className="text-xs font-medium text-zinc-200">{product.name}</p>
@@ -54,28 +69,28 @@ export function ProductCardVisual({
   switch (product.previewComponentKey) {
     case 'component-signal-button':
       return (
-        <div className={`${heightClass} w-full overflow-hidden rounded-lg border border-white/[0.08]`}>
+        <div className={getVisualFrameClass(heightClass, flush, 'border-white/[0.08]')}>
           <SignalButtonDemo theme="dark" compact />
         </div>
       );
 
     case 'component-prism-toggle':
       return (
-        <div className={`${heightClass} w-full overflow-hidden rounded-lg border border-white/[0.08]`}>
+        <div className={getVisualFrameClass(heightClass, flush, 'border-white/[0.08]')}>
           <PrismSwitchDemo theme="dark" compact />
         </div>
       );
 
     case 'component-kinetic-card':
       return (
-        <div className={`${heightClass} w-full overflow-hidden rounded-lg border border-white/[0.08]`}>
+        <div className={getVisualFrameClass(heightClass, flush, 'border-white/[0.08]')}>
           <KineticMetricDemo theme="dark" compact />
         </div>
       );
 
     case 'component-voices-cards':
       return (
-        <div className={`${heightClass} w-full overflow-hidden rounded-lg border border-white/[0.08]`}>
+        <div className={getVisualFrameClass(heightClass, flush, 'border-white/[0.08]')}>
           <VoicesTestimonialsDemo theme="light" compact />
         </div>
       );
@@ -83,7 +98,7 @@ export function ProductCardVisual({
     case 'template-orbit':
       return (
         <div
-          className={`relative flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#0b0b0e] p-4 text-white`}
+          className={`relative flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#0b0b0e] p-4 text-white`}
         >
           <div className="flex items-center justify-between text-[10px] text-zinc-500">
             <span className="font-semibold text-zinc-200">orbit</span>
@@ -119,7 +134,7 @@ export function ProductCardVisual({
     case 'template-northbound':
       return (
         <div
-          className={`flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#f4f4f5] p-4 text-zinc-950`}
+          className={`flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#f4f4f5] p-4 text-zinc-950`}
         >
           <div className="flex items-center justify-between text-[10px] text-zinc-500">
             <span className="font-semibold text-zinc-900">northbound</span>
@@ -144,7 +159,7 @@ export function ProductCardVisual({
     case 'template-metric':
       return (
         <div
-          className={`flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#fafafa] p-3.5 text-zinc-950`}
+          className={`flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#fafafa] p-3.5 text-zinc-950`}
         >
           <div className="flex items-center justify-between text-[10px]">
             <span className="font-semibold text-zinc-900">Good morning, Alex.</span>
@@ -179,7 +194,7 @@ export function ProductCardVisual({
     case 'component-halo-hero':
       return (
         <div
-          className={`flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#ebebef] p-4 text-zinc-950`}
+          className={`flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#ebebef] p-4 text-zinc-950`}
         >
           <div className="flex items-center justify-between text-[9px] text-zinc-500">
             <span className="font-semibold text-zinc-900">halo</span>
@@ -203,7 +218,7 @@ export function ProductCardVisual({
     case 'component-pulse-hero':
       return (
         <div
-          className={`flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#b8b8be] p-4 text-zinc-950`}
+          className={`flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#b8b8be] p-4 text-zinc-950`}
         >
           <div className="flex items-center justify-between text-[9px] text-zinc-700">
             <span className="font-semibold text-zinc-950">pulse</span>
@@ -226,7 +241,7 @@ export function ProductCardVisual({
     case 'component-nexus-grid':
       return (
         <div
-          className={`flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#f6f6f7] p-3.5 text-zinc-950`}
+          className={`flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#f6f6f7] p-3.5 text-zinc-950`}
         >
           <div>
             <p className="text-xs font-semibold leading-tight text-zinc-950">
@@ -252,7 +267,7 @@ export function ProductCardVisual({
     case 'component-priceless-table':
       return (
         <div
-          className={`flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#121216] p-3.5 text-white`}
+          className={`flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#121216] p-3.5 text-white`}
         >
           <p className="text-center text-xs font-semibold text-zinc-100">
             Good work. Fair pricing.
@@ -277,7 +292,7 @@ export function ProductCardVisual({
     case 'component-monolith-hero':
       return (
         <div
-          className={`flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#111114] p-4 text-white`}
+          className={`flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#111114] p-4 text-white`}
         >
           <span className="text-[9px] uppercase tracking-widest text-zinc-500">
             Monolith 09
@@ -300,7 +315,7 @@ export function ProductCardVisual({
     default:
       return (
         <div
-          className={`flex ${heightClass} w-full flex-col justify-between overflow-hidden rounded-lg border border-white/10 bg-[#0b0b0e] p-4 text-white`}
+          className={`flex ${getVisualFrameClass(heightClass, flush, 'border-white/10')} flex-col justify-between bg-[#0b0b0e] p-4 text-white`}
         >
           <div className="flex items-center justify-between text-[10px] text-zinc-500">
             <span className="font-mono uppercase">{product.category}</span>

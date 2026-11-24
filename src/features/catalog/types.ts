@@ -6,8 +6,8 @@
 
 import type { FrameworkType, ProductCategory, ProductTier } from '@/types/domain';
 
-/** Top-level tab selection in the Library view. */
-export type CatalogTab = 'all' | 'component' | 'template';
+/** Top-level tab selection in the Library view (`Components` or `Templates`). */
+export type CatalogTab = 'component' | 'template';
 
 /** Supported sorting orders in the Library toolbar. */
 export type CatalogSortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc';
@@ -22,9 +22,9 @@ export interface CatalogFilterState {
   sortBy: CatalogSortOption;
 }
 
-/** Default unfiltered state for the Library page. */
+/** Default unfiltered state for the Library page (starts on `Components`). */
 export const DEFAULT_CATALOG_FILTERS: CatalogFilterState = {
-  tab: 'all',
+  tab: 'component',
   category: 'all',
   tier: 'all',
   framework: 'all',

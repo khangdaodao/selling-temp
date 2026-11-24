@@ -1,11 +1,11 @@
 /**
- * Pure filtering, search, sorting, and category counting functions for the forma/ catalog.
+ * Pure filtering, search, sorting, and category/tier counting functions for the forma/ catalog.
  * Extracted from UI components so business logic stays deterministic and testable.
  *
  * Related: src/features/catalog/types.ts, src/types/domain.ts
  */
 
-import type { CurrencyCode, Product, ProductCategory } from '@/types/domain';
+import type { CurrencyCode, Product, ProductCategory, ProductTier } from '@/types/domain';
 import type { CatalogFilterState, CatalogTab } from './types';
 
 /** Ordered list of catalog categories shown in the Library sidebar. */
@@ -26,14 +26,14 @@ function getComparablePrice(product: Product, currency: CurrencyCode): number {
 }
 
 /**
- * Checks whether any non-default filter or search query is active.
+ * Checks whether any sidebar filter, search query, or non-default sort order is active.
+ * Switching between `Components` and `Templates` tabs does not count as an active filter.
  *
  * @param filters - Current catalog filter state.
- * @returns `true` if at least one filter or search term narrows the list.
+ * @returns `true` if at least one filter, search term, or custom sort narrows/reorders the tab.
  */
 export function hasActiveCatalogFilters(filters: CatalogFilterState): boolean {
   return (
-    filters.tab !== 'all' ||
     filters.category !== 'all' ||
     filters.tier !== 'all' ||
     filters.framework !== 'all' ||
@@ -43,8 +43,8 @@ export function hasActiveCatalogFilters(filters: CatalogFilterState): boolean {
 }
 
 /**
- * Filters and sorts catalog products according to tab, category, tier, framework,
- * bilingual search text, and active currency sort order.
+ * Filters and sorts catalog products according to active tab (`component` | `template`),
+ * category, tier, framework, bilingual search text, and active currency sort order.
  *
  * @param products - Full list of published products from `productRepository`.
  * @param filters - Active filter & sort selections.
@@ -59,7 +59,7 @@ export function filterAndSortProducts(
   const normalizedQuery = filters.searchQuery.trim().toLowerCase();
 
   const filtered = products.filter((product) => {
-    if (filters.tab !== 'all' && product.type !== filters.tab) {
+    if (product.type !== filters.tab) {
       return false;
     }
     if (filters.category !== 'all' && product.category !== filters.category) {
@@ -114,10 +114,9 @@ export function filterAndSortProducts(
 }
 
 /**
- * Counts published products grouped by top-level tab (`all`, `component`, `template`).
+ * Counts published products grouped by the two top-level Library tabs (`component`, `template`).
  */
 export function countProductsByType(products: Product[]): {
-  all: number;
   component: number;
   template: number;
 } {
@@ -131,7 +130,6 @@ export function countProductsByType(products: Product[]): {
     }
   }
   return {
-    all: products.length,
     component,
     template,
   };
@@ -158,11 +156,35 @@ export function countProductsByCategory(
   };
 
   for (const item of products) {
-    if (activeTab !== 'all' && item.type !== activeTab) {
+    if (item.type !== activeTab) {
       continue;
     }
     counts.all += 1;
     counts[item.category] += 1;
+  }
+
+  return counts;
+}
+
+/**
+ * Counts products per pricing tier (`all`, `free`, `paid`) scoped by the active tab.
+ */
+export function countProductsByTier(
+  products: Product[],
+  activeTab: CatalogTab,
+): Record<ProductTier | 'all', number> {
+  const counts: Record<ProductTier | 'all', number> = {
+    all: 0,
+    free: 0,
+    paid: 0,
+  };
+
+  for (const item of products) {
+    if (item.type !== activeTab) {
+      continue;
+    }
+    counts.all += 1;
+    counts[item.tier] += 1;
   }
 
   return counts;

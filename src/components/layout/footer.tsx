@@ -1,6 +1,7 @@
 /**
  * Global dark minimalist footer for `forma/` with top newsletter signup row,
  * brand summary, 3 structured route columns, and copyright/demo boundary bar.
+ * Automatically hidden on the full-bleed `/library` workspace route.
  *
  * Related: src/i18n/use-i18n-store.ts, src/app/layout.tsx
  * Phase 1 Notice: Newsletter form demonstrates UI feedback only without backend API or persistence.
@@ -10,6 +11,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, useInView, useReducedMotion, type Variants } from 'motion/react';
 import { ArrowRight, Mail } from 'lucide-react';
 import { useI18n } from '@/i18n/use-i18n-store';
@@ -59,9 +61,11 @@ const footerItemVariants: Variants = {
 /**
  * Site-wide `forma/` footer featuring a top newsletter signup bar,
  * a 12-column link directory, and a Phase 1 copyright/boundary footer strip.
+ * Suppressed on `/library` so the catalog sidebar and grid remain edge-to-edge cleanly.
  */
-export function Footer({ className }: FooterProps): React.JSX.Element {
+export function Footer({ className }: FooterProps): React.JSX.Element | null {
   const { t } = useI18n();
+  const pathname = usePathname();
   const containerRef = useRef<HTMLElement>(null);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shouldReduceMotion = useReducedMotion();
@@ -129,6 +133,10 @@ export function Footer({ className }: FooterProps): React.JSX.Element {
   ];
 
   const motionState = shouldReduceMotion || isInView ? 'visible' : 'hidden';
+
+  if (pathname.startsWith('/library')) {
+    return null;
+  }
 
   return (
     <footer
