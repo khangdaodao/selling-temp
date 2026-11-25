@@ -156,20 +156,15 @@ export function CatalogProductCard({
         )}
       </div>
 
-      {/* Bottom Compact Footer: Price + Framework on left, Preview trigger on right */}
+      {/* Bottom Compact Footer: Price on left, Preview trigger on right */}
       <div className="flex items-center justify-between gap-2 px-4 py-2.5">
-        <div className="flex min-w-0 items-center gap-2">
-          <span
-            className={`font-mono text-sm font-semibold ${
-              product.tier === 'free' ? 'text-accent-cyan' : 'text-white'
-            }`}
-          >
-            {formattedPrice}
-          </span>
-          <span className="truncate font-mono text-[10px] text-zinc-500">
-            {product.frameworks[0]}
-          </span>
-        </div>
+        <span
+          className={`font-mono text-sm font-semibold ${
+            product.tier === 'free' ? 'text-accent-cyan' : 'text-white'
+          }`}
+        >
+          {formattedPrice}
+        </span>
 
         <Link
           href={`/preview/${product.slug}`}

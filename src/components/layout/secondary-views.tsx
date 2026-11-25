@@ -27,7 +27,7 @@ export function AboutView(): React.JSX.Element {
   const { t } = useI18n();
 
   return (
-    <div className="forma-grid-bg">
+    <div className="forma-grid-bg min-h-[calc(100vh-65px)]">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="rounded-2xl border border-white/10 bg-[#0b0b0f] p-6 sm:p-10">
           <Badge variant="cyan">{t.aboutPage.badge}</Badge>
@@ -86,7 +86,7 @@ export function SupportView(): React.JSX.Element {
   const { t } = useI18n();
 
   return (
-    <div className="forma-grid-bg">
+    <div className="forma-grid-bg min-h-[calc(100vh-65px)]">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="rounded-2xl border border-white/10 bg-[#0b0b0f] p-6 sm:p-10">
           <Badge variant="cyan">{t.supportPage.badge}</Badge>

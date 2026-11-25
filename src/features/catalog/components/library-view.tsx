@@ -1,8 +1,8 @@
 /**
  * Full-bleed interactive Library catalog client component inspired by crisp SaaS library layouts.
- * Features an edge-to-edge sub-header (`Components` | `Templates` tabs + `⌘K` search),
- * an independent scrollable left Sidebar anchored to the left edge with pill counts
- * (`Categories`, `Pricing`, `Framework`), a compact single-row grid header with `Sort`,
+ * Features an edge-to-edge sub-header (`Components` | `Templates` tabs + centered `⌘K` search),
+ * an independent fixed scrollable left Sidebar anchored to the left edge with pill counts
+ * (`Categories`, `Pricing`), a compact single-row grid header with `Sort`,
  * and an edge-to-edge card grid (`CatalogProductCard`).
  *
  * Related: src/app/library/page.tsx, src/features/catalog/catalog-utils.ts, src/services/index.ts
@@ -23,7 +23,6 @@ import { useI18n } from '@/i18n/use-i18n-store';
 import { DEMO_RESET_EVENT } from '@/lib/storage/storage-keys';
 import { productRepository } from '@/services';
 import type {
-  FrameworkType,
   Product,
   ProductCategory,
   ProductTier,
@@ -144,7 +143,6 @@ export function LibraryView(): React.JSX.Element {
   );
 
   const isFiltered = hasActiveCatalogFilters(filters);
-  const activeTabTotal = typeCounts[filters.tab];
 
   const resetFilters = (): void => {
     setFilters((prev) => ({
@@ -156,13 +154,6 @@ export function LibraryView(): React.JSX.Element {
   const tabItems: Array<{ id: CatalogTab; label: string; count: number }> = [
     { id: 'component', label: t.library.tabComponents, count: typeCounts.component },
     { id: 'template', label: t.library.tabTemplates, count: typeCounts.template },
-  ];
-
-  const frameworkOptions: Array<{ id: FrameworkType | 'all'; label: string }> = [
-    { id: 'all', label: t.library.sidebar.frameworkAll },
-    { id: 'nextjs', label: 'Next.js' },
-    { id: 'react', label: 'React' },
-    { id: 'tailwind', label: 'Tailwind CSS' },
   ];
 
   const activeCategoryHeading =
@@ -385,52 +376,15 @@ export function LibraryView(): React.JSX.Element {
               })}
             </div>
           </div>
-
-          {/* Framework Filter Chips */}
-          <div className="mt-6 border-t border-white/[0.06] pt-5">
-            <h2 className="px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
-              {t.library.sidebar.frameworkHeading}
-            </h2>
-            <div className="mt-2.5 flex flex-wrap gap-1.5 px-1">
-              {frameworkOptions.map((option) => {
-                const active = filters.framework === option.id;
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() =>
-                      setFilters((prev) => ({ ...prev, framework: option.id }))
-                    }
-                    className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
-                      active
-                        ? 'border-accent-cyan/60 bg-accent-cyan/10 font-medium text-accent-cyan'
-                        : 'border-white/10 bg-surface text-zinc-400 hover:border-white/25 hover:text-white'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </aside>
 
         {/* Right Workspace: Compact Single-Row Header + Fluid Card Grid (Independent Scroll on Desktop) */}
         <div className="forma-scrollbar min-w-0 flex-1 px-4 py-6 sm:px-6 lg:h-full lg:overflow-y-auto lg:px-7">
-          {/* Compact Single-Row Title + Item Counter + Sort Dropdown */}
+          {/* Compact Single-Row Title + Sort Dropdown */}
           <div className="flex flex-col gap-3 border-b border-white/[0.06] pb-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-baseline gap-3">
-              <h1 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
-                {activeCategoryHeading}
-              </h1>
-              <p className="text-xs text-zinc-400">
-                {t.library.showingPrefix}{' '}
-                <span className="font-mono font-semibold text-white">
-                  {filteredProducts.length}
-                </span>{' '}
-                / {activeTabTotal} {t.library.showingSuffix}
-              </p>
-            </div>
+            <h1 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              {activeCategoryHeading}
+            </h1>
 
             <div className="flex flex-wrap items-center gap-2">
               {isFiltered ? (

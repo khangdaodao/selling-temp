@@ -4,6 +4,27 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.7.11] — 2026-11-25 — UI Scoped Fix: Chỉ hiển thị `Footer` ở Trang chủ (`/`)
+
+### Đã sửa (Fixed)
+- **Giới hạn hiển thị `Footer` duy nhất tại Homepage (`/`) trong [footer.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/footer.tsx):**
+  - Chuyển điều kiện ẩn từ `pathname.startsWith('/library')` sang `pathname !== '/'` để toàn bộ các trang còn lại (`/library`, `/login`, `/about`, `/support`, `/products/*`, `/preview/*`, `/checkout`, `/account`, `/admin`, `404`) đều không hiển thị `Footer`.
+- **Giữ nền lưới liền mạch cho `/about` & `/support` trong [secondary-views.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/secondary-views.tsx):**
+  - Thêm `min-h-[calc(100vh-65px)]` cho `.forma-grid-bg` để chiều cao nền lưới phủ kín màn hình khi không còn `Footer` bên dưới.
+
+---
+
+## [0.7.10] — 2026-11-25 — UI Polish: Tinh giản thêm Library (bỏ `Framework`, techstack dưới card & dòng đếm sản phẩm)
+
+### Đã lược bỏ (Removed / Simplified)
+- **Tinh giản Sidebar & tiêu đề trong [library-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/library-view.tsx):**
+  - Xóa hoàn toàn mục lọc `FRAMEWORK` ở Sidebar trái.
+  - Xóa dòng đếm `"Đang hiển thị ... / ... sản phẩm"` bên cạnh tiêu đề lưới phải, giữ tiêu đề gọn gàng cùng dropdown `Sắp xếp`.
+- **Tinh giản đáy Card trong [catalog-product-card.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/catalog/components/catalog-product-card.tsx):**
+  - Xóa nhãn techstack (`react` / `nextjs`...) cạnh giá tiền, chỉ giữ lại giá tiền bên trái và nút `Preview ↗` bên phải.
+
+---
+
 ## [0.7.9] — 2026-11-24 — UI Polish: Bố cục Library tràn viền sát mép, bỏ tab `Tất cả` & thiết kế lại Card Library
 
 ### Đã tinh chỉnh (Changed)

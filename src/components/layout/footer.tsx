@@ -1,7 +1,7 @@
 /**
- * Global dark minimalist footer for `forma/` with top newsletter signup row,
+ * Dark minimalist footer for `forma/` with top newsletter signup row,
  * brand summary, 3 structured route columns, and copyright/demo boundary bar.
- * Automatically hidden on the full-bleed `/library` workspace route.
+ * Rendered exclusively on the Homepage (`/`) and hidden on all secondary routes.
  *
  * Related: src/i18n/use-i18n-store.ts, src/app/layout.tsx
  * Phase 1 Notice: Newsletter form demonstrates UI feedback only without backend API or persistence.
@@ -59,9 +59,9 @@ const footerItemVariants: Variants = {
 };
 
 /**
- * Site-wide `forma/` footer featuring a top newsletter signup bar,
+ * Homepage `forma/` footer featuring a top newsletter signup bar,
  * a 12-column link directory, and a Phase 1 copyright/boundary footer strip.
- * Suppressed on `/library` so the catalog sidebar and grid remain edge-to-edge cleanly.
+ * Suppressed on all non-Homepage routes (`/library`, `/login`, `/about`, `/support`, etc.).
  */
 export function Footer({ className }: FooterProps): React.JSX.Element | null {
   const { t } = useI18n();
@@ -134,7 +134,7 @@ export function Footer({ className }: FooterProps): React.JSX.Element | null {
 
   const motionState = shouldReduceMotion || isInView ? 'visible' : 'hidden';
 
-  if (pathname.startsWith('/library')) {
+  if (pathname !== '/') {
     return null;
   }
 

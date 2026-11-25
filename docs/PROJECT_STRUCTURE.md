@@ -59,7 +59,7 @@ forma/
     │       └── page.tsx                           # Server Component entrypoint cho Hỗ trợ & FAQ (`/support`)
     ├── components/
     │   ├── layout/
-    │   │   ├── footer.tsx                         # Footer tối giản gồm hàng đăng ký Newsletter, lưới 12 cột (brand + 3 cột route thật) & thanh bản quyền/ranh giới Demo
+    │   │   ├── footer.tsx                         # Footer chỉ hiển thị ở Homepage (`/`) gồm hàng đăng ký Newsletter, lưới 12 cột & thanh bản quyền/ranh giới Demo
     │   │   ├── header-switchers.tsx               # 2 nút icon tròn Tiền tệ (Coins) & Ngôn ngữ (Globe) kèm popover menu Dark-Cyan
     │   │   ├── navbar.tsx                         # Thanh điều hướng sticky, Icon Switchers, Cart trigger, `/account`, `/admin`, `/about`, `/support`
     │   │   └── secondary-views.tsx                # Giao diện song ngữ cho `/about`, `/support` và `not-found`
