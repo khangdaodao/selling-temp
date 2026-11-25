@@ -106,7 +106,7 @@ export function Navbar(): React.JSX.Element {
           </button>
 
           {session ? (
-            <div className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-surface pl-2 pr-1 py-1">
+            <div className="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/10 bg-surface px-2">
               {session.user.role === 'admin' ? (
                 <Link
                   href="/admin"
@@ -117,23 +117,14 @@ export function Navbar(): React.JSX.Element {
               ) : null}
               <Link
                 href="/account"
-                className="inline-flex items-center gap-1.5 rounded pr-1 text-xs text-zinc-200 transition-colors hover:text-accent-cyan"
+                className="inline-flex items-center gap-1.5 rounded text-xs text-zinc-200 transition-colors hover:text-accent-cyan"
                 title={t.account.tabs.myLibrary}
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded bg-cyan-400/15 font-mono text-[10px] font-bold text-accent-cyan">
+                <span className="flex h-5 w-5 items-center justify-center rounded bg-cyan-400/15 font-mono text-[10px] font-bold text-accent-cyan">
                   {session.user.avatarInitials}
                 </span>
                 <span className="hidden max-w-[110px] truncate lg:inline">{session.user.name}</span>
               </Link>
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                aria-label={t.auth.signOut}
-                title={t.auth.signOut}
-                className="rounded p-1 text-zinc-400 hover:bg-white/10 hover:text-white"
-              >
-                <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-              </button>
             </div>
           ) : (
             <Link
@@ -150,6 +141,18 @@ export function Navbar(): React.JSX.Element {
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </Button>
+
+          {session ? (
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              aria-label={t.auth.signOut}
+              title={t.auth.signOut}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-surface text-zinc-400 transition-colors hover:border-white/25 hover:text-white"
+            >
+              <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+          ) : null}
         </div>
 
         {/* Mobile Actions & Menu Trigger */}

@@ -79,3 +79,19 @@
   - `localStorage` giới hạn ~5MB và dễ tràn quota hoặc đơ trình duyệt nếu lưu binary archive; đồng thời không được chạy code chưa kiểm duyệt từ file ZIP upload (kế thừa `ADR-004`).
   - Phân tách rõ ranh giới UI gating vs Server RBAC giúp không tạo ảo giác an toàn trước khi triển khai Next.js Middleware + Server Session Verification + MySQL RBAC ở Phase 2.
 - **Đánh đổi:** Các thao tác upload ZIP thật lên S3/R2 và bảo vệ route `/admin` thực sự chỉ kích hoạt khi lên Phase 2 backend.
+
+---
+
+## ADR-008: Kiến trúc Backend Phase 2 theo mô hình Supabase Hybrid & Song cổng thanh toán PayOS + Stripe
+
+- **Trạng thái:** Đã duyệt (Phase 2.0 — 2026-11-25)
+- **Bối cảnh:** Sau khi hoàn tất Phase 1 Frontend Demo-First (`0.7.12`), chủ dự án cần lộ trình đưa `forma/` lên Production nhanh gọn cho solo developer nhưng vẫn đảm bảo khả năng chuyển sang hạ tầng tự chủ hoàn toàn (dedicated PostgreSQL VPS + Better Auth + Cloudflare R2) khi lượng khách và doanh thu tăng mạnh.
+- **Quyết định:**
+  1. **Database & ORM:** Dùng **Supabase PostgreSQL** nhưng truy vấn bằng **Prisma ORM** (`prisma/schema.prisma`) thông qua `DATABASE_URL` thay vì gọi `supabase.from(...)` rải rác trong UI; đồng thời bật RLS chặn truy cập trực tiếp ở schema `public`.
+  2. **Authentication:** Dùng **Supabase Auth** (`@supabase/ssr`, cookie `HttpOnly`) cho Email/Password & Google OAuth, đồng bộ sang bảng `User` của Prisma để kiểm tra `role` (`CUSTOMER`/`ADMIN`) trên server (không dùng `user_metadata` cho phân quyền) và gỡ bỏ `Preset Demo Accounts`.
+  3. **Private Storage:** Dùng **Supabase Storage (Private Bucket)** với `zipObjectKey` tương đối (ví dụ `products/orbit/latest.zip`, không lưu cứng URL domain Supabase trong DB) kết hợp kiểm tra `UserEntitlement` trên server trước khi cấp Signed Download URL (~60 giây).
+  4. **Server Logic & Payment (`PayOS` + `Stripe`):** Toàn bộ logic Checkout, kiểm tra Coupon, Admin CRUD và Webhook thanh toán **PayOS (VND / VietQR)** + **Stripe (USD)** được viết bằng TypeScript ngay trong Next.js Server (`src/app/api/*` / Server Actions) và giữ hợp đồng trong [interfaces.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/interfaces.ts).
+- **Lý do:**
+  - Tận dụng tốc độ triển khai của Supabase Auth & Private Storage ở giai đoạn đầu mà **không bị khóa chặt (vendor lock-in)** ở tầng Database hay logic nghiệp vụ.
+  - Khi muốn tách khỏi Supabase về sau, chỉ cần đổi `DATABASE_URL` sang server Postgres riêng (code Prisma giữ nguyên), chép bucket sang Cloudflare R2 (đổi 1 hàm tạo Signed URL) và thay Supabase Auth bằng Better Auth — toàn bộ logic PayOS/Stripe/Checkout/UI giữ nguyên.
+- **Đánh đổi:** Bản Supabase Free Tier tự tạm dừng (pause) sau 7 ngày không có traffic nên khi mở bán thương mại thật cần nâng cấp gói trả phí hoặc chuyển sang hạ tầng tự chủ theo lộ trình thiết kế sẵn.

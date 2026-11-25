@@ -2,18 +2,23 @@
 
 Tài liệu này phản ánh **đúng cây thư mục thực tế** hiện có trong `c:\BusinessWeb\Selling_tem`. Các thư mục tương lai sẽ chỉ được tạo khi bước vào sub-phase cần dùng tới chúng.
 
-## Cây Thư mục Hiện tại (Phase 1.7 — Hoàn chỉnh Phase 1)
+## Cây Thư mục Hiện tại (Phase 2.1 — Supabase Postgres + Prisma Foundation)
 
 ```text
 forma/
+├── .env.example                                   # File mẫu biến môi trường an toàn (Supabase + Prisma, không chứa secret)
 ├── AGENTS.md                                      # Quy tắc kỹ thuật, bảo mật và quy trình làm việc của agent
 ├── README.md                                      # Hướng dẫn cài đặt, scripts, cảnh báo Demo Mode, mục lục docs
 ├── eslint.config.mjs                              # Cấu hình ESLint flat config (Next.js + TypeScript strict)
 ├── next.config.ts                                 # Cấu hình Next.js (bật reactStrictMode)
-├── package.json                                   # Danh sách thư viện và npm scripts (kèm @monaco-editor/react)
+├── package.json                                   # Danh sách thư viện (kèm Prisma 6, Supabase SSR, Zod, tsx) và npm/db scripts
 ├── postcss.config.mjs                             # Pipeline PostCSS cho Tailwind CSS v3
 ├── tailwind.config.ts                             # Design tokens Dark Minimalism & Cyan Accent
 ├── tsconfig.json                                  # Cấu hình TypeScript strict + path alias @/*
+├── prisma/
+│   ├── rls.sql                                    # SQL bật RLS & khóa truy cập PostgREST trực tiếp trên schema `public`
+│   ├── schema.prisma                              # Schema 7 bảng Supabase PostgreSQL (`snake_case`, tiền tệ Int, index FK)
+│   └── seed.ts                                    # Seed idempotent 18 sản phẩm, 54 code files & 3 coupons lên Supabase Postgres
 ├── public/
 │   ├── demo-assets/
 │   │   └── forma-sample-bundle.zip                # Gói ZIP mẫu an toàn dùng cho tính năng tải demo ở My Library
@@ -119,12 +124,18 @@ forma/
     │   ├── types.ts                               # Interface đảm bảo hai bộ từ điển vi/en luôn khớp khóa
     │   └── use-i18n-store.ts                      # Zustand store quản lý ngôn ngữ, tiền tệ & detect browser
     ├── lib/
+    │   ├── env.ts                                 # Kiểm tra biến môi trường server/client bằng Zod (tách biệt secret khỏi client)
+    │   ├── prisma.ts                              # PrismaClient singleton server-only nối Supabase PostgreSQL
+    │   ├── utils.ts                               # Hàm `cn()` gộp class Tailwind
     │   ├── format/
     │   │   └── currency.ts                        # Định dạng giá số nguyên VND/USD và tính giảm giá số nguyên
     │   ├── storage/
     │   │   ├── storage-adapter.ts                 # Wrapper localStorage có version, SSR-safe, fallback & reset
     │   │   └── storage-keys.ts                    # Danh sách tập trung các key `forma:v1:*`
-    │   └── utils.ts                               # Hàm `cn()` gộp class Tailwind
+    │   └── supabase/
+    │       ├── admin.ts                           # Supabase server-only client dùng `SUPABASE_SERVICE_ROLE_KEY`
+    │       ├── client.ts                          # Supabase browser client (`@supabase/ssr`, publishable key)
+    │       └── server.ts                          # Supabase server cookie client (`@supabase/ssr` + `cookies()`)
     ├── mocks/
     │   ├── accounts.seed.ts                       # 2 tài khoản demo chọn sẵn (Customer & Admin)
     │   ├── coupons.seed.ts                        # 3 mã giảm giá mẫu (FORMA20, WELCOME10, EXPIRED50)

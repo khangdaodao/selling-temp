@@ -4,6 +4,38 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.8.1] — 2026-11-25 — Phase 2.1: Thiết lập Supabase PostgreSQL, Prisma ORM, RLS & Seed dữ liệu thật
+
+### Đã thêm mới & Thiết lập (Added)
+- **Cài đặt dependencies nền tảng Backend ([package.json](file:///c:/BusinessWeb/Selling_tem/package.json)):**
+  - `@prisma/client` (`^6.19.3`), `prisma` (`^6.19.3`), `@supabase/supabase-js` (`^2.119.2`), `@supabase/ssr` (`^0.12.7`), `zod` (`^4.6.7`), `tsx` (`^4.23.15`) cùng bộ script `db:generate`, `db:push`, `db:seed`, `db:studio`.
+- **Biến môi trường & Database Clients:**
+  - Tạo [.env.example](file:///c:/BusinessWeb/Selling_tem/.env.example) và [env.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/env.ts) kiểm tra biến môi trường bằng Zod, chặn tuyệt đối `getServerEnv()` chạy ở trình duyệt.
+  - Tạo [prisma.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/prisma.ts) singleton và bộ 3 Supabase clients ([client.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/supabase/client.ts), [server.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/supabase/server.ts), [admin.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/supabase/admin.ts)).
+- **Schema PostgreSQL, Bảo mật RLS & Seed dữ liệu ([schema.prisma](file:///c:/BusinessWeb/Selling_tem/prisma/schema.prisma), [rls.sql](file:///c:/BusinessWeb/Selling_tem/prisma/rls.sql), [seed.ts](file:///c:/BusinessWeb/Selling_tem/prisma/seed.ts)):**
+  - Thiết kế 7 bảng `snake_case` (`users`, `products`, `product_code_files`, `coupons`, `orders`, `order_items`, `user_entitlements`) trên Supabase PostgreSQL (`selling-temp`), giữ nguyên giá số nguyên `Int`, `zip_object_key` tương đối và index toàn bộ khóa ngoại.
+  - Đẩy schema qua `prisma db push`, bật RLS & thu hồi quyền PostgREST Data API từ `anon`/`authenticated` (kèm thu hồi quyền thực thi RPC `rls_auto_enable`), và seed thành công **18 sản phẩm, 54 file code mẫu & 3 coupons**.
+
+---
+
+## [0.8.0-docs] — 2026-11-25 — Phase 2.0: Chốt kiến trúc Supabase Hybrid & Song cổng thanh toán PayOS + Stripe
+
+### Đã cập nhật (Documentation & Architecture Plan)
+- **Chốt `ADR-008` trong [DECISIONS.md](file:///c:/BusinessWeb/Selling_tem/docs/DECISIONS.md):** Chọn hướng **Supabase Hybrid** (`Supabase PostgreSQL` + `Prisma ORM` + `Supabase Auth` `@supabase/ssr` + `Supabase Private Storage` theo `zipObjectKey` tương đối) kết hợp **Next.js Server Routes** để sẵn sàng chuyển sang hạ tầng tự chủ về sau mà không bị khóa chặt.
+- **Đồng bộ quy chuẩn & lộ trình Phase 2 ([AGENTS.md](file:///c:/BusinessWeb/Selling_tem/AGENTS.md), [ARCHITECTURE.md](file:///c:/BusinessWeb/Selling_tem/docs/ARCHITECTURE.md), [PROGRESS.md](file:///c:/BusinessWeb/Selling_tem/docs/PROGRESS.md)):**
+  - Chốt Phase 2.1 → 2.5 theo đúng nguyên tắc mỗi lượt một sub-phase, bật RLS trên schema `public`, không dùng `user_metadata` cho phân quyền Admin và kết hợp cả hai cổng thanh toán **PayOS (VND)** + **Stripe (USD)** ở Phase 2.4.
+  - Cập nhật trạng thái hoàn tất Phase 1 đến mốc `0.7.12` trong [PROGRESS.md](file:///c:/BusinessWeb/Selling_tem/docs/PROGRESS.md).
+
+---
+
+## [0.7.12] — 2026-11-25 — UI Polish: Chuyển nút Đăng xuất sang bên phải nút `Explore Library`
+
+### Đã tinh chỉnh (Changed)
+- **Điều chỉnh vị trí nút Đăng xuất trên thanh điều hướng ([navbar.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/navbar.tsx)):**
+  - Tách nút Đăng xuất (`LogOut`) ra khỏi pill hồ sơ tài khoản khi đã đăng nhập và đặt thành nút riêng đồng bộ chiều cao `h-8` ngay bên phải nút `Explore Library` (`Khám phá Library`).
+
+---
+
 ## [0.7.11] — 2026-11-25 — UI Scoped Fix: Chỉ hiển thị `Footer` ở Trang chủ (`/`)
 
 ### Đã sửa (Fixed)

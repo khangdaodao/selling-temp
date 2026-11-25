@@ -1,0 +1,225 @@
+// Prisma schema for forma/ Phase 2 (Supabase PostgreSQL + RLS-protected `public` schema).
+// Uses lowercase snake_case Postgres identifiers, integer money columns (`price_vnd`, `price_usd`),
+// indexed foreign keys, and relative `zip_object_key` paths for vendor-neutral Private Storage.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  customer
+  admin
+
+  @@map("user_role")
+}
+
+enum ProductType {
+  component
+  template
+
+  @@map("product_type")
+}
+
+enum ProductTier {
+  free
+  paid
+
+  @@map("product_tier")
+}
+
+enum ProductStatus {
+  published
+  draft
+
+  @@map("product_status")
+}
+
+enum ProductCategory {
+  hero
+  navbar
+  pricing
+  cards
+  footer
+  dashboard
+  saas
+  portfolio
+  ecommerce
+
+  @@map("product_category")
+}
+
+enum PreviewMode {
+  interactive_card    @map("interactive-card")
+  thumbnail_modal     @map("thumbnail-modal")
+  template_fullscreen @map("template-fullscreen")
+
+  @@map("preview_mode")
+}
+
+enum CurrencyCode {
+  VND
+  USD
+
+  @@map("currency_code")
+}
+
+enum OrderStatus {
+  pending
+  paid
+  failed
+  free_claimed
+
+  @@map("order_status")
+}
+
+enum PaymentProvider {
+  payos
+  stripe
+  free
+
+  @@map("payment_provider")
+}
+
+model User {
+  id             String            @id @default(uuid()) @db.Uuid
+  email          String            @unique
+  name           String
+  role           UserRole          @default(customer)
+  avatarInitials String            @map("avatar_initials")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  orders         Order[]
+  entitlements   UserEntitlement[]
+
+  @@map("users")
+}
+
+model Product {
+  id                  String            @id
+  slug                String            @unique
+  name                String
+  type                ProductType
+  tier                ProductTier
+  status              ProductStatus     @default(published)
+  category            ProductCategory
+  frameworks          String[]
+  tags                String[]
+  priceVnd            Int               @default(0) @map("price_vnd")
+  priceUsd            Int               @default(0) @map("price_usd")
+  shortDescriptionVi  String            @map("short_description_vi")
+  shortDescriptionEn  String            @map("short_description_en")
+  descriptionVi       String            @map("description_vi")
+  descriptionEn       String            @map("description_en")
+  documentationVi     String            @map("documentation_vi")
+  documentationEn     String            @map("documentation_en")
+  thumbnailVariant    String            @default("dark") @map("thumbnail_variant")
+  thumbnailSubtitle   String            @map("thumbnail_subtitle")
+  previewMode         PreviewMode       @map("preview_mode")
+  previewComponentKey String?           @map("preview_component_key")
+  supportsThemeToggle Boolean           @default(false) @map("supports_theme_toggle")
+  featured            Boolean           @default(false)
+  zipObjectKey        String?           @map("zip_object_key")
+  zipFileName         String            @map("zip_file_name")
+  zipSizeBytes        Int               @default(0) @map("zip_size_bytes")
+  zipUpdatedAt        DateTime          @default(now()) @map("zip_updated_at") @db.Timestamptz(6)
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  codeFiles           ProductCodeFile[]
+  orderItems          OrderItem[]
+  entitlements        UserEntitlement[]
+
+  @@index([status, featured])
+  @@index([type, category, status])
+  @@map("products")
+}
+
+model ProductCodeFile {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  path      String
+  language  String
+  content   String
+  sortOrder Int     @default(0) @map("sort_order")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, path])
+  @@index([productId])
+  @@map("product_code_files")
+}
+
+model Coupon {
+  code            String   @id
+  discountPercent Int      @map("discount_percent")
+  active          Boolean  @default(true)
+  descriptionVi   String   @map("description_vi")
+  descriptionEn   String   @map("description_en")
+  expiresAt       DateTime @map("expires_at") @db.Timestamptz(6)
+  maxUses         Int?     @map("max_uses")
+  usedCount       Int      @default(0) @map("used_count")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([active, expiresAt])
+  @@map("coupons")
+}
+
+model Order {
+  id              String           @id @default(cuid())
+  userId          String           @map("user_id") @db.Uuid
+  customerEmail   String           @map("customer_email")
+  couponCode      String?          @map("coupon_code")
+  discountPercent Int              @default(0) @map("discount_percent")
+  subtotalVnd     Int              @map("subtotal_vnd")
+  subtotalUsd     Int              @map("subtotal_usd")
+  totalVnd        Int              @map("total_vnd")
+  totalUsd        Int              @map("total_usd")
+  currencyUsed    CurrencyCode     @map("currency_used")
+  status          OrderStatus      @default(pending)
+  paymentProvider PaymentProvider? @map("payment_provider")
+  providerRef     String?          @unique @map("provider_ref")
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items           OrderItem[]
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String      @id @default(cuid())
+  orderId     String      @map("order_id")
+  productId   String      @map("product_id")
+  productName String      @map("product_name")
+  productType ProductType @map("product_type")
+  priceVnd    Int         @map("price_vnd")
+  priceUsd    Int         @map("price_usd")
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model UserEntitlement {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id") @db.Uuid
+  productId     String   @map("product_id")
+  sourceOrderId String?  @map("source_order_id")
+  grantedAt     DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@map("user_entitlements")
+}

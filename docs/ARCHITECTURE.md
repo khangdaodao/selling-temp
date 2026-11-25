@@ -2,16 +2,17 @@
 
 ## 1. Nguyên tắc Kiến trúc
 
-`forma/` áp dụng **Feature-First Layered Architecture** trên nền **Next.js 15 App Router**. Dù Phase 1 chạy hoàn toàn trên trình duyệt bằng `localStorage` và dữ liệu seed, mọi luồng dữ liệu đều đi qua **Repository Interfaces** có kiểu dữ liệu chặt chẽ để khi nâng cấp lên Phase 2 (backend + MySQL), phần giao diện UI gần như không phải viết lại.
+`forma/` áp dụng **Feature-First Layered Architecture** trên nền **Next.js 15 App Router**. Ở Phase 1, dữ liệu chạy qua `localStorage` và dữ liệu seed; sang **Phase 2**, `forma/` áp dụng mô hình **Supabase Hybrid (`ADR-008`)** — dùng **Prisma ORM** nối Supabase PostgreSQL + **Supabase Auth** (`@supabase/ssr`) + **Supabase Private Storage**, còn toàn bộ nghiệp vụ Admin/Checkout/Payment (`PayOS` + `Stripe`) chạy tập trung trên Next.js Server thông qua bộ **Repository Interfaces** để dễ dàng tách sang hạ tầng tự chủ về sau.
 
 ```mermaid
 flowchart LR
-    UI["App Router & Feature UI\n(src/app, src/features)"] --> Store["Zustand Domain Stores\n(src/i18n, feature stores)"]
+    UI["App Router & Feature UI\n(src/app, src/features)"] --> Store["Zustand Domain Stores & Server Calls\n(src/i18n, feature stores)"]
     Store --> Contract["Repository Interfaces\n(src/services/repositories/interfaces.ts)"]
-    Contract -->|Phase 1 Đang chạy| Mock["Mock Repositories\n(src/services/repositories/mock-*.ts)"]
-    Contract -.->|Phase 2 Dự kiến| Prisma["Next.js Server Actions / API\n+ MySQL + Prisma"]
-    Mock --> Adapter["Versioned StorageAdapter\n(src/lib/storage/storage-adapter.ts)"]
-    Mock --> Seed["Dữ liệu gốc (Seed)\n(src/mocks/*.seed.ts)"]
+    Contract -->|Phase 1 Hoàn tất| Mock["Mock Repositories\n(localStorage + seed)"]
+    Contract -->|Phase 2 Supabase Hybrid| Server["Next.js Server Actions / API\n+ Prisma ORM + @supabase/ssr"]
+    Server --> DB["Supabase PostgreSQL (RLS Enabled)"]
+    Server --> Storage["Supabase Private Bucket (.zip)"]
+    Server --> Pay["PayOS (VND) & Stripe (USD) Webhooks"]
 ```
 
 ---
@@ -77,11 +78,13 @@ Nếu `JSON.parse` gặp lỗi, `version` lệch với `STORAGE_SCHEMA_VERSION`,
 
 ---
 
-## 7. Lộ trình Nâng cấp lên Phase 2 (Backend & MySQL)
+## 7. Lộ trình Nâng cấp lên Phase 2 (**Supabase Hybrid** & Đường rút tự chủ)
 
-Khi bắt đầu Phase 2:
-1. **Database (MySQL + Prisma):** Thiết kế schema MySQL khớp với các entity trong `src/types/domain.ts` (`Product`, `User`, `Order`, `OrderItem`, `Coupon`, `UserEntitlement`).
-2. **Thay thế Repository:** Tạo `PrismaProductRepository`, `ServerOrderRepository`... gọi qua Next.js Server Actions / Route Handlers theo đúng các interface đã định nghĩa sẵn trong `src/services/repositories/interfaces.ts`.
-3. **Authentication & Server RBAC:** Đánh giá và tích hợp auth provider tương thích tốt với MySQL + Prisma (ví dụ Auth.js v5 hoặc Better Auth kèm adapter MySQL) và khóa quyền Admin ở tầng server.
-4. **Private Storage & Kiểm quyền trên Server:** Đưa file `.zip` lên object storage riêng tư (S3 / Cloudflare R2). Chỉ cấp link tải có thời hạn (signed URL) và trả full source code cho Monaco Viewer **sau khi server kiểm tra bảng quyền sở hữu trong MySQL**.
-5. **Tính tiền trên Server:** Tuyệt đối không tin giá tiền hoặc mã giảm giá gửi từ trình duyệt; server phải tự truy vấn giá gốc từ MySQL trước khi tạo phiên thanh toán.
+Theo **`ADR-008`**, Phase 2 triển khai theo kiến trúc **Supabase Hybrid chống khóa chặt (Zero Lock-in)**:
+
+1. **Database (Supabase PostgreSQL + Prisma ORM):** Thiết kế schema trong `prisma/schema.prisma` khớp với các entity trong `src/types/domain.ts` (`Product`, `ProductCodeFile`, `User`, `Order`, `OrderItem`, `Coupon`, `UserEntitlement`) giữ nguyên tiền tệ **số nguyên (`Int`)**. Bật RLS trên toàn bộ bảng trong schema `public` để chặn truy cập trực tiếp qua PostgREST.
+2. **Thay thế Repository qua Hợp đồng có sẵn:** Tạo `PrismaProductRepository`, `ServerOrderRepository`, `ServerCouponRepository` gọi từ Next.js Server Actions / Route Handlers theo đúng `src/services/repositories/interfaces.ts`. Không gọi `supabase.from(...)` trực tiếp trong React UI components.
+3. **Authentication (`@supabase/ssr`) & Server RBAC:** Dùng Supabase Auth cho Email/Password và Google OAuth với cookie `HttpOnly`. Trên server luôn xác thực phiên người dùng rồi mới kiểm tra `role` (`ADMIN`/`CUSTOMER`) từ bảng `User` của Prisma (không dùng `user_metadata` cho phân quyền).
+4. **Private Storage (`.zip`) & Kiểm quyền trên Server:** Upload `.zip` lên **Supabase Private Bucket** theo `zipObjectKey` tương đối (không lưu cứng URL domain Supabase trong DB). Chỉ cấp **Signed Download URL (~60s)** và trả mã nguồn cho Monaco Viewer sau khi server xác nhận `UserEntitlement` trong Postgres.
+5. **Song cổng Thanh toán (`PayOS` + `Stripe`) & Server-Side Pricing:** Server tự truy vấn `priceVnd`/`priceUsd` từ Postgres, xác thực `Coupon` trong transaction trước khi tạo phiên thanh toán PayOS (VND) hoặc Stripe (USD); chỉ mở khóa `UserEntitlement` sau khi xác thực chữ ký **Webhook** hợp lệ.
+6. **Lộ trình tách sang hạ tầng tự chủ (khi nhiều khách):** Đổi `DATABASE_URL` sang dedicated Postgres (giữ nguyên toàn bộ code Prisma), chép bucket `.zip` sang Cloudflare R2 (đổi 1 hàm tạo Signed URL) và chuyển Auth sang Better Auth mà không cần viết lại UI hay luồng thanh toán.

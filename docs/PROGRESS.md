@@ -1,10 +1,10 @@
-# Nhật ký Tiến độ & Bàn giao Phase 1 (`docs/PROGRESS.md`) — `forma/`
+# Nhật ký Tiến độ & Bàn giao (`docs/PROGRESS.md`) — `forma/`
 
-**Cập nhật lần cuối:** 2026-11-23  
-**Cột mốc hiện tại:** **Phase 1.7 + UI Polish & Full QA (`0.7.8` — Hoàn thành toàn bộ Phase 1 Frontend Demo-First)**  
+**Cập nhật lần cuối:** 2026-11-25  
+**Cột mốc hiện tại:** **Phase 2.1 — Thiết lập Supabase PostgreSQL, Prisma Schema, RLS & Seed dữ liệu thật** *(Phase 1 UI vẫn vận hành song song qua `localStorage` cho tới khi nối Auth & Repository ở Phase 2.2 → 2.4)*
 
 > ⚠️ **Tuyên bố Trạng thái (Non-Production Disclaimer):**  
-> Dự án **`forma/` hiện tại là bản Frontend Demo-First Prototype** vận hành hoàn toàn trên trình duyệt qua `localStorage` và dữ liệu seed. **Sản phẩm CHƯA phải bản Production-ready** — tuyệt đối không deploy phục vụ giao dịch thương mại thật cho đến khi hoàn thành **Phase 2 (Backend, MySQL + Prisma, Auth thật, Server RBAC, Private Object Storage & Payment Gateway)**.
+> Giao diện hiện tại của **`forma/` vẫn đang vận hành ở chế độ Phase 1 Frontend Demo-First** qua `localStorage` và dữ liệu seed. **Sản phẩm CHƯA phải bản Production-ready** cho đến khi triển khai xong các chặng **Phase 2.1 → 2.5 (Supabase PostgreSQL + Prisma ORM, Supabase Auth, Private Storage, Server RBAC, PayOS & Stripe Webhooks)**.
 
 ---
 
@@ -18,7 +18,20 @@
 | **Phase 1.4** | Mock Auth (`/login` bám sát ảnh thiết kế #3), `Get Free` claim flow, Cart Drawer trượt phải chống mua trùng, One-Page Checkout (`/checkout`), kiểm tra coupon (`FORMA20`, `WELCOME10`, `EXPIRED50`) & mô phỏng thanh toán `Success`/`Failure` | **Done (Đã xong)** |
 | **Phase 1.5** | Customer Dashboard (`/account`: `My Library`, `Orders`, `Wishlist`, `Settings` sửa Mock Profile không mật khẩu), Lazy-loaded Read-Only Monaco Code Viewer (Tree, Search, Copy, Fullscreen) & tải gói ZIP mẫu (`forma-sample-bundle.zip`) | **Done (Đã xong)** |
 | **Phase 1.6** | Admin Dashboard (`/admin`: Mock Role Gate, Sidebar 7 mục, Products CRUD + `Draft`/`Published` sync + Metadata-only `.zip`, Orders, Customers, Coupons CRUD, Mock Analytics, Settings `Reset All Demo Data`) | **Done (Đã xong)** |
-| **Phase 1.7** | **QA + Handoff & UI Polish (`0.7.0` → `0.7.8`):** Gỡ 3 package Radix thừa (`39` sub-packages), sửa token `accent-cyan-rgb` hỗ trợ toàn bộ alpha opacity `/10`–`/75`, bổ sung `prefers-reduced-motion` + `<MotionConfig reducedMotion="user">`, thay `DemoModeBar` bằng 2 nút icon tròn `HeaderSwitchers` (`Coins` + `Globe`) trên `Navbar`, thêm dải `Metrics` 3 cột nền trắng, tái cấu trúc card `Our Products` kèm hiệu ứng hover scale & quick actions (Wishlist/Cart), thêm dải `TechStackMarquee` 1 hàng chạy ngang, refactor `Footer` kèm form Newsletter demo, dựng `/about`, `/support`, `not-found.tsx`, `error.tsx`, kiểm tra 12/12 routes trên Chrome DevTools & bàn giao tài liệu Phase 2 | **Done (Đã xong)** |
+| **Phase 1.7** | **QA + Handoff & UI Polish (`0.7.0` → `0.7.12`):** Gỡ 3 package Radix thừa (`39` sub-packages), sửa token `accent-cyan-rgb` alpha, bổ sung `prefers-reduced-motion` + `<MotionConfig reducedMotion="user">`, thay `DemoModeBar` bằng `HeaderSwitchers` (`Coins` + `Globe`) & chuyển nút Đăng xuất sang phải `Explore Library` trên `Navbar`, thêm dải `Metrics`, tái cấu trúc card `Our Products` (hover scale + Wishlist/Cart), thêm `TechStackMarquee` (có `JavaScript`, bỏ `Prisma`), refactor `Footer` Newsletter và chỉ hiển thị ở Trang chủ `/`, tái cấu trúc `/library` tràn viền (2 tab `Components`/`Templates`, Search `⌘K` căn giữa, Sidebar cố định có thanh cuộn riêng `.forma-scrollbar`, Card sát mép), dựng `/about`, `/support`, `not-found.tsx`, `error.tsx` & QA 12/12 routes | **Done (Đã xong)** |
+
+---
+
+## 1B. Lộ trình Triển khai Phase 2 (Supabase Hybrid + PayOS & Stripe)
+
+| Sub-phase | Phạm vi công việc dự kiến | Trạng thái |
+| :--- | :--- | :--- |
+| **Phase 2.0** | Chốt quyết định kiến trúc **Supabase Hybrid (`ADR-008`)**, đồng bộ [AGENTS.md](file:///c:/BusinessWeb/Selling_tem/AGENTS.md), [ARCHITECTURE.md](file:///c:/BusinessWeb/Selling_tem/docs/ARCHITECTURE.md), [DECISIONS.md](file:///c:/BusinessWeb/Selling_tem/docs/DECISIONS.md), [PROGRESS.md](file:///c:/BusinessWeb/Selling_tem/docs/PROGRESS.md) & [CHANGELOG.md](file:///c:/BusinessWeb/Selling_tem/docs/CHANGELOG.md) | **Done (Đã xong)** |
+| **Phase 2.1** | Thiết lập dự án Supabase (`selling-temp`), cài `@prisma/client`, `prisma` (`^6.19.3`), `@supabase/supabase-js`, `@supabase/ssr`, `zod`, `tsx`; tạo `.env.example`, `src/lib/env.ts`, `src/lib/prisma.ts`, `src/lib/supabase/{client,server,admin}.ts`, `prisma/schema.prisma` (7 bảng Postgres `snake_case`), `prisma/rls.sql` (bật RLS + khóa PostgREST cho toàn bộ schema `public`), đẩy schema & seed thành công (`18` sản phẩm, `54` code files, `3` coupons) | **Done (Đã xong)** |
+| **Phase 2.2** | Triển khai **Supabase Auth** (`@supabase/ssr` Email/Password + Google OAuth), đồng bộ bảng `User` qua Prisma, gỡ `Preset Demo Accounts` & khóa Server RBAC cho `/admin` | **Pending** |
+| **Phase 2.3** | Thiết lập **Supabase Private Bucket** lưu `.zip` (`zipObjectKey` tương đối), Admin CRUD + Upload thật, Customer tải `.zip` qua Signed URL 60s & nạp source code Monaco từ Postgres | **Pending** |
+| **Phase 2.4** | Tích hợp song song **PayOS (VND / VietQR)** & **Stripe (USD)** với Server-Side Pricing, kiểm tra Coupon trong transaction & Webhook xác thực chữ ký mở khóa `UserEntitlement` | **Pending** |
+| **Phase 2.5** | Nối Newsletter API thật, thay Mock Analytics bằng query bảng `Order`, audit Supabase Advisors/RLS, CSP headers, rate limiting & kiểm thử E2E Production | **Pending** |
 
 ---
 
@@ -56,27 +69,30 @@
 
 ---
 
-## 4. Phase 2 Backlog (Lộ trình Triển khai Backend & Production)
+## 4. Phase 2 Backlog (Lộ trình Triển khai Backend Supabase Hybrid & Production)
 
-Khi bắt đầu **Phase 2**, nhóm phát triển cần thực hiện theo đúng thứ tự ưu tiên bảo mật dưới đây (tận dụng các interface đã tách sẵn trong [interfaces.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/interfaces.ts)):
+Khi triển khai **Phase 2.1 → 2.5**, thực hiện theo đúng thứ tự ưu tiên bảo mật dưới đây (tận dụng bộ interface đã tách sẵn trong [interfaces.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/interfaces.ts) và thiết kế `ADR-008`):
 
-1. **MySQL + Prisma Schema & Repository Implementation:**
-   - Thiết kế bảng `User`, `Product`, `ProductCodeFile`, `Coupon`, `Order`, `OrderItem`, `UserEntitlement` trong `prisma/schema.prisma`.
-   - Bảo toàn tiền tệ **số nguyên** (`priceVnd: Int`, `priceUsd: Int`, hoặc USD cents nếu gateway yêu cầu) và tạo các class `PrismaProductRepository`, `ServerOrderRepository`, `ServerCouponRepository` thay thế cho các `Mock*Repository` trong [src/services/index.ts](file:///c:/BusinessWeb/Selling_tem/src/services/index.ts).
-2. **Auth Provider Decision & Session Verification (Bắt buộc tương thích MySQL):**
-   - Chốt lựa chọn giữa **Auth.js v5 (Prisma Adapter)** hoặc **Better Auth (MySQL/Prisma)** — ưu tiên `HttpOnly`, `Secure`, `SameSite=Lax` session cookies, mã hóa mật khẩu bằng Argon2/bcrypt (nếu dùng email/password) và cấu hình Google OAuth thật bằng secret server-side.
-   - Xóa bỏ hoàn toàn nút đăng nhập nhanh `Preset Demo Accounts` (`customer@forma.demo`, `admin@forma.demo`) khỏi code Production.
-3. **Server Authorization Boundaries (RBAC):**
-   - Bảo vệ `/admin` bằng Next.js Middleware + kiểm tra session trong Server Components trước khi render HTML.
-   - Bắt buộc mọi Server Action / Route Handler (`POST/PATCH/DELETE` sản phẩm, bật `Published`/`Draft`, CRUD coupon) xác thực `session.user.role === 'ADMIN'` ngay trên server đối chiếu MySQL, trả `401`/`403` nếu không đủ quyền.
-4. **Private Object Storage (S3 / Cloudflare R2) & Asset Protection:**
-   - Upload gói `.zip` thật của Admin qua **Pre-signed PUT URL** lên private bucket (chỉ chấp nhận `application/zip`, giới hạn dung lượng).
-   - Thay link `/demo-assets/forma-sample-bundle.zip` bằng API tải cấp **Short-lived Pre-signed GET URL** (hết hạn sau ~60 giây) và chỉ trả mã nguồn Monaco từ API sau khi server truy vấn xác nhận `UserEntitlement` trong MySQL.
-5. **Payment Gateway & Server-Side Pricing:**
-   - Tích hợp cổng thanh toán thật (Stripe cho quốc tế / PayOS hoặc VNPay cho VND).
-   - Tuyệt đối không tin giỏ hàng hay phần trăm giảm giá từ trình duyệt: server tự đọc `priceVnd`/`priceUsd` từ MySQL, kiểm tra hạn & hiệu lực `Coupon` trong transaction rồi mới tạo payment session; mở khóa `UserEntitlement` chỉ khi nhận và xác thực chữ ký Webhook hợp lệ.
-6. **Production Security Hardening:**
-   - Bổ sung Content-Security-Policy (CSP), rate limiting trên các route `/api/auth`, `/api/coupons/validate`, `/api/checkout`, và audit log mọi thao tác Admin. Nếu mở preview cho code upload động trong tương lai, bắt buộc phục vụ từ **domain/origin cô lập riêng** ngoài domain chính.
+1. **Supabase PostgreSQL + Prisma Schema & RLS (`Phase 2.1`):**
+   - Thiết kế bảng `User`, `Product`, `ProductCodeFile`, `Coupon`, `Order`, `OrderItem`, `UserEntitlement` trong `prisma/schema.prisma` (provider `postgresql`).
+   - Bật **RLS** trên toàn bộ bảng ở schema `public` (không để `anon`/`authenticated` tự đọc/ghi tùy tiện qua PostgREST Data API).
+   - Bảo toàn tiền tệ **số nguyên** (`priceVnd: Int`, `priceUsd: Int`) và tạo `PrismaProductRepository`, `ServerOrderRepository`, `ServerCouponRepository` cắm vào [src/services/index.ts](file:///c:/BusinessWeb/Selling_tem/src/services/index.ts).
+2. **Supabase Auth (`@supabase/ssr`) & Session Verification (`Phase 2.2`):**
+   - Dùng **Supabase Auth** (Email/Password + Google OAuth thật) qua `@supabase/ssr` với cookie `HttpOnly`, `Secure`, `SameSite=Lax`.
+   - Đồng bộ `auth.users` ↔ bảng `User` của Prisma (lưu `email` unique + `role`). Tuyệt đối không dùng `user_metadata` cho phân quyền.
+   - Xóa bỏ hoàn toàn nút đăng nhập nhanh `Preset Demo Accounts` (`customer@forma.demo`, `admin@forma.demo`) khỏi bản Production.
+3. **Server Authorization Boundaries (RBAC — `Phase 2.2`):**
+   - Bảo vệ `/admin` bằng Next.js Middleware + kiểm tra phiên từ server (`getUser()`) trước khi render HTML.
+   - Bắt buộc mọi Server Action / Route Handler (`POST/PATCH/DELETE` sản phẩm, bật `Published`/`Draft`, CRUD coupon) xác thực `user.role === 'ADMIN'` ngay trên server đối chiếu Postgres, trả `401`/`403` nếu không đủ quyền.
+4. **Supabase Private Storage & Asset Protection (`Phase 2.3`):**
+   - Tạo **Private Bucket** trên Supabase Storage; lưu đường dẫn tương đối vào `zipObjectKey` (không lưu cứng domain URL Supabase để sẵn sàng chuyển sang Cloudflare R2/S3 về sau).
+   - Admin upload file `.zip` qua **Signed Upload URL** do server cấp sau khi kiểm tra quyền `ADMIN` (chỉ nhận `application/zip`, giới hạn dung lượng).
+   - Khách hàng tải `.zip` qua API kiểm tra `UserEntitlement` trong Postgres và cấp **Short-lived Signed Download URL (~60 giây)**; API đọc code cho Monaco Viewer cũng chỉ trả dữ liệu sau khi xác nhận `UserEntitlement`.
+5. **Song cổng Thanh toán `PayOS` (VND) + `Stripe` (USD) & Server-Side Pricing (`Phase 2.4`):**
+   - Tích hợp **cả hai**: **PayOS** (VietQR / chuyển khoản VND) và **Stripe** (thẻ quốc tế USD).
+   - Tuyệt đối không tin giỏ hàng hay phần trăm giảm giá từ trình duyệt: Next.js Server tự đọc `priceVnd`/`priceUsd` từ Postgres, kiểm tra hạn & lượt dùng `Coupon` trong database transaction rồi mới tạo phiên thanh toán; mở khóa `UserEntitlement` chỉ khi nhận và xác thực chữ ký **Webhook** hợp lệ từ PayOS hoặc Stripe.
+6. **Production Security Hardening & Polish (`Phase 2.5`):**
+   - Bổ sung Content-Security-Policy (CSP), rate limiting trên `/api/auth`, `/api/coupons/validate`, `/api/checkout`, audit log thao tác Admin, nối API thật cho Newsletter ở `Footer` & Analytics thật từ bảng `Order`, và chạy Supabase Advisors kiểm tra RLS. Nếu mở preview cho code upload động trong tương lai, bắt buộc phục vụ từ **origin/domain cô lập riêng** ngoài domain chính.
 
 ---
 

@@ -15,13 +15,18 @@
 
 ## 1. Phạm vi Phase & Ranh giới Tuyệt đối
 
-- **Phạm vi hiện tại:** **Phase 1 (Frontend Demo-First)**.
-- **Nghiêm cấm thực hiện trong Phase 1** (trừ khi chủ dự án yêu cầu trực tiếp):
-  - KHÔNG cài đặt Prisma, tạo schema MySQL, kết nối database hay viết backend API thật.
-  - KHÔNG triển khai Google OAuth thật, mã hóa/hash mật khẩu, tích hợp SDK thanh toán thật hay lưu trữ/chạy file ZIP người dùng upload.
-  - KHÔNG nhúng mã nguồn thương mại trả phí thật vào file seed phía client; chỉ dùng các đoạn code mẫu an toàn.
+- **Phạm vi hiện tại:** **Phase 2 (Backend & Production Migration — Supabase Hybrid)** *(với Phase 1 Frontend Demo-First đã hoàn tất đến mốc `0.7.12`)*.
+- **Kiến trúc Phase 2 đã chốt (`ADR-008`):**
+  - **Database & ORM:** Supabase PostgreSQL kết nối qua **Prisma ORM** (`DATABASE_URL`), giữ tiền tệ **số nguyên** (`Int`), bật **RLS** trên toàn bộ bảng trong schema `public`.
+  - **Authentication & RBAC:** **Supabase Auth** (`@supabase/ssr` + `@supabase/supabase-js`) với cookie `HttpOnly`; kiểm tra `role` trên server thông qua `User` table trong Prisma (hoặc `app_metadata`) — **CẤM dùng `user_metadata` cho phân quyền**.
+  - **Private Storage:** **Supabase Private Bucket** lưu bằng `zipObjectKey` tương đối (không hardcode domain URL trong DB), cấp Signed URL ngắn hạn sau khi server xác nhận `ADMIN` / `UserEntitlement`.
+  - **API & Payment (`PayOS` + `Stripe`):** Toàn bộ logic Checkout, Coupon, Webhook và Admin CRUD chạy trên Next.js Server (`src/app/api/*` / Server Actions).
+- **Ranh giới An toàn Bắt buộc trong Phase 2:**
+  - KHÔNG để lộ `SUPABASE_SERVICE_ROLE_KEY`, `PAYOS_*`, `STRIPE_SECRET_KEY`, `DATABASE_URL` vào biến `NEXT_PUBLIC_*` hoặc code client.
+  - KHÔNG tin giá tiền, phần trăm coupon, `role` hay `ownedProductIds` gửi từ trình duyệt/`localStorage`.
   - KHÔNG lưu mật khẩu, secret key hay thông tin thẻ thanh toán vào `localStorage`.
-- **Quy tắc mỗi lượt một Sub-phase:** Chỉ triển khai ĐÚNG MỘT sub-phase trong mỗi lượt. Chờ chủ dự án duyệt mới chuyển sang bước tiếp theo.
+  - KHÔNG giải nén/chạy mã nguồn từ file ZIP người dùng upload ngay trên origin chính của ứng dụng.
+- **Quy tắc mỗi lượt một Sub-phase:** Chỉ triển khai ĐÚNG MỘT sub-phase (`2.0`, `2.1`, `2.2`...) trong mỗi lượt. Chờ chủ dự án duyệt mới chuyển sang bước tiếp theo.
 
 ---
 
