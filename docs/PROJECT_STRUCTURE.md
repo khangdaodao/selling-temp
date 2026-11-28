@@ -2,7 +2,7 @@
 
 Tài liệu này phản ánh **đúng cây thư mục thực tế** hiện có trong `c:\BusinessWeb\Selling_tem`. Các thư mục tương lai sẽ chỉ được tạo khi bước vào sub-phase cần dùng tới chúng.
 
-## Cây Thư mục Hiện tại (Phase 2.2 — Supabase Auth, PostgreSQL User Sync & Server RBAC)
+## Cây Thư mục Hiện tại (Phase 2.3 — Private Storage `.zip` + Catalog & Coupon Prisma APIs)
 
 ```text
 forma/
@@ -50,11 +50,26 @@ forma/
     │   │   └── page.tsx                           # Server Component `/admin` khóa Server RBAC (`role === 'admin'`) trước khi render
     │   ├── api/
     │   │   ├── admin/
-    │   │   │   └── customers/
-    │   │   │       └── route.ts                   # `GET /api/admin/customers` (401/403 RBAC + danh sách users PostgreSQL)
-    │   │   └── auth/
-    │   │       └── session/
-    │   │           └── route.ts                   # `GET` phiên đã xác thực & `PATCH` cập nhật tên hiển thị PostgreSQL
+    │   │   │   ├── customers/
+    │   │   │   │   └── route.ts                   # `GET /api/admin/customers` (401/403 RBAC + danh sách users PostgreSQL)
+    │   │   │   └── storage/
+    │   │   │       └── upload-url/
+    │   │   │           └── route.ts               # `POST /api/admin/storage/upload-url` cấp Signed Upload URL `.zip` cho Admin
+    │   │   ├── auth/
+    │   │   │   └── session/
+    │   │   │       └── route.ts                   # `GET` phiên đã xác thực & `PATCH` cập nhật tên hiển thị PostgreSQL
+    │   │   ├── coupons/
+    │   │   │   ├── validate/
+    │   │   │   │   └── route.ts                   # `POST /api/coupons/validate` kiểm tra coupon thật trên PostgreSQL
+    │   │   │   └── route.ts                       # `GET/POST/DELETE /api/coupons` quản trị coupon (Server RBAC)
+    │   │   └── products/
+    │   │       ├── [id]/
+    │   │       │   ├── code/
+    │   │       │   │   └── route.ts               # `GET /api/products/[id]/code` cấp source Monaco (Admin / UserEntitlement)
+    │   │       │   ├── download/
+    │   │       │   │   └── route.ts               # `GET /api/products/[id]/download` cấp Signed Download URL 60s `.zip`
+    │   │       │   └── route.ts                   # `GET/PATCH/DELETE /api/products/[id]`
+    │   │       └── route.ts                       # `GET/POST /api/products` (Catalog PostgreSQL + Admin RBAC)
     │   ├── auth/
     │   │   └── callback/
     │   │       └── route.ts                       # PKCE OAuth / Email / Recovery callback đồng bộ `public.users`
@@ -138,12 +153,15 @@ forma/
     │   ├── auth/
     │   │   ├── auth-utils.ts                      # Hàm thuần shared (`resolveSafeNextPath`, `computeAvatarInitials`, `normalizeAuthEmail`)
     │   │   └── server-auth.ts                     # Server-only xác thực `getUser()`, sync `public.users` & guard `requireAdminUser()`
+    │   ├── catalog/
+    │   │   └── product-mapper.ts                  # Mapper Prisma ↔ Domain, Zod schemas, SSR DB queries & kiểm tra `UserEntitlement`
     │   ├── env.ts                                 # Kiểm tra biến môi trường server/client bằng Zod (tách biệt secret khỏi client)
     │   ├── prisma.ts                              # PrismaClient singleton server-only nối Supabase PostgreSQL
     │   ├── utils.ts                               # Hàm `cn()` gộp class Tailwind
     │   ├── format/
     │   │   └── currency.ts                        # Định dạng giá số nguyên VND/USD và tính giảm giá số nguyên
     │   ├── storage/
+    │   │   ├── private-bucket.ts                  # Quản lý bucket kín `product-bundles` (50 MB `.zip`), Signed Upload & Download URLs 60s
     │   │   ├── storage-adapter.ts                 # Wrapper localStorage có version, SSR-safe, fallback & reset
     │   │   └── storage-keys.ts                    # Danh sách tập trung các key `forma:v1:*`
     │   └── supabase/
@@ -155,12 +173,12 @@ forma/
     │   └── products.seed.ts                       # 18 sản phẩm mẫu (11 UI Components + 7 Website Templates)
     ├── middleware.ts                              # Edge Middleware refresh cookie Supabase Auth & chặn khách chưa đăng nhập ở `/admin`
     ├── services/
-    │   ├── index.ts                               # Export các repository instances (`SupabaseAuthRepository` + mock catalog/orders/coupons)
+    │   ├── index.ts                               # Export repository instances (`SupabaseAuth`, `ApiProduct`, `ApiCoupon` + mock orders)
     │   └── repositories/
+    │       ├── api-coupon.repository.ts           # Triển khai `ICouponRepository` qua `/api/coupons*`
+    │       ├── api-product.repository.ts          # Triển khai `IProductRepository` qua `/api/products*`
     │       ├── interfaces.ts                      # Hợp đồng IProductRepository, IAuthRepository, IOrderRepository, ICouponRepository
-    │       ├── mock-coupon.repository.ts
     │       ├── mock-order.repository.ts
-    │       ├── mock-product.repository.ts
     │       └── supabase-auth.repository.ts        # Triển khai `IAuthRepository` dùng Supabase Auth + `/api/auth/session`
     └── types/
         └── domain.ts                              # Domain models dùng chung (Product, Order, Coupon, DemoUser...)

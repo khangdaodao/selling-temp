@@ -20,6 +20,7 @@ import {
   ArrowUpRight,
   Check,
   Code2,
+  Download,
   FileCode2,
   Heart,
   Lock,
@@ -122,6 +123,8 @@ export function ProductDetailView({
   }
 
   const isOwned = session !== null && ownedProductIds.includes(product.id);
+  const isAdmin = session?.user.role === 'admin';
+  const hasSourceAccess = isOwned || isAdmin;
   const isInCart = cartItems.some((item) => item.productId === product.id);
   const isInlineInteractive =
     product.previewMode === 'interactive-card' && product.previewComponentKey !== null;
@@ -352,6 +355,18 @@ export function ProductDetailView({
                     </span>
                   </Button>
                 )}
+
+                {hasSourceAccess && product.zipMetadata.sampleDownloadPath ? (
+                  <Button variant="outline" size="default" asChild>
+                    <a
+                      href={product.zipMetadata.sampleDownloadPath}
+                      download={product.zipMetadata.fileName}
+                    >
+                      <Download className="h-4 w-4 text-accent-cyan" aria-hidden="true" />
+                      <span>{t.account.downloadZipCta}</span>
+                    </a>
+                  </Button>
+                ) : null}
               </div>
 
               {actionNotice ? (
@@ -406,7 +421,7 @@ export function ProductDetailView({
                   }`}
                 >
                   {tab.id === 'source' ? (
-                    isOwned ? (
+                    hasSourceAccess ? (
                       <Code2 className="h-3.5 w-3.5" aria-hidden="true" />
                     ) : (
                       <Lock className="h-3.5 w-3.5" aria-hidden="true" />
@@ -478,7 +493,7 @@ export function ProductDetailView({
 
             {activeTab === 'source' ? (
               <div className="space-y-5">
-                {!isOwned ? (
+                {!hasSourceAccess ? (
                   <>
                     <div className="flex flex-col items-start gap-4 rounded-xl border border-white/10 bg-[#08080b] p-5 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-start gap-3">

@@ -69,13 +69,15 @@ export interface ProductCodeFile {
 
 /**
  * Latest-only ZIP distribution metadata (per forma/ policy: no historical version archive).
- * In Phase 1, ZIP uploads in Admin store metadata only; downloads point to static demo assets.
+ * Stores a relative Supabase Private Storage object key (`objectKey`) rather than hardcoded domain URLs.
  */
 export interface ProductZipMetadata {
   fileName: string;
   sizeBytes: number;
   updatedAt: string;
-  /** Static public path (e.g., "/demo-assets/sample-component.zip") or null when unavailable. */
+  /** Vendor-neutral relative object key inside private storage (e.g., "products/orbit/latest.zip"). */
+  objectKey?: string | null;
+  /** Server-authorized download API endpoint (`/api/products/<id>/download`) or null when unavailable. */
   sampleDownloadPath: string | null;
 }
 

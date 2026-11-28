@@ -386,7 +386,7 @@ export const viDictionary: TranslationDictionary = {
   codeViewer: {
     title: 'Monaco Source Viewer',
     readOnlyBadge: 'Chỉ đọc (Read-only)',
-    demoFixtureBadge: 'Demo Source Fixture',
+    demoFixtureBadge: 'PostgreSQL Source',
     searchPlaceholder: 'Tìm từ khóa trong code...',
     matchesLabel: 'khớp',
     noMatches: 'Không có dòng nào khớp trong file này',
@@ -397,7 +397,7 @@ export const viDictionary: TranslationDictionary = {
     fullscreenExit: 'Thu nhỏ',
     loadingEditor: 'Đang nạp Monaco Editor (lazy-loaded)...',
     securityNote:
-      'Đây là đoạn code mẫu an toàn cho Phase 1 Demo. Không chứa mã nguồn thương mại trả phí thật; bảo mật tải file thật được kiểm tra phía server ở Phase 2.',
+      'Mã nguồn được cấp qua API `/api/products/[id]/code` sau khi server xác nhận quyền Admin hoặc quyền sở hữu PostgreSQL.',
   },
   admin: {
     badge: 'ADMIN DASHBOARD • SERVER RBAC',
@@ -446,9 +446,9 @@ export const viDictionary: TranslationDictionary = {
       noOrdersYet: 'Chưa có đơn hàng mô phỏng nào. Hãy thử Checkout hoặc Claim Free ở Library.',
     },
     productsSection: {
-      title: 'Quản lý Sản phẩm (Mock CRUD)',
+      title: 'Quản lý Sản phẩm (PostgreSQL + Private Storage)',
       subtitle:
-        'Thêm, sửa, xóa hoặc chuyển Draft/Published. Sản phẩm ở trạng thái Draft sẽ tự động ẩn khỏi trang chủ và /library công khai.',
+        'Thêm, sửa, xóa hoặc chuyển Draft/Published trực tiếp lên Supabase PostgreSQL. Sản phẩm Draft tự động ẩn khỏi trang chủ và /library.',
       newProductCta: 'Thêm sản phẩm',
       searchPlaceholder: 'Tìm theo tên, slug hoặc danh mục...',
       statusFilterAll: 'Tất cả',
@@ -461,8 +461,8 @@ export const viDictionary: TranslationDictionary = {
       unpublishBtn: 'Chuyển Draft',
       editBtn: 'Sửa',
       deleteBtn: 'Xóa',
-      confirmDeleteNotice: 'Đã xóa sản phẩm khỏi mock catalog (chỉ trong localStorage).',
-      savedNotice: 'Đã lưu sản phẩm vào localStorage và đồng bộ với Library!',
+      confirmDeleteNotice: 'Đã xóa sản phẩm khỏi PostgreSQL và Private Storage.',
+      savedNotice: 'Đã lưu sản phẩm lên PostgreSQL và đồng bộ với Library!',
       deletedNotice: 'Đã xóa sản phẩm.',
       statusUpdatedNotice: 'Đã cập nhật trạng thái xuất bản.',
       emptyState: 'Không có sản phẩm nào khớp bộ lọc hiện tại.',
@@ -496,14 +496,14 @@ export const viDictionary: TranslationDictionary = {
         descEnLabel: 'Detailed description (English)',
         docsViLabel: 'Hướng dẫn sử dụng (Tiếng Việt)',
         docsEnLabel: 'Documentation (English)',
-        zipUploadTitle: 'Tải lên file nguồn ZIP (Chỉ đọc Metadata)',
+        zipUploadTitle: 'Tải lên gói nguồn ZIP thật (Supabase Private Storage)',
         zipUploadSubtitle:
-          'Chọn file .zip bất kỳ để ghi nhận tên file và dung lượng (bytes) vào metadata tạm thời.',
-        zipSelectBtn: 'Chọn file .zip (Metadata Only)',
-        zipCurrentMeta: 'Metadata hiện tại:',
+          'Chọn file .zip (tối đa 50 MB). Khi bấm Lưu, file sẽ upload thẳng lên Private Bucket (`products/<slug>/latest.zip`) ghi đè bản mới nhất.',
+        zipSelectBtn: 'Chọn file .zip thật (≤ 50 MB)',
+        zipCurrentMeta: 'File ZIP hiện tại:',
         zipNoFile: 'Chưa gán file ZIP nào.',
         zipSecurityNotice:
-          'Ranh giới bảo mật Phase 1: Hệ thống KHÔNG đọc nội dung nhị phân, KHÔNG lưu file lớn vào localStorage và KHÔNG thực thi code từ ZIP tải lên.',
+          'Bảo mật Private Bucket: Chỉ Admin được cấp Signed Upload URL; khách phải có UserEntitlement hợp lệ mới nhận được Signed Download URL (hạn 60 giây).',
         validationError: 'Vui lòng nhập Tên, Slug hợp lệ, ít nhất 1 Framework và mô tả ngắn.',
       },
     },
@@ -531,9 +531,9 @@ export const viDictionary: TranslationDictionary = {
       verifiedBadge: 'PostgreSQL',
     },
     couponsSection: {
-      title: 'Quản lý Mã giảm giá (Coupons)',
+      title: 'Quản lý Mã giảm giá (PostgreSQL)',
       subtitle:
-        'Tạo hoặc cập nhật mã giảm giá. Checkout sẽ kiểm tra trực tiếp danh sách này (thử FORMA20 hoặc mã mới tạo).',
+        'Tạo hoặc cập nhật mã giảm giá trong PostgreSQL. Checkout kiểm tra trực tiếp qua `/api/coupons/validate`.',
       newCouponCta: 'Lưu / Cập nhật Coupon',
       codeLabel: 'Mã Coupon (in hoa) *',
       discountPercentLabel: 'Phần trăm giảm (1 - 100%) *',
@@ -548,7 +548,7 @@ export const viDictionary: TranslationDictionary = {
       deleteBtn: 'Xóa',
       statusActive: 'Đang bật',
       statusInactive: 'Đang tắt',
-      savedNotice: 'Đã lưu coupon vào localStorage!',
+      savedNotice: 'Đã lưu coupon lên PostgreSQL!',
       deletedNotice: 'Đã xóa coupon.',
       validationError: 'Mã coupon phải có ít nhất 2 ký tự và mức giảm từ 1% đến 100%.',
     },

@@ -1,14 +1,16 @@
 /**
  * App Router Server Component entrypoint for the Homepage (`/`).
- * Pre-renders the 6 featured seed products on the server for instant SEO/SSR HTML,
- * then hands off interactive language/currency switching and repository syncing to `HomepageView`.
+ * Queries featured published products directly from PostgreSQL via Prisma for SEO/SSR HTML,
+ * then hands off interactive language/currency switching to `HomepageView`.
  *
- * Related: src/features/catalog/components/homepage-view.tsx, src/mocks/products.seed.ts
+ * Related: src/features/catalog/components/homepage-view.tsx, src/lib/catalog/product-mapper.ts
  */
 
 import type { Metadata } from 'next';
 import { HomepageView } from '@/features/catalog/components/homepage-view';
-import { SEED_PRODUCTS } from '@/mocks/products.seed';
+import { getPublishedFeaturedProductsFromDb } from '@/lib/catalog/product-mapper';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Forma/ — UI Components & Website Templates',
@@ -17,12 +19,10 @@ export const metadata: Metadata = {
 };
 
 /**
- * Root `/` Server Component passing initial featured catalog items to the client view.
+ * Root `/` Server Component passing initial featured PostgreSQL catalog items to the client view.
  */
-export default function HomePage(): React.JSX.Element {
-  const initialFeaturedProducts = SEED_PRODUCTS.filter(
-    (product) => product.status === 'published' && product.featured,
-  ).slice(0, 6);
+export default async function HomePage(): Promise<React.JSX.Element> {
+  const initialFeaturedProducts = await getPublishedFeaturedProductsFromDb(6);
 
   return <HomepageView initialFeaturedProducts={initialFeaturedProducts} />;
 }

@@ -4,26 +4,27 @@
  * directly to concrete storage or Phase 2 Supabase/Prisma implementations.
  *
  * Phase 2 migration status:
- * - `authRepository` uses real Supabase Auth + PostgreSQL `public.users` (`Phase 2.2`).
- * - `productRepository`, `couponRepository`, and `orderRepository` migrate in `Phase 2.3–2.4`.
+ * - `authRepository` uses Supabase Auth + PostgreSQL `public.users` (`Phase 2.2`).
+ * - `productRepository` & `couponRepository` use PostgreSQL + Prisma APIs (`Phase 2.3`).
+ * - `orderRepository` migrates to PayOS/Stripe + PostgreSQL in `Phase 2.4`.
  *
  * Related: src/services/repositories/interfaces.ts
  */
 
+import { ApiCouponRepository } from './repositories/api-coupon.repository';
+import { ApiProductRepository } from './repositories/api-product.repository';
 import type {
   IAuthRepository,
   ICouponRepository,
   IOrderRepository,
   IProductRepository,
 } from './repositories/interfaces';
-import { MockCouponRepository } from './repositories/mock-coupon.repository';
 import { MockOrderRepository } from './repositories/mock-order.repository';
-import { MockProductRepository } from './repositories/mock-product.repository';
 import { SupabaseAuthRepository } from './repositories/supabase-auth.repository';
 
-export const productRepository: IProductRepository = new MockProductRepository();
+export const productRepository: IProductRepository = new ApiProductRepository();
 export const authRepository: IAuthRepository = new SupabaseAuthRepository();
-export const couponRepository: ICouponRepository = new MockCouponRepository();
+export const couponRepository: ICouponRepository = new ApiCouponRepository();
 export const orderRepository: IOrderRepository = new MockOrderRepository();
 
 export type {

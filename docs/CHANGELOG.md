@@ -4,6 +4,18 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.8.3] — 2026-11-28 — Phase 2.3: Supabase Private Storage `.zip` + Catalog & Coupon Prisma APIs
+
+### Đã thêm mới & Nâng cấp (Added & Changed)
+- **Supabase Private Bucket `product-bundles` ([private-bucket.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/storage/private-bucket.ts), [seed.ts](file:///c:/BusinessWeb/Selling_tem/prisma/seed.ts)):**
+  - Khởi tạo bucket kín (`public: false`, giới hạn `50 MB`, chỉ nhận `.zip`), nạp sẵn `samples/forma-sample-bundle.zip` làm `zipObjectKey` mặc định cho 18 sản phẩm gốc mà không ghi đè file upload thật khi re-seed.
+- **Catalog, Coupons & Authorized Asset APIs ([product-mapper.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/catalog/product-mapper.ts), `/api/products/*`, `/api/coupons*`, `/api/admin/storage/upload-url`):**
+  - Chuyển toàn bộ SSR ([page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/page.tsx), [products/[slug]/page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/products/[slug]/page.tsx), [preview/[slug]/page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/preview/[slug]/page.tsx)) và repositories ([api-product.repository.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/api-product.repository.ts), [api-coupon.repository.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/api-coupon.repository.ts)) sang đọc/ghi trực tiếp trên PostgreSQL.
+  - Ẩn `ProductCodeFile.content` khỏi mọi response/HTML công khai; chỉ cấp mã nguồn qua `/api/products/[id]/code` và **Signed Download URL (60s)** qua `/api/products/[id]/download` khi server xác nhận `role === 'admin'` hoặc PostgreSQL `UserEntitlement`.
+  - Hỗ trợ Admin upload file `.zip` thật từ [admin-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/admin/components/admin-view.tsx) thẳng lên `product-bundles` (`products/<slug>/latest.zip`) thông qua Signed Upload token, đồng thời gỡ bỏ `mock-product.repository.ts` & `mock-coupon.repository.ts`.
+
+---
+
 ## [0.8.2] — 2026-11-25 — Phase 2.2: Supabase Auth (`@supabase/ssr`), Đồng bộ PostgreSQL & Server RBAC
 
 ### Đã thêm mới & Nâng cấp (Added & Changed)

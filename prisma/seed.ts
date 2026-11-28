@@ -15,6 +15,10 @@ import {
   ProductTier,
   ProductType,
 } from '@prisma/client';
+import {
+  SAMPLE_BUNDLE_OBJECT_KEY,
+  syncSampleBundleToPrivateStorage,
+} from '../src/lib/storage/private-bucket';
 import { SEED_COUPONS } from '../src/mocks/coupons.seed';
 import { SEED_PRODUCTS } from '../src/mocks/products.seed';
 import type { PreviewMode as DomainPreviewMode } from '../src/types/domain';
@@ -36,9 +40,20 @@ function mapPreviewMode(mode: DomainPreviewMode): PreviewMode {
  * Upserts catalog products, code bundle files, and seed coupons into PostgreSQL.
  */
 async function main(): Promise<void> {
-  console.info(`Seeding ${SEED_PRODUCTS.length} products and ${SEED_COUPONS.length} coupons...`);
+  console.info(
+    `Provisioning private bucket and seeding ${SEED_PRODUCTS.length} products and ${SEED_COUPONS.length} coupons...`,
+  );
+
+  await syncSampleBundleToPrivateStorage();
 
   for (const product of SEED_PRODUCTS) {
+    const existing = await prisma.product.findUnique({
+      where: { id: product.id },
+      select: { zipObjectKey: true },
+    });
+    const resolvedObjectKey =
+      existing?.zipObjectKey ?? SAMPLE_BUNDLE_OBJECT_KEY;
+
     await prisma.product.upsert({
       where: { id: product.id },
       update: {
@@ -64,9 +79,10 @@ async function main(): Promise<void> {
         previewComponentKey: product.previewComponentKey,
         supportsThemeToggle: product.supportsThemeToggle,
         featured: product.featured,
-        zipFileName: product.zipMetadata.fileName,
-        zipSizeBytes: product.zipMetadata.sizeBytes,
-        zipUpdatedAt: new Date(product.zipMetadata.updatedAt),
+        zipObjectKey: resolvedObjectKey,
+        zipFileName: existing?.zipObjectKey ? undefined : product.zipMetadata.fileName,
+        zipSizeBytes: existing?.zipObjectKey ? undefined : product.zipMetadata.sizeBytes,
+        zipUpdatedAt: existing?.zipObjectKey ? undefined : new Date(product.zipMetadata.updatedAt),
       },
       create: {
         id: product.id,
@@ -92,7 +108,7 @@ async function main(): Promise<void> {
         previewComponentKey: product.previewComponentKey,
         supportsThemeToggle: product.supportsThemeToggle,
         featured: product.featured,
-        zipObjectKey: null,
+        zipObjectKey: SAMPLE_BUNDLE_OBJECT_KEY,
         zipFileName: product.zipMetadata.fileName,
         zipSizeBytes: product.zipMetadata.sizeBytes,
         zipUpdatedAt: new Date(product.zipMetadata.updatedAt),

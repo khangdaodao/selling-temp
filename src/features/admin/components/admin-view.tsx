@@ -1,18 +1,12 @@
 /**
- * Admin Dashboard (`/admin`) workspace for forma/ Phase 1 (Demo-First).
- * Provides a responsive 7-section sidebar interface covering Overview, Products CRUD
- * (with Draft/Published visibility toggles & metadata-only ZIP selection), Simulated Orders,
- * Demo Customers, Coupons CRUD, explicitly mocked Analytics, and Reset Demo Data Settings.
+ * Admin Dashboard (`/admin`) workspace for forma/ Phase 2.3.
+ * Protected by Server RBAC (`src/app/admin/page.tsx`) and connected to PostgreSQL + Prisma
+ * APIs for Products CRUD, Draft/Published toggles, real Supabase Private Storage `.zip` uploads,
+ * Registered Customers (`GET /api/admin/customers`), and Coupons CRUD (`GET/POST/DELETE /api/coupons`).
+ * Note: Orders, simulated revenue, and Analytics remain backed by Phase 1 stubs until Phase 2.4–2.5.
  *
- * Security boundary: Role gating (`role === 'admin'`) is simulated in the browser solely for
- * Phase 1 UI demonstration and NEVER constitutes real authorization. Never persist binary
- * ZIP contents or passwords into `localStorage`.
- *
- * TODO(Phase 2): Protect `/admin` routes and all catalog/coupon mutations with Next.js server-side
- * session verification, RBAC middleware, MySQL + Prisma, and signed S3/R2 asset uploads.
- *
- * Related: src/app/admin/page.tsx, src/services/repositories/mock-product.repository.ts,
- * src/services/repositories/mock-coupon.repository.ts
+ * Related: src/app/admin/page.tsx, src/services/repositories/api-product.repository.ts,
+ * src/services/repositories/api-coupon.repository.ts
  */
 
 'use client';
@@ -26,6 +20,7 @@ import {
   BarChart3,
   Check,
   CheckCircle2,
+  Download,
   Eye,
   EyeOff,
   FileArchive,
@@ -51,6 +46,7 @@ import { pickLocalizedText, useI18n } from '@/i18n/use-i18n-store';
 import { formatMoneyAmount, formatProductPrice } from '@/lib/format/currency';
 import { resetAllDemoData } from '@/lib/storage/storage-adapter';
 import { DEMO_RESET_EVENT } from '@/lib/storage/storage-keys';
+import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import {
   couponRepository,
   orderRepository,
@@ -309,6 +305,8 @@ export function AdminView(): React.JSX.Element {
   );
   const [productFormError, setProductFormError] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [pendingZipFile, setPendingZipFile] = useState<File | null>(null);
+  const [savingProduct, setSavingProduct] = useState(false);
   const zipInputRef = useRef<HTMLInputElement | null>(null);
 
   // Coupons CRUD state
@@ -475,6 +473,7 @@ export function AdminView(): React.JSX.Element {
     setEditingProductId(null);
     setSlugTouched(false);
     setProductFormError(null);
+    setPendingZipFile(null);
     setProductForm(createEmptyProductForm());
     setShowProductForm(true);
     setActiveTab('products');
@@ -484,6 +483,7 @@ export function AdminView(): React.JSX.Element {
     setEditingProductId(product.id);
     setSlugTouched(true);
     setProductFormError(null);
+    setPendingZipFile(null);
     setProductForm(productToFormState(product));
     setShowProductForm(true);
   };
@@ -508,21 +508,33 @@ export function AdminView(): React.JSX.Element {
 
   const handleZipMetadataChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) {
       return;
     }
-    // Security boundary: extract ONLY file.name & file.size metadata in memory.
-    // Never call FileReader or store binary ZIP payloads in localStorage.
+
+    const maxBytes = 50 * 1024 * 1024;
+    if (!file.name.toLowerCase().endsWith('.zip')) {
+      setProductFormError('Only .zip archive files are supported.');
+      return;
+    }
+    if (file.size <= 0 || file.size > maxBytes) {
+      setProductFormError('ZIP file must be between 1 byte and 50 MB.');
+      return;
+    }
+
+    setProductFormError(null);
+    setPendingZipFile(file);
     setProductForm((prev) => ({
       ...prev,
       zipMetadata: {
         fileName: file.name,
         sizeBytes: file.size,
         updatedAt: new Date().toISOString(),
-        sampleDownloadPath: '/demo-assets/forma-sample-bundle.zip',
+        objectKey: prev.zipMetadata.objectKey ?? null,
+        sampleDownloadPath: prev.zipMetadata.sampleDownloadPath,
       },
     }));
-    event.target.value = '';
   };
 
   const handleSaveProduct = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -545,69 +557,154 @@ export function AdminView(): React.JSX.Element {
       return;
     }
 
-    const safeVnd = productForm.tier === 'free' ? 0 : Math.max(0, Math.round(productForm.priceVnd));
-    const safeUsd = productForm.tier === 'free' ? 0 : Math.max(0, Math.round(productForm.priceUsd));
+    setSavingProduct(true);
+    try {
+      let nextZipMetadata = { ...productForm.zipMetadata };
 
-    const payload: CreateProductInput = {
-      slug: cleanSlug,
-      name: cleanName,
-      type: productForm.type,
-      tier: productForm.tier,
-      status: productForm.status,
-      category: productForm.category,
-      frameworks: productForm.frameworks,
-      tags: [productForm.category, productForm.type, ...productForm.frameworks],
-      priceVnd: safeVnd,
-      priceUsd: safeUsd,
-      shortDescription: { vi: cleanShortVi, en: cleanShortEn },
-      description: {
-        vi: productForm.descVi.trim() || cleanShortVi,
-        en: productForm.descEn.trim() || cleanShortEn,
-      },
-      documentation: {
-        vi: productForm.docsVi.trim() || cleanShortVi,
-        en: productForm.docsEn.trim() || cleanShortEn,
-      },
-      thumbnailVariant: productForm.thumbnailVariant,
-      thumbnailSubtitle:
-        productForm.thumbnailSubtitle.trim() || cleanShortEn || cleanName,
-      previewMode: productForm.previewMode,
-      previewComponentKey: productForm.previewComponentKey.trim() || null,
-      supportsThemeToggle: productForm.supportsThemeToggle,
-      featured: false,
-      codeBundle: buildSanitizedCodeBundle(cleanSlug, cleanName),
-      zipMetadata: productForm.zipMetadata,
-    };
+      if (pendingZipFile) {
+        const signResponse = await fetch('/api/admin/storage/upload-url', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            slug: cleanSlug,
+            fileName: pendingZipFile.name,
+            sizeBytes: pendingZipFile.size,
+          }),
+        });
 
-    if (editingProductId) {
-      const existing = products.find((p) => p.id === editingProductId);
-      await productRepository.update(editingProductId, {
-        ...payload,
-        featured: existing?.featured ?? false,
-        codeBundle: existing?.codeBundle ?? payload.codeBundle,
-      });
-    } else {
-      await productRepository.create(payload);
+        const signPayload = (await signResponse.json()) as {
+          bucket?: string;
+          objectKey?: string;
+          token?: string;
+          error?: string;
+        };
+
+        if (
+          !signResponse.ok ||
+          !signPayload.bucket ||
+          !signPayload.objectKey ||
+          !signPayload.token
+        ) {
+          throw new Error(
+            signPayload.error ?? 'Failed to initialize private ZIP upload.',
+          );
+        }
+
+        const supabase = createSupabaseBrowserClient();
+        const { error: uploadError } = await supabase.storage
+          .from(signPayload.bucket)
+          .uploadToSignedUrl(
+            signPayload.objectKey,
+            signPayload.token,
+            pendingZipFile,
+            { contentType: 'application/zip' },
+          );
+
+        if (uploadError) {
+          throw new Error(`Private Storage upload failed: ${uploadError.message}`);
+        }
+
+        nextZipMetadata = {
+          fileName: pendingZipFile.name,
+          sizeBytes: pendingZipFile.size,
+          updatedAt: new Date().toISOString(),
+          objectKey: signPayload.objectKey,
+          sampleDownloadPath: null,
+        };
+      }
+
+      const safeVnd =
+        productForm.tier === 'free' ? 0 : Math.max(0, Math.round(productForm.priceVnd));
+      const safeUsd =
+        productForm.tier === 'free' ? 0 : Math.max(0, Math.round(productForm.priceUsd));
+
+      const payload: CreateProductInput = {
+        slug: cleanSlug,
+        name: cleanName,
+        type: productForm.type,
+        tier: productForm.tier,
+        status: productForm.status,
+        category: productForm.category,
+        frameworks: productForm.frameworks,
+        tags: [productForm.category, productForm.type, ...productForm.frameworks],
+        priceVnd: safeVnd,
+        priceUsd: safeUsd,
+        shortDescription: { vi: cleanShortVi, en: cleanShortEn },
+        description: {
+          vi: productForm.descVi.trim() || cleanShortVi,
+          en: productForm.descEn.trim() || cleanShortEn,
+        },
+        documentation: {
+          vi: productForm.docsVi.trim() || cleanShortVi,
+          en: productForm.docsEn.trim() || cleanShortEn,
+        },
+        thumbnailVariant: productForm.thumbnailVariant,
+        thumbnailSubtitle:
+          productForm.thumbnailSubtitle.trim() || cleanShortEn || cleanName,
+        previewMode: productForm.previewMode,
+        previewComponentKey: productForm.previewComponentKey.trim() || null,
+        supportsThemeToggle: productForm.supportsThemeToggle,
+        featured: false,
+        codeBundle: buildSanitizedCodeBundle(cleanSlug, cleanName),
+        zipMetadata: nextZipMetadata,
+      };
+
+      if (editingProductId) {
+        const existing = products.find((p) => p.id === editingProductId);
+        await productRepository.update(editingProductId, {
+          ...payload,
+          featured: existing?.featured ?? false,
+          codeBundle: existing?.codeBundle ?? payload.codeBundle,
+        });
+      } else {
+        await productRepository.create(payload);
+      }
+
+      await loadAdminSnapshots();
+      setPendingZipFile(null);
+      setShowProductForm(false);
+      setEditingProductId(null);
+      showToast(t.admin.productsSection.savedNotice);
+    } catch (error) {
+      setProductFormError(
+        error instanceof Error ? error.message : 'Unable to save product.',
+      );
+    } finally {
+      setSavingProduct(false);
     }
-
-    await loadAdminSnapshots();
-    setShowProductForm(false);
-    setEditingProductId(null);
-    showToast(t.admin.productsSection.savedNotice);
   };
 
   const handleToggleProductStatus = async (product: Product): Promise<void> => {
-    const nextStatus: ProductStatus = product.status === 'published' ? 'draft' : 'published';
-    await productRepository.setStatus(product.id, nextStatus);
-    await loadAdminSnapshots();
-    showToast(`${product.name}: ${nextStatus.toUpperCase()} — ${t.admin.productsSection.statusUpdatedNotice}`);
+    try {
+      const nextStatus: ProductStatus =
+        product.status === 'published' ? 'draft' : 'published';
+      await productRepository.setStatus(product.id, nextStatus);
+      await loadAdminSnapshots();
+      showToast(
+        `${product.name}: ${nextStatus.toUpperCase()} — ${t.admin.productsSection.statusUpdatedNotice}`,
+      );
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : 'Failed to update product status.',
+      );
+    }
   };
 
   const handleDeleteProduct = async (productId: string): Promise<void> => {
-    await productRepository.delete(productId);
-    setConfirmDeleteId(null);
-    await loadAdminSnapshots();
-    showToast(t.admin.productsSection.deletedNotice);
+    try {
+      await productRepository.delete(productId);
+      setConfirmDeleteId(null);
+      await loadAdminSnapshots();
+      showToast(t.admin.productsSection.deletedNotice);
+    } catch (error) {
+      setConfirmDeleteId(null);
+      showToast(
+        error instanceof Error ? error.message : 'Failed to delete product.',
+      );
+    }
   };
 
   // Handlers for Coupon Form
@@ -625,29 +722,39 @@ export function AdminView(): React.JSX.Element {
       ? couponForm.expiresAtDate
       : `${couponForm.expiresAtDate || '2027-12-31'}T23:59:59.000Z`;
 
-    await couponRepository.upsert({
-      code: cleanCode,
-      discountPercent: safePercent,
-      active: couponForm.active,
-      expiresAt: isoExpiry,
-      description: {
-        vi: couponForm.descVi.trim() || `Giảm ${safePercent}% cho mã ${cleanCode}.`,
-        en: couponForm.descEn.trim() || `${safePercent}% off with code ${cleanCode}.`,
-      },
-    });
+    try {
+      await couponRepository.upsert({
+        code: cleanCode,
+        discountPercent: safePercent,
+        active: couponForm.active,
+        expiresAt: isoExpiry,
+        description: {
+          vi: couponForm.descVi.trim() || `Giảm ${safePercent}% cho mã ${cleanCode}.`,
+          en: couponForm.descEn.trim() || `${safePercent}% off with code ${cleanCode}.`,
+        },
+      });
 
-    await loadAdminSnapshots();
-    setCouponForm(createEmptyCouponForm());
-    showToast(t.admin.couponsSection.savedNotice);
+      await loadAdminSnapshots();
+      setCouponForm(createEmptyCouponForm());
+      showToast(t.admin.couponsSection.savedNotice);
+    } catch (error) {
+      setCouponError(
+        error instanceof Error ? error.message : 'Unable to save coupon.',
+      );
+    }
   };
 
   const handleToggleCouponActive = async (coupon: Coupon): Promise<void> => {
-    await couponRepository.upsert({
-      ...coupon,
-      active: !coupon.active,
-    });
-    await loadAdminSnapshots();
-    showToast(t.admin.couponsSection.savedNotice);
+    try {
+      await couponRepository.upsert({
+        ...coupon,
+        active: !coupon.active,
+      });
+      await loadAdminSnapshots();
+      showToast(t.admin.couponsSection.savedNotice);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Unable to update coupon.');
+    }
   };
 
   const handleEditCoupon = (coupon: Coupon): void => {
@@ -662,9 +769,13 @@ export function AdminView(): React.JSX.Element {
   };
 
   const handleDeleteCoupon = async (code: string): Promise<void> => {
-    await couponRepository.delete(code);
-    await loadAdminSnapshots();
-    showToast(t.admin.couponsSection.deletedNotice);
+    try {
+      await couponRepository.delete(code);
+      await loadAdminSnapshots();
+      showToast(t.admin.couponsSection.deletedNotice);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Unable to delete coupon.');
+    }
   };
 
   const handleResetDemoData = async (): Promise<void> => {
@@ -1492,13 +1603,14 @@ export function AdminView(): React.JSX.Element {
                       onClick={() => {
                         setShowProductForm(false);
                         setEditingProductId(null);
+                        setPendingZipFile(null);
                       }}
                     >
                       {t.admin.productsSection.form.cancelBtn}
                     </Button>
-                    <Button type="submit" variant="cyan" size="sm">
+                    <Button type="submit" variant="cyan" size="sm" disabled={savingProduct}>
                       <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                      {t.admin.productsSection.form.saveBtn}
+                      {savingProduct ? t.auth.submitting : t.admin.productsSection.form.saveBtn}
                     </Button>
                   </div>
                 </form>
@@ -1565,6 +1677,18 @@ export function AdminView(): React.JSX.Element {
                         </div>
 
                         <div className="flex shrink-0 flex-wrap items-center gap-2">
+                          {product.zipMetadata.sampleDownloadPath ? (
+                            <Button variant="outline" size="sm" asChild>
+                              <a
+                                href={product.zipMetadata.sampleDownloadPath}
+                                download={product.zipMetadata.fileName}
+                              >
+                                <Download className="h-3.5 w-3.5 text-accent-cyan" aria-hidden="true" />
+                                ZIP
+                              </a>
+                            </Button>
+                          ) : null}
+
                           <Button
                             type="button"
                             variant="outline"

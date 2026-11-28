@@ -1,14 +1,14 @@
 /**
- * Lazy-loaded, read-only Monaco Source Viewer for forma/ Phase 1.
+ * Lazy-loaded, read-only Monaco Source Viewer for forma/ Phase 2.3.
  * Dynamically imports `@monaco-editor/react` with `ssr: false` so the Monaco bundle
  * is excluded from server rendering and initial catalog loads.
- * Features a file tree sidebar, in-code search with jump-to-line matches, syntax highlighting,
- * copy-to-clipboard button, fullscreen toggle, and explicit Demo Source Fixture notice.
+ * Fetches protected source contents on-demand from `GET /api/products/[id]/code` so
+ * source code never leaks in public catalog HTML/JSON.
  *
- * Security boundary: Displays sanitized Phase 1 sample fixtures only. Real paid source bundles
- * are never stored in client code and require server authorization in Phase 2.
+ * Security boundary: Full source files are served ONLY after server verification
+ * of `role === 'admin'` or a persisted PostgreSQL `UserEntitlement`.
  *
- * Related: src/features/account/components/account-view.tsx, src/features/product-detail/components/product-detail-view.tsx
+ * Related: src/app/api/products/[id]/code/route.ts, src/features/account/components/account-view.tsx
  */
 
 'use client';
@@ -71,17 +71,29 @@ interface SearchMatch {
   previewText: string;
 }
 
+interface CodeApiResponse {
+  files?: ProductCodeFile[];
+  error?: string;
+}
+
 interface MonacoCodeViewerProps {
   product: Product;
 }
 
 /**
- * Interactive read-only code explorer for owned demo products.
+ * Interactive read-only code explorer backed by server-authorized `/api/products/[id]/code`.
  */
 export function MonacoCodeViewer({
   product,
 }: MonacoCodeViewerProps): React.JSX.Element {
   const { t } = useI18n();
+  const [files, setFiles] = useState<ProductCodeFile[]>(() =>
+    product.codeBundle.some((f) => f.content.length > 0) ? product.codeBundle : [],
+  );
+  const [loadingFiles, setLoadingFiles] = useState<boolean>(
+    () => !product.codeBundle.some((f) => f.content.length > 0),
+  );
+  const [accessError, setAccessError] = useState<string | null>(null);
   const [selectedPath, setSelectedPath] = useState<string>(
     product.codeBundle[0]?.path ?? '',
   );
@@ -90,18 +102,71 @@ export function MonacoCodeViewer({
   const [fullscreen, setFullscreen] = useState(false);
   const editorRef = useRef<MonacoEditorInstance | null>(null);
 
-  const activeFile = useMemo(
-    () =>
-      product.codeBundle.find((file) => file.path === selectedPath) ??
-      product.codeBundle[0] ??
-      null,
-    [product.codeBundle, selectedPath],
-  );
-
   useEffect(() => {
-    setSelectedPath(product.codeBundle[0]?.path ?? '');
+    let active = true;
+    const hasInlineContent = product.codeBundle.some((f) => f.content.length > 0);
+    setAccessError(null);
     setSearchQuery('');
+
+    if (hasInlineContent) {
+      setFiles(product.codeBundle);
+      setSelectedPath(product.codeBundle[0]?.path ?? '');
+      setLoadingFiles(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    setLoadingFiles(true);
+
+    const fetchAuthorizedCode = async (): Promise<void> => {
+      try {
+        const response = await fetch(
+          `/api/products/${encodeURIComponent(product.id)}/code`,
+          {
+            method: 'GET',
+            credentials: 'same-origin',
+            cache: 'no-store',
+          },
+        );
+        const payload = (await response.json()) as CodeApiResponse;
+
+        if (!active) {
+          return;
+        }
+
+        if (!response.ok || !payload.files) {
+          setFiles([]);
+          setAccessError(
+            payload.error ??
+              'Server entitlement in PostgreSQL is required to inspect source files.',
+          );
+          setLoadingFiles(false);
+          return;
+        }
+
+        setFiles(payload.files);
+        setSelectedPath(payload.files[0]?.path ?? '');
+        setLoadingFiles(false);
+      } catch {
+        if (active) {
+          setAccessError('Failed to retrieve authorized source code from server.');
+          setLoadingFiles(false);
+        }
+      }
+    };
+
+    void fetchAuthorizedCode();
+
+    return () => {
+      active = false;
+    };
   }, [product.id, product.codeBundle]);
+
+  const activeFile = useMemo(
+    () => files.find((file) => file.path === selectedPath) ?? files[0] ?? null,
+    [files, selectedPath],
+  );
 
   useEffect(() => {
     if (!fullscreen) {
@@ -122,7 +187,7 @@ export function MonacoCodeViewer({
     if (!query) {
       return counts;
     }
-    for (const file of product.codeBundle) {
+    for (const file of files) {
       const lines = file.content.split('\n');
       let matchCount = 0;
       for (const line of lines) {
@@ -133,7 +198,7 @@ export function MonacoCodeViewer({
       counts.set(file.path, matchCount);
     }
     return counts;
-  }, [product.codeBundle, searchQuery]);
+  }, [files, searchQuery]);
 
   const activeFileMatches = useMemo<SearchMatch[]>(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -176,10 +241,31 @@ export function MonacoCodeViewer({
     editor.focus();
   };
 
+  if (loadingFiles) {
+    return (
+      <div className="flex h-[260px] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-[#08080b] p-6 text-center">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/15 border-t-accent-cyan" />
+        <p className="font-mono text-xs text-zinc-400">{t.codeViewer.loadingEditor}</p>
+      </div>
+    );
+  }
+
+  if (accessError) {
+    return (
+      <div className="flex items-start gap-3 rounded-xl border border-amber-400/30 bg-amber-400/5 p-5 text-xs leading-relaxed text-amber-200/90">
+        <Lock className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden="true" />
+        <div>
+          <p className="font-semibold text-white">{t.codeViewer.title}</p>
+          <p className="mt-1">{accessError}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!activeFile) {
     return (
       <div className="rounded-xl border border-white/10 bg-[#0b0b0f] p-6 text-xs text-zinc-400">
-        No source files available in this demo bundle.
+        No source files available in this bundle.
       </div>
     );
   }
@@ -261,40 +347,40 @@ export function MonacoCodeViewer({
         </div>
       </div>
 
-      {/* Main Tree + Monaco Stage */}
+      {/* Main Split: File Tree + Read-Only Monaco Canvas */}
       <div
         className={`grid grid-cols-1 lg:grid-cols-12 ${
-          fullscreen ? 'flex-1 overflow-hidden' : ''
+          fullscreen ? 'min-h-0 flex-1' : ''
         }`}
       >
-        {/* File Tree Sidebar */}
-        <aside className="border-b border-white/[0.08] bg-[#0a0a0e] p-3 lg:col-span-4 lg:border-b-0 lg:border-r xl:col-span-3">
-          <div className="mb-2 flex items-center gap-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+        {/* File Tree */}
+        <aside className="border-b border-white/[0.08] bg-[#0a0a0e] p-3 lg:col-span-3 lg:border-b-0 lg:border-r">
+          <div className="mb-2 flex items-center gap-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
             <FolderTree className="h-3 w-3" aria-hidden="true" />
             <span>{t.codeViewer.filesHeading}</span>
           </div>
           <ul className="space-y-1">
-            {product.codeBundle.map((file) => {
+            {files.map((file) => {
               const active = file.path === activeFile.path;
-              const fileMatches = matchCountsByFile.get(file.path) ?? 0;
+              const matchCount = matchCountsByFile.get(file.path) ?? 0;
               return (
                 <li key={file.path}>
                   <button
                     type="button"
                     onClick={() => setSelectedPath(file.path)}
-                    className={`flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-2 text-left font-mono text-xs transition-colors ${
+                    className={`flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left font-mono text-[11px] transition-colors ${
                       active
                         ? 'bg-accent-cyan/15 text-accent-cyan font-semibold'
-                        : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                        : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
                     }`}
                   >
-                    <span className="flex min-w-0 items-center gap-2">
+                    <span className="flex min-w-0 items-center gap-1.5">
                       <FileCode2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                       <span className="truncate">{file.path}</span>
                     </span>
-                    {searchQuery.trim().length > 0 && fileMatches > 0 ? (
-                      <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-white">
-                        {fileMatches}
+                    {matchCount > 0 ? (
+                      <span className="rounded bg-accent-cyan/20 px-1.5 py-0.5 text-[10px] text-accent-cyan">
+                        {matchCount}
                       </span>
                     ) : null}
                   </button>
@@ -303,28 +389,26 @@ export function MonacoCodeViewer({
             })}
           </ul>
 
-          {/* Line match jump list */}
-          {searchQuery.trim().length > 0 ? (
+          {/* Search Matches Jump List for Active File */}
+          {searchQuery.trim() ? (
             <div className="mt-4 border-t border-white/[0.08] pt-3">
-              <p className="px-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+              <p className="px-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                 {activeFileMatches.length} {t.codeViewer.matchesLabel}
               </p>
               {activeFileMatches.length === 0 ? (
-                <p className="mt-1.5 px-2 text-[11px] text-zinc-500">
+                <p className="mt-1.5 px-1.5 text-[11px] text-zinc-500">
                   {t.codeViewer.noMatches}
                 </p>
               ) : (
-                <ul className="mt-1.5 max-h-40 space-y-1 overflow-y-auto">
-                  {activeFileMatches.map((match) => (
-                    <li key={match.lineNumber}>
+                <ul className="mt-1.5 max-h-36 space-y-1 overflow-y-auto">
+                  {activeFileMatches.slice(0, 12).map((match) => (
+                    <li key={`${activeFile.path}:${match.lineNumber}`}>
                       <button
                         type="button"
                         onClick={() => handleJumpToLine(match.lineNumber)}
-                        className="flex w-full items-center gap-2 rounded px-2 py-1 text-left font-mono text-[11px] text-zinc-300 hover:bg-white/5 hover:text-accent-cyan"
+                        className="flex w-full items-center gap-1.5 rounded px-1.5 py-1 text-left font-mono text-[10px] text-zinc-400 hover:bg-white/5 hover:text-white"
                       >
-                        <span className="shrink-0 text-accent-cyan">
-                          L{match.lineNumber}
-                        </span>
+                        <span className="text-accent-cyan">L{match.lineNumber}</span>
                         <span className="truncate">{match.previewText}</span>
                       </button>
                     </li>
@@ -335,42 +419,40 @@ export function MonacoCodeViewer({
           ) : null}
         </aside>
 
-        {/* Monaco Read-only Editor */}
-        <div className="flex flex-col lg:col-span-8 xl:col-span-9">
-          <div className="flex items-center justify-between border-b border-white/[0.06] bg-[#0b0b10] px-4 py-1.5 font-mono text-[11px] text-zinc-400">
-            <span>{activeFile.path}</span>
-            <span className="uppercase text-zinc-500">{activeFile.language}</span>
-          </div>
-          <div className={fullscreen ? 'flex-1 min-h-[380px]' : 'h-[360px]'}>
-            <LazyMonacoEditor
-              height="100%"
-              theme="vs-dark"
-              path={activeFile.path}
-              language={mapLanguageForMonaco(activeFile.language)}
-              value={activeFile.content}
-              onMount={(editor) => {
-                editorRef.current = editor;
-              }}
-              options={{
-                readOnly: true,
-                domReadOnly: true,
-                minimap: { enabled: false },
-                fontSize: 13,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                wordWrap: 'on',
-                automaticLayout: true,
-                padding: { top: 12, bottom: 12 },
-              }}
-            />
-          </div>
+        {/* Monaco Read-Only Surface */}
+        <div
+          className={`lg:col-span-9 ${
+            fullscreen ? 'h-full min-h-[420px]' : 'h-[360px]'
+          }`}
+        >
+          <LazyMonacoEditor
+            height="100%"
+            language={mapLanguageForMonaco(activeFile.language)}
+            value={activeFile.content}
+            theme="vs-dark"
+            onMount={(editor) => {
+              editorRef.current = editor;
+            }}
+            options={{
+              readOnly: true,
+              domReadOnly: true,
+              minimap: { enabled: false },
+              fontSize: 13,
+              lineHeight: 20,
+              wordWrap: 'on',
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
+              padding: { top: 14, bottom: 14 },
+              renderValidationDecorations: 'off',
+            }}
+          />
         </div>
       </div>
 
-      {/* Security Notice Strip */}
-      <div className="flex items-start gap-2 border-t border-white/[0.08] bg-[#0a0a0e] px-4 py-2.5 text-[11px] text-zinc-400">
+      {/* Bottom Server Authorization Boundary Note */}
+      <div className="flex items-start gap-2 border-t border-white/[0.08] bg-[#0c0c10] px-4 py-2.5 text-[11px] text-zinc-400">
         <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-cyan" aria-hidden="true" />
-        <p>{t.codeViewer.securityNote}</p>
+        <span>{t.codeViewer.securityNote}</span>
       </div>
     </div>
   );

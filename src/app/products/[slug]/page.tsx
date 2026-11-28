@@ -1,27 +1,29 @@
 /**
  * App Router Server Component entrypoint for `/products/[slug]`.
- * Pre-loads the matching product from seed data on the server for SEO metadata
- * and immediate hydration into `ProductDetailView`.
+ * Queries the published PostgreSQL product record on the server for SEO metadata
+ * and immediate SSR hydration into `ProductDetailView` (with source contents stripped).
  *
- * Related: src/features/product-detail/components/product-detail-view.tsx, src/mocks/products.seed.ts
+ * Related: src/features/product-detail/components/product-detail-view.tsx, src/lib/catalog/product-mapper.ts
  */
 
 import type { Metadata } from 'next';
 import { ProductDetailView } from '@/features/product-detail/components/product-detail-view';
-import { SEED_PRODUCTS } from '@/mocks/products.seed';
+import { getPublishedProductBySlugFromDb } from '@/lib/catalog/product-mapper';
+
+export const dynamic = 'force-dynamic';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
 /**
- * Generates dynamic SEO metadata per product slug.
+ * Generates dynamic SEO metadata per product slug from PostgreSQL.
  */
 export async function generateMetadata({
   params,
 }: ProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = SEED_PRODUCTS.find((item) => item.slug === slug);
+  const product = await getPublishedProductBySlugFromDb(slug);
   return {
     title: product ? `${product.name} — forma/` : 'Product Not Found — forma/',
     description:
@@ -37,8 +39,7 @@ export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps): Promise<React.JSX.Element> {
   const { slug } = await params;
-  const initialProduct =
-    SEED_PRODUCTS.find((item) => item.slug === slug) ?? null;
+  const initialProduct = await getPublishedProductBySlugFromDb(slug);
 
   return <ProductDetailView slug={slug} initialProduct={initialProduct} />;
 }

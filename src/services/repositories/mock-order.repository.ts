@@ -16,7 +16,7 @@ import { readStorage, writeStorage } from '@/lib/storage/storage-adapter';
 import { STORAGE_KEYS } from '@/lib/storage/storage-keys';
 import type { CurrencyCode, DemoUser, Order, OrderItem, Product } from '@/types/domain';
 import type { IOrderRepository, PlaceSimulatedOrderInput } from './interfaces';
-import { MockCouponRepository } from './mock-coupon.repository';
+import { ApiCouponRepository } from './api-coupon.repository';
 
 function isOrderArray(value: unknown): value is Order[] {
   return (
@@ -36,7 +36,7 @@ function isStringArray(value: unknown): value is string[] {
 }
 
 export class MockOrderRepository implements IOrderRepository {
-  private readonly couponRepo = new MockCouponRepository();
+  private readonly couponRepo = new ApiCouponRepository();
 
   /** @inheritdoc */
   async getAllOrders(): Promise<Order[]> {

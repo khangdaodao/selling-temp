@@ -386,7 +386,7 @@ export const enDictionary: TranslationDictionary = {
   codeViewer: {
     title: 'Monaco Source Viewer',
     readOnlyBadge: 'Read-only',
-    demoFixtureBadge: 'Demo Source Fixture',
+    demoFixtureBadge: 'PostgreSQL Source',
     searchPlaceholder: 'Search inside source...',
     matchesLabel: 'matches',
     noMatches: 'No matching lines in active file',
@@ -397,7 +397,7 @@ export const enDictionary: TranslationDictionary = {
     fullscreenExit: 'Exit Fullscreen',
     loadingEditor: 'Loading lazy-loaded Monaco Editor...',
     securityNote:
-      'Phase 1 sanitized demo fixture only. Real commercial bundles are never exposed on the client and will be server-authorized in Phase 2.',
+      'Source files are served through `/api/products/[id]/code` only after server verification of Admin privileges or PostgreSQL UserEntitlement.',
   },
   admin: {
     badge: 'ADMIN DASHBOARD • SERVER RBAC',
@@ -446,9 +446,9 @@ export const enDictionary: TranslationDictionary = {
       noOrdersYet: 'No simulated orders yet. Complete a demo checkout or free claim in Library.',
     },
     productsSection: {
-      title: 'Products Management (Mock CRUD)',
+      title: 'Products Management (PostgreSQL + Private Storage)',
       subtitle:
-        'Create, edit, delete, or toggle Draft/Published status. Draft items are automatically hidden from Homepage and public /library.',
+        'Create, edit, delete, or toggle Draft/Published status directly in Supabase PostgreSQL. Draft items are hidden from Homepage and public /library.',
       newProductCta: 'New Product',
       searchPlaceholder: 'Search by name, slug, or category...',
       statusFilterAll: 'All',
@@ -461,8 +461,8 @@ export const enDictionary: TranslationDictionary = {
       unpublishBtn: 'Set Draft',
       editBtn: 'Edit',
       deleteBtn: 'Delete',
-      confirmDeleteNotice: 'Product deleted from localStorage mock catalog.',
-      savedNotice: 'Product saved to localStorage and synced with public Library!',
+      confirmDeleteNotice: 'Product deleted from PostgreSQL and Private Storage.',
+      savedNotice: 'Product saved to PostgreSQL and synced with public Library!',
       deletedNotice: 'Product deleted.',
       statusUpdatedNotice: 'Publication status updated.',
       emptyState: 'No products match your current filter.',
@@ -496,14 +496,14 @@ export const enDictionary: TranslationDictionary = {
         descEnLabel: 'Full Description (English)',
         docsViLabel: 'Documentation Notes (Vietnamese)',
         docsEnLabel: 'Documentation Notes (English)',
-        zipUploadTitle: 'Upload Source ZIP (Metadata Only)',
+        zipUploadTitle: 'Upload Real Source ZIP (Supabase Private Storage)',
         zipUploadSubtitle:
-          'Select any `.zip` archive to record its filename and byte size as temporary metadata.',
-        zipSelectBtn: 'Choose .zip File (Metadata Only)',
-        zipCurrentMeta: 'Recorded metadata:',
-        zipNoFile: 'No ZIP metadata recorded yet.',
+          'Select any `.zip` archive (max 50 MB). Saving uploads directly to the Private Bucket (`products/<slug>/latest.zip`) replacing the latest bundle.',
+        zipSelectBtn: 'Choose .zip File (≤ 50 MB)',
+        zipCurrentMeta: 'Current ZIP bundle:',
+        zipNoFile: 'No ZIP bundle attached yet.',
         zipSecurityNotice:
-          'Phase 1 Boundary: Binary file contents are NEVER read, executed, or stored in browser localStorage.',
+          'Private Bucket Security: Only Admins receive Signed Upload tokens; customers require a verified PostgreSQL UserEntitlement for 60s Signed Download URLs.',
         validationError: 'Please provide a Name, valid Slug, at least 1 Framework, and short descriptions.',
       },
     },
@@ -531,9 +531,9 @@ export const enDictionary: TranslationDictionary = {
       verifiedBadge: 'PostgreSQL',
     },
     couponsSection: {
-      title: 'Coupons Management (Mock)',
+      title: 'Coupons Management (PostgreSQL)',
       subtitle:
-        'Create, edit, delete, or toggle promotional codes. Checkout validates directly against this localStorage list.',
+        'Create, edit, delete, or toggle promotional codes in PostgreSQL. Checkout verifies codes via `/api/coupons/validate`.',
       newCouponCta: 'Create / Update Coupon',
       codeLabel: 'Coupon Code (uppercase) *',
       discountPercentLabel: 'Discount % (1 - 100) *',
@@ -548,7 +548,7 @@ export const enDictionary: TranslationDictionary = {
       deleteBtn: 'Delete',
       statusActive: 'Active',
       statusInactive: 'Inactive',
-      savedNotice: 'Coupon saved to localStorage!',
+      savedNotice: 'Coupon saved to PostgreSQL!',
       deletedNotice: 'Coupon deleted.',
       validationError: 'Coupon code must be at least 2 characters with discount between 1% and 100%.',
     },
