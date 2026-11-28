@@ -27,7 +27,6 @@ import {
   Settings,
   ShoppingBag,
   Trash2,
-  UserCheck,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -52,7 +51,6 @@ export function AccountView(): React.JSX.Element {
   const session = useAuthStore((state) => state.session);
   const ownedProductIds = useAuthStore((state) => state.ownedProductIds);
   const orders = useAuthStore((state) => state.orders);
-  const signInWithPreset = useAuthStore((state) => state.signInWithPreset);
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const signOut = useAuthStore((state) => state.signOut);
 
@@ -68,6 +66,8 @@ export function AccountView(): React.JSX.Element {
   const [viewerProductId, setViewerProductId] = useState<string | null>(null);
   const [profileName, setProfileName] = useState('');
   const [profileEmail, setProfileEmail] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const [savedNotice, setSavedNotice] = useState(false);
 
   useEffect(() => {
@@ -117,9 +117,19 @@ export function AccountView(): React.JSX.Element {
     event: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     event.preventDefault();
-    await updateProfile({ name: profileName, email: profileEmail });
-    setSavedNotice(true);
-    window.setTimeout(() => setSavedNotice(false), 2400);
+    setProfileError(null);
+    setSavingProfile(true);
+    try {
+      await updateProfile({ name: profileName });
+      setSavedNotice(true);
+      window.setTimeout(() => setSavedNotice(false), 2400);
+    } catch (error) {
+      setProfileError(
+        error instanceof Error ? error.message : 'Unable to save profile updates.',
+      );
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   if (!session) {
@@ -142,15 +152,6 @@ export function AccountView(): React.JSX.Element {
                   <span>{t.account.authGateLoginCta}</span>
                   <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="default"
-                onClick={() => void signInWithPreset('usr_demo_customer')}
-              >
-                <UserCheck className="h-4 w-4" aria-hidden="true" />
-                <span>{t.account.authGateCustomerCta}</span>
               </Button>
             </div>
           </div>
@@ -563,15 +564,21 @@ export function AccountView(): React.JSX.Element {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    required
+                    readOnly
+                    disabled
                     value={profileEmail}
-                    onChange={(e) => setProfileEmail(e.target.value)}
-                    className="mt-1.5 h-10 w-full rounded-lg border border-white/10 bg-[#101014] px-3 text-sm text-white focus:border-accent-cyan focus:outline-none"
+                    className="mt-1.5 h-10 w-full cursor-not-allowed rounded-lg border border-white/10 bg-[#0b0b0f] px-3 text-sm text-zinc-400 opacity-80 focus:outline-none"
                   />
                 </div>
 
+                {profileError ? (
+                  <p role="alert" className="text-xs text-rose-300">
+                    {profileError}
+                  </p>
+                ) : null}
+
                 <div className="flex flex-wrap items-center gap-3 pt-2">
-                  <Button type="submit" variant="default" size="default">
+                  <Button type="submit" variant="default" size="default" disabled={savingProfile}>
                     {t.account.settingsSaveCta}
                   </Button>
                   {savedNotice ? (

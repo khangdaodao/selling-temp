@@ -52,15 +52,14 @@ import { formatMoneyAmount, formatProductPrice } from '@/lib/format/currency';
 import { resetAllDemoData } from '@/lib/storage/storage-adapter';
 import { DEMO_RESET_EVENT } from '@/lib/storage/storage-keys';
 import {
-  authRepository,
   couponRepository,
   orderRepository,
   productRepository,
   type CreateProductInput,
 } from '@/services';
 import type {
+  AuthUser,
   Coupon,
-  DemoUser,
   FrameworkType,
   Order,
   PreviewMode,
@@ -284,7 +283,6 @@ export function AdminView(): React.JSX.Element {
   const session = useAuthStore((state) => state.session);
   const hydrated = useAuthStore((state) => state.hydrated);
   const ownedProductIds = useAuthStore((state) => state.ownedProductIds);
-  const signInWithPreset = useAuthStore((state) => state.signInWithPreset);
   const hydrateAuth = useAuthStore((state) => state.hydrateAuth);
 
   const tabParam = searchParams.get('tab');
@@ -296,7 +294,7 @@ export function AdminView(): React.JSX.Element {
   const [products, setProducts] = useState<Product[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [demoAccounts, setDemoAccounts] = useState<DemoUser[]>([]);
+  const [registeredUsers, setRegisteredUsers] = useState<AuthUser[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
 
@@ -330,15 +328,27 @@ export function AdminView(): React.JSX.Element {
 
   const loadAdminSnapshots = useCallback(async (): Promise<void> => {
     setLoadingData(true);
-    const [allProducts, allCoupons, allOrders] = await Promise.all([
+    const [allProducts, allCoupons, allOrders, usersResponse] = await Promise.all([
       productRepository.getAll({ includeDrafts: true }),
       couponRepository.getAll(),
       orderRepository.getAllOrders(),
+      fetch('/api/admin/customers', {
+        method: 'GET',
+        credentials: 'same-origin',
+        cache: 'no-store',
+      }).catch(() => null),
     ]);
     setProducts(allProducts);
     setCoupons(allCoupons);
     setOrders(allOrders);
-    setDemoAccounts(authRepository.getDemoAccounts());
+
+    if (usersResponse && usersResponse.ok) {
+      const payload = (await usersResponse.json()) as { users?: AuthUser[] };
+      setRegisteredUsers(payload.users ?? []);
+    } else {
+      setRegisteredUsers([]);
+    }
+
     setLoadingData(false);
   }, []);
 
@@ -431,15 +441,15 @@ export function AdminView(): React.JSX.Element {
       id: string;
       name: string;
       email: string;
-      role: DemoUser['role'];
-      isPreset: boolean;
+      role: AuthUser['role'];
+      isSyncedUser: boolean;
       orderCount: number;
-    }> = demoAccounts.map((acc) => ({
+    }> = registeredUsers.map((acc) => ({
       id: acc.id,
       name: acc.name,
       email: acc.email,
       role: acc.role,
-      isPreset: true,
+      isSyncedUser: true,
       orderCount: orderCounts.get(acc.email.toLowerCase()) ?? 0,
     }));
 
@@ -448,17 +458,17 @@ export function AdminView(): React.JSX.Element {
       if (!combined.some((entry) => entry.email.toLowerCase() === lower)) {
         combined.push({
           id: order.userId,
-          name: order.customerEmail.split('@')[0] || 'Customer Demo',
+          name: order.customerEmail.split('@')[0] || 'Customer',
           email: order.customerEmail,
           role: 'customer',
-          isPreset: false,
+          isSyncedUser: false,
           orderCount: orderCounts.get(lower) ?? 0,
         });
       }
     }
 
     return combined;
-  }, [demoAccounts, orders]);
+  }, [orders, registeredUsers]);
 
   // Handlers for Product Form
   const handleOpenCreateProduct = (): void => {
@@ -707,15 +717,8 @@ export function AdminView(): React.JSX.Element {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button
-              type="button"
-              variant="cyan"
-              onClick={() => void signInWithPreset('usr_demo_admin')}
-            >
-              {t.admin.roleGate.switchAdminCta}
-            </Button>
-            <Button type="button" variant="outline" asChild>
-              <Link href="/login?returnTo=/admin">{t.admin.roleGate.goToLoginCta}</Link>
+            <Button type="button" variant="cyan" asChild>
+              <Link href="/login?next=/admin">{t.admin.roleGate.goToLoginCta}</Link>
             </Button>
             <Button type="button" variant="ghost" asChild>
               <Link href="/library">{t.admin.roleGate.backToStoreCta}</Link>
@@ -1721,8 +1724,8 @@ export function AdminView(): React.JSX.Element {
                             ? t.admin.customersSection.roleAdmin
                             : t.admin.customersSection.roleCustomer}
                         </Badge>
-                        {customer.isPreset ? (
-                          <Badge variant="outline">{t.admin.customersSection.presetBadge}</Badge>
+                        {customer.isSyncedUser ? (
+                          <Badge variant="outline">{t.admin.customersSection.verifiedBadge}</Badge>
                         ) : null}
                       </div>
                       <p className="mt-1 font-mono text-xs text-zinc-400">{customer.email}</p>

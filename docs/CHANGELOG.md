@@ -4,6 +4,21 @@ Ghi nhận những thay đổi thực tế đã hoàn tất và được kiểm 
 
 ---
 
+## [0.8.2] — 2026-11-25 — Phase 2.2: Supabase Auth (`@supabase/ssr`), Đồng bộ PostgreSQL & Server RBAC
+
+### Đã thêm mới & Nâng cấp (Added & Changed)
+- **Middleware & Server RBAC Auth Layer ([middleware.ts](file:///c:/BusinessWeb/Selling_tem/src/middleware.ts), [server-auth.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/auth/server-auth.ts), [auth-utils.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/auth/auth-utils.ts)):**
+  - Thiết lập Next.js Edge Middleware làm mới cookie `HttpOnly` qua `@supabase/ssr` và chuyển hướng khách chưa đăng nhập ở `/admin` về `/login?next=/admin`.
+  - Tạo `getServerAuthSession()`, `requireAuthenticatedUser()` và `requireAdminUser()` xác thực phiên qua `supabase.auth.getUser()` và đối chiếu trực tiếp vai trò `role` từ bảng `public.users` trên PostgreSQL (tuyệt đối không dùng `user_metadata` để phân quyền).
+- **Route Handlers Auth & Admin ([callback/route.ts](file:///c:/BusinessWeb/Selling_tem/src/app/auth/callback/route.ts), [session/route.ts](file:///c:/BusinessWeb/Selling_tem/src/app/api/auth/session/route.ts), [customers/route.ts](file:///c:/BusinessWeb/Selling_tem/src/app/api/admin/customers/route.ts)):**
+  - Triển khai `/auth/callback` (PKCE code exchange + OTP verification) tự đồng bộ user mới vào `public.users` với `role = customer`.
+  - Triển khai `/api/auth/session` (`GET` session thật & `PATCH` cập nhật tên hiển thị lên Postgres) và `/api/admin/customers` (`401`/`403` RBAC).
+- **Loại bỏ Demo Auth & Cập nhật UI ([supabase-auth.repository.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/supabase-auth.repository.ts), [login-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/auth/components/login-view.tsx), [admin/page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/admin/page.tsx)):**
+  - Xóa bỏ toàn bộ `Preset Demo Accounts` (`mock-auth.repository.ts`, `accounts.seed.ts`) và các nút đăng nhập demo 1 chạm khỏi `/login`, `/account`, `/checkout`, `/admin`.
+  - Khóa `/admin` ngay trong Server Component [admin/page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/admin/page.tsx) (redirect `/login?next=/admin` với khách, trả [admin-forbidden-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/admin/components/admin-forbidden-view.tsx) `403` với tài khoản `customer`).
+
+---
+
 ## [0.8.1] — 2026-11-25 — Phase 2.1: Thiết lập Supabase PostgreSQL, Prisma ORM, RLS & Seed dữ liệu thật
 
 ### Đã thêm mới & Thiết lập (Added)

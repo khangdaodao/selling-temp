@@ -1,27 +1,44 @@
 /**
- * Admin Dashboard route (`/admin`) entrypoint for forma/ Phase 1.
- * Thin App Router wrapper delegating UI rendering to the client-side `AdminView` workspace.
+ * Admin Dashboard route (`/admin`) entrypoint protected by Server RBAC (`Phase 2.2`).
+ * Verifies Supabase Auth session and PostgreSQL `public.users.role === 'admin'` on the
+ * server BEFORE sending any Admin UI bundle or rendering `<AdminView />`.
  *
- * Security boundary: Phase 1 gating relies on browser demo role state ONLY.
- * TODO(Phase 2): Enforce server-side session RBAC before rendering or mutating `/admin`.
+ * Security boundary:
+ * - Unauthenticated visitors redirect immediately to `/login?next=/admin`.
+ * - Signed-in non-admin accounts receive `<AdminForbiddenView />` (403) without Admin UI HTML.
  *
- * Related: src/features/admin/components/admin-view.tsx
+ * Related: src/lib/auth/server-auth.ts, src/features/admin/components/admin-view.tsx
  */
 
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { AdminForbiddenView } from '@/features/admin/components/admin-forbidden-view';
 import { AdminView } from '@/features/admin/components/admin-view';
+import { getServerAuthSession } from '@/lib/auth/server-auth';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Admin Dashboard (Demo)',
+  title: 'Admin Dashboard — forma/',
   description:
-    'Mock personal storefront administration for managing components, templates, Draft/Published status, coupons, and demo orders.',
+    'Personal storefront administration for managing components, templates, Draft/Published status, coupons, and orders.',
 };
 
 /**
- * `/admin` Server Component page shell.
+ * `/admin` Server Component entrypoint enforcing server-side RBAC.
  */
-export default function AdminPage(): React.JSX.Element {
+export default async function AdminPage(): Promise<React.JSX.Element> {
+  const session = await getServerAuthSession();
+
+  if (!session) {
+    redirect('/login?next=/admin');
+  }
+
+  if (session.user.role !== 'admin') {
+    return <AdminForbiddenView user={session.user} />;
+  }
+
   return (
     <Suspense
       fallback={

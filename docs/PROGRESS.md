@@ -1,10 +1,10 @@
 # Nhật ký Tiến độ & Bàn giao (`docs/PROGRESS.md`) — `forma/`
 
 **Cập nhật lần cuối:** 2026-11-25  
-**Cột mốc hiện tại:** **Phase 2.1 — Thiết lập Supabase PostgreSQL, Prisma Schema, RLS & Seed dữ liệu thật** *(Phase 1 UI vẫn vận hành song song qua `localStorage` cho tới khi nối Auth & Repository ở Phase 2.2 → 2.4)*
+**Cột mốc hiện tại:** **Phase 2.2 — Supabase Auth (`@supabase/ssr`), Đồng bộ `public.users` & Server RBAC** *(Catalog CRUD, Private Storage `.zip` và PayOS/Stripe tiếp tục chuyển sang backend ở Phase 2.3 → 2.4)*
 
 > ⚠️ **Tuyên bố Trạng thái (Non-Production Disclaimer):**  
-> Giao diện hiện tại của **`forma/` vẫn đang vận hành ở chế độ Phase 1 Frontend Demo-First** qua `localStorage` và dữ liệu seed. **Sản phẩm CHƯA phải bản Production-ready** cho đến khi triển khai xong các chặng **Phase 2.1 → 2.5 (Supabase PostgreSQL + Prisma ORM, Supabase Auth, Private Storage, Server RBAC, PayOS & Stripe Webhooks)**.
+> Giao diện **`forma/` đã kết nối Authentication thật (`Supabase Auth` + PostgreSQL `users` + Server RBAC cho `/admin`)**, nhưng Catalog sản phẩm, Giỏ hàng, Coupon và Đơn hàng vẫn đang chạy tạm qua `localStorage` của Phase 1. **Sản phẩm CHƯA phải bản Production-ready** cho đến khi hoàn tất **Phase 2.3 → 2.5 (Private Storage `.zip`, Server-Side Pricing, PayOS & Stripe Webhooks)**.
 
 ---
 
@@ -28,7 +28,7 @@
 | :--- | :--- | :--- |
 | **Phase 2.0** | Chốt quyết định kiến trúc **Supabase Hybrid (`ADR-008`)**, đồng bộ [AGENTS.md](file:///c:/BusinessWeb/Selling_tem/AGENTS.md), [ARCHITECTURE.md](file:///c:/BusinessWeb/Selling_tem/docs/ARCHITECTURE.md), [DECISIONS.md](file:///c:/BusinessWeb/Selling_tem/docs/DECISIONS.md), [PROGRESS.md](file:///c:/BusinessWeb/Selling_tem/docs/PROGRESS.md) & [CHANGELOG.md](file:///c:/BusinessWeb/Selling_tem/docs/CHANGELOG.md) | **Done (Đã xong)** |
 | **Phase 2.1** | Thiết lập dự án Supabase (`selling-temp`), cài `@prisma/client`, `prisma` (`^6.19.3`), `@supabase/supabase-js`, `@supabase/ssr`, `zod`, `tsx`; tạo `.env.example`, `src/lib/env.ts`, `src/lib/prisma.ts`, `src/lib/supabase/{client,server,admin}.ts`, `prisma/schema.prisma` (7 bảng Postgres `snake_case`), `prisma/rls.sql` (bật RLS + khóa PostgREST cho toàn bộ schema `public`), đẩy schema & seed thành công (`18` sản phẩm, `54` code files, `3` coupons) | **Done (Đã xong)** |
-| **Phase 2.2** | Triển khai **Supabase Auth** (`@supabase/ssr` Email/Password + Google OAuth), đồng bộ bảng `User` qua Prisma, gỡ `Preset Demo Accounts` & khóa Server RBAC cho `/admin` | **Pending** |
+| **Phase 2.2** | Triển khai **Supabase Auth** (`@supabase/ssr` Email/Password + Google OAuth + Forgot/Reset Password), `src/middleware.ts` refresh cookie `HttpOnly`, đồng bộ bảng `users` qua Prisma, gỡ toàn bộ nút Demo 1 chạm (`mock-auth.repository.ts`, `accounts.seed.ts`) & khóa Server RBAC cho `/admin` + `/api/admin/customers` | **Done (Đã xong)** |
 | **Phase 2.3** | Thiết lập **Supabase Private Bucket** lưu `.zip` (`zipObjectKey` tương đối), Admin CRUD + Upload thật, Customer tải `.zip` qua Signed URL 60s & nạp source code Monaco từ Postgres | **Pending** |
 | **Phase 2.4** | Tích hợp song song **PayOS (VND / VietQR)** & **Stripe (USD)** với Server-Side Pricing, kiểm tra Coupon trong transaction & Webhook xác thực chữ ký mở khóa `UserEntitlement` | **Pending** |
 | **Phase 2.5** | Nối Newsletter API thật, thay Mock Analytics bằng query bảng `Order`, audit Supabase Advisors/RLS, CSP headers, rate limiting & kiểm thử E2E Production | **Pending** |
@@ -115,13 +115,10 @@ npm run start
 
 ## 6. Danh mục `// TODO(Phase 2)` Đồng bộ trong Source Code
 
-- [navbar.tsx](file:///c:/BusinessWeb/Selling_tem/src/components/layout/navbar.tsx): `// TODO(Phase 2): Replace mock role badge checks with server-verified session data.`
-- [admin-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/admin/components/admin-view.tsx) & [admin/page.tsx](file:///c:/BusinessWeb/Selling_tem/src/app/admin/page.tsx): `// TODO(Phase 2): Protect /admin routes and all catalog/coupon mutations with Next.js server-side session verification, RBAC middleware, MySQL + Prisma, and signed S3/R2 asset uploads.`
-- [use-auth-store.ts](file:///c:/BusinessWeb/Selling_tem/src/features/auth/use-auth-store.ts): `// TODO(Phase 2): Replace with server-verified session cookies and MySQL entitlement queries.`
+- [admin-view.tsx](file:///c:/BusinessWeb/Selling_tem/src/features/admin/components/admin-view.tsx): `// TODO(Phase 2): Migrate catalog CRUD, coupon CRUD, orders, and signed Private Storage `.zip` uploads from localStorage mocks to Prisma + Supabase Storage APIs (Phase 2.3–2.4).`
 - [use-cart-store.ts](file:///c:/BusinessWeb/Selling_tem/src/features/cart/use-cart-store.ts): `// TODO(Phase 2): Synchronize cart with server session and ignore client-submitted prices.`
-- [use-wishlist-store.ts](file:///c:/BusinessWeb/Selling_tem/src/features/wishlist/use-wishlist-store.ts): `// TODO(Phase 2): Synchronize wishlist items with MySQL user wishlist table on the server.`
+- [use-wishlist-store.ts](file:///c:/BusinessWeb/Selling_tem/src/features/wishlist/use-wishlist-store.ts): `// TODO(Phase 2): Synchronize wishlist items with PostgreSQL user wishlist table on the server.`
 - [currency.ts](file:///c:/BusinessWeb/Selling_tem/src/lib/format/currency.ts): `// TODO(Phase 2): Replace or augment with server-validated payment currency rules and minor-unit amounts required by the selected payment gateway.`
-- [accounts.seed.ts](file:///c:/BusinessWeb/Selling_tem/src/mocks/accounts.seed.ts): `// TODO(Phase 2): Replace with database-backed User records and real session verification.`
 - [coupons.seed.ts](file:///c:/BusinessWeb/Selling_tem/src/mocks/coupons.seed.ts): `// TODO(Phase 2): Validate and calculate coupon discounts strictly on the server inside a database transaction before creating a payment intent.`
-- [products.seed.ts](file:///c:/BusinessWeb/Selling_tem/src/mocks/products.seed.ts): `// TODO(Phase 2): Replace seed fixtures with MySQL + Prisma queries and private object storage ZIP URLs.`
-- [interfaces.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/interfaces.ts) & [src/services/index.ts](file:///c:/BusinessWeb/Selling_tem/src/services/index.ts): `// TODO(Phase 2): Bind interfaces to server-side MySQL + Prisma implementations with Server RBAC and signed private download URLs.`
+- [products.seed.ts](file:///c:/BusinessWeb/Selling_tem/src/mocks/products.seed.ts): `// TODO(Phase 2): Replace remaining client catalog mocks with Prisma queries and signed Private Storage ZIP URLs (Phase 2.3).`
+- [interfaces.ts](file:///c:/BusinessWeb/Selling_tem/src/services/repositories/interfaces.ts) & [src/services/index.ts](file:///c:/BusinessWeb/Selling_tem/src/services/index.ts): `authRepository` đã chuyển sang `SupabaseAuthRepository`; `productRepository`, `couponRepository`, `orderRepository` tiếp tục migrate sang Prisma ở Phase 2.3–2.4.

@@ -47,25 +47,46 @@ export interface IProductRepository {
   delete(id: string): Promise<void>;
 }
 
+/** Credentials payload for Supabase Email + Password login. */
+export interface SignInWithPasswordInput {
+  email: string;
+  password: string;
+}
+
+/** Registration payload for Supabase Email + Password sign-up. */
+export interface SignUpWithPasswordInput {
+  name: string;
+  email: string;
+  password: string;
+  emailRedirectTo?: string;
+}
+
+/** Result returned from Email + Password registration. */
+export interface SignUpResult {
+  session: AuthSession | null;
+  requiresEmailConfirmation: boolean;
+}
+
 /**
- * Authentication and entitlement repository contract.
- * Security boundary: Phase 1 methods simulate login without verifying passwords or OAuth tokens.
- * TODO(Phase 2): Replace with a MySQL-compatible auth provider session layer (e.g., Auth.js/Better Auth + Prisma).
+ * Authentication and profile repository contract backed by Supabase Auth + PostgreSQL `public.users`.
+ * Security boundary: Never stores passwords locally or trusts client role mutations.
  */
 export interface IAuthRepository {
-  /** Lists preset demo accounts available for one-click Phase 1 sign-in. */
-  getDemoAccounts(): DemoUser[];
-  /** Returns the active mock session from storage, or `null` if signed out. */
+  /** Fetches the server-verified session from `/api/auth/session`, or `null` when signed out. */
   getSession(): Promise<AuthSession | null>;
-  /** Signs in using one of the preset demo accounts (`customer@forma.demo` or `admin@forma.demo`). */
-  signInWithDemoAccount(accountId: string): Promise<AuthSession>;
-  /** Simulates login/registration form sign-in without storing or checking real passwords. */
-  signInWithDemoForm(input: { email: string; name?: string }): Promise<AuthSession>;
-  /** Simulates clicking "Continue with Google (Demo UI)" without asking for Google credentials. */
-  signInWithGoogleDemoUi(): Promise<AuthSession>;
-  /** Updates display name and email of the active Phase 1 demo profile (never handles passwords). */
-  updateDemoProfile(input: { name: string; email: string }): Promise<AuthSession>;
-  /** Clears the current mock session. */
+  /** Authenticates via Email + Password using Supabase Auth and resolves PostgreSQL profile. */
+  signInWithPassword(input: SignInWithPasswordInput): Promise<AuthSession>;
+  /** Creates a new customer account via Supabase Auth. */
+  signUpWithPassword(input: SignUpWithPasswordInput): Promise<SignUpResult>;
+  /** Sends a password recovery link via Supabase Auth. */
+  sendPasswordResetEmail(input: { email: string; redirectTo: string }): Promise<void>;
+  /** Updates password for an active or recovery Supabase Auth session. */
+  updatePassword(newPassword: string): Promise<void>;
+  /** Launches Google OAuth redirect flow through Supabase Auth. */
+  signInWithGoogle(redirectTo: string): Promise<void>;
+  /** Updates display name inside PostgreSQL `public.users` via server API. */
+  updateProfile(input: { name: string }): Promise<AuthSession>;
+  /** Signs out of Supabase Auth and clears server cookies. */
   signOut(): Promise<void>;
 }
 

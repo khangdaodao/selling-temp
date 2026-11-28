@@ -114,8 +114,9 @@ export interface Product {
 export type UserRole = 'customer' | 'admin';
 
 /**
- * Demo account entity used in Phase 1 mock authentication.
- * Security boundary: Never stores real passwords, hashes, or OAuth secrets.
+ * Authenticated user profile entity for forma/.
+ * In Phase 2, fields mirror `public.users` in PostgreSQL via Prisma ORM.
+ * Security boundary: Never stores passwords, hashes, or OAuth secrets client-side.
  */
 export interface DemoUser {
   id: string;
@@ -126,10 +127,13 @@ export interface DemoUser {
   createdAt: string;
 }
 
-/** Active mock authentication session persisted in localStorage. */
+/** Semantic alias representing a verified user account record. */
+export type AuthUser = DemoUser;
+
+/** Active Supabase authentication session hydrated on client/server. */
 export interface AuthSession {
-  user: DemoUser;
-  authProvider: 'demo-preset' | 'demo-form' | 'demo-google-ui';
+  user: AuthUser;
+  authProvider: 'email' | 'google';
   signedInAt: string;
 }
 

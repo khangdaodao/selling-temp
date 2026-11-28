@@ -53,7 +53,6 @@ export function CheckoutView(): React.JSX.Element {
   const session = useAuthStore((state) => state.session);
   const ownedProductIds = useAuthStore((state) => state.ownedProductIds);
   const orders = useAuthStore((state) => state.orders);
-  const signInWithPreset = useAuthStore((state) => state.signInWithPreset);
   const placeSimulatedOrder = useAuthStore((state) => state.placeSimulatedOrder);
 
   const items = useCartStore((state) => state.items);
@@ -349,14 +348,6 @@ export function CheckoutView(): React.JSX.Element {
                             <span>{t.checkout.authRequiredCta}</span>
                             <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                           </Link>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => void signInWithPreset('usr_demo_customer')}
-                        >
-                          {t.checkout.quickDemoCustomerCta}
                         </Button>
                       </div>
                     </div>

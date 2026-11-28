@@ -204,32 +204,40 @@ export interface TranslationDictionary {
   auth: {
     backLabel: string;
     eyebrow: string;
+    securityBadge: string;
     loginTitle: string;
     loginSubtitle: string;
     registerTitle: string;
     registerSubtitle: string;
     forgotTitle: string;
     forgotSubtitle: string;
+    resetTitle: string;
+    resetSubtitle: string;
     nameLabel: string;
     namePlaceholder: string;
     emailLabel: string;
     emailPlaceholder: string;
     passwordLabel: string;
     passwordPlaceholder: string;
+    newPasswordLabel: string;
     forgotLink: string;
     submitLogin: string;
     submitRegister: string;
     submitForgot: string;
+    submitReset: string;
+    submitting: string;
     forgotSentNotice: string;
+    emailConfirmationNotice: string;
+    resetSuccessNotice: string;
+    callbackErrorNotice: string;
+    googleNotConfiguredError: string;
+    emailRateLimitError: string;
     orDivider: string;
-    googleDemoCta: string;
-    presetHeading: string;
-    presetCustomerRole: string;
-    presetAdminRole: string;
+    googleCta: string;
     switchToRegister: string;
     switchToLogin: string;
     returnToCheckoutBanner: string;
-    demoBoundaryNotice: string;
+    securityNote: string;
     signedInAs: string;
     signOut: string;
   };
@@ -263,7 +271,6 @@ export interface TranslationDictionary {
     authRequiredTitle: string;
     authRequiredBody: string;
     authRequiredCta: string;
-    quickDemoCustomerCta: string;
     emptyTitle: string;
     emptyBody: string;
     emptyCta: string;
@@ -307,7 +314,6 @@ export interface TranslationDictionary {
     authGateTitle: string;
     authGateBody: string;
     authGateLoginCta: string;
-    authGateCustomerCta: string;
     tabs: {
       myLibrary: string;
       orders: string;
@@ -365,10 +371,13 @@ export interface TranslationDictionary {
       description: string;
       currentRoleLabel: string;
       guestRole: string;
-      switchAdminCta: string;
       goToLoginCta: string;
       backToStoreCta: string;
       securityNote: string;
+      forbiddenBadge: string;
+      forbiddenTitle: string;
+      forbiddenBody: string;
+      roleSyncedHint: string;
     };
     nav: {
       overview: string;
@@ -472,7 +481,7 @@ export interface TranslationDictionary {
       roleCustomer: string;
       ownedItemsCount: string;
       ordersCount: string;
-      presetBadge: string;
+      verifiedBadge: string;
     };
     couponsSection: {
       title: string;

@@ -2,7 +2,7 @@
 
 Tài liệu này phản ánh **đúng cây thư mục thực tế** hiện có trong `c:\BusinessWeb\Selling_tem`. Các thư mục tương lai sẽ chỉ được tạo khi bước vào sub-phase cần dùng tới chúng.
 
-## Cây Thư mục Hiện tại (Phase 2.1 — Supabase Postgres + Prisma Foundation)
+## Cây Thư mục Hiện tại (Phase 2.2 — Supabase Auth, PostgreSQL User Sync & Server RBAC)
 
 ```text
 forma/
@@ -47,7 +47,17 @@ forma/
     │   ├── account/
     │   │   └── page.tsx                           # Server Component entrypoint cho Customer Account (`/account`)
     │   ├── admin/
-    │   │   └── page.tsx                           # Server Component entrypoint cho Admin Dashboard (`/admin`)
+    │   │   └── page.tsx                           # Server Component `/admin` khóa Server RBAC (`role === 'admin'`) trước khi render
+    │   ├── api/
+    │   │   ├── admin/
+    │   │   │   └── customers/
+    │   │   │       └── route.ts                   # `GET /api/admin/customers` (401/403 RBAC + danh sách users PostgreSQL)
+    │   │   └── auth/
+    │   │       └── session/
+    │   │           └── route.ts                   # `GET` phiên đã xác thực & `PATCH` cập nhật tên hiển thị PostgreSQL
+    │   ├── auth/
+    │   │   └── callback/
+    │   │       └── route.ts                       # PKCE OAuth / Email / Recovery callback đồng bộ `public.users`
     │   ├── checkout/
     │   │   └── page.tsx                           # Server Component entrypoint cho `/checkout` (kèm Suspense boundary)
     │   ├── library/
@@ -80,11 +90,12 @@ forma/
     │   │       └── monaco-code-viewer.tsx         # Lazy-loaded Read-only Monaco Viewer (Tree, Search, Copy, Fullscreen)
     │   ├── admin/
     │   │   └── components/
+    │   │       ├── admin-forbidden-view.tsx       # Màn hình 403 server-enforced khi tài khoản không phải `admin` vào `/admin`
     │   │       └── admin-view.tsx                 # Sidebar Admin 7 mục (CRUD, Draft/Published, Metadata ZIP, Coupons, Analytics Mock)
     │   ├── auth/
-    │   │   ├── use-auth-store.ts                  # Zustand store quản lý mock session, profile, orders & ownedProductIds
+    │   │   ├── use-auth-store.ts                  # Zustand store đồng bộ Supabase Auth (`/api/auth/session`) & entitlements
     │   │   └── components/
-    │   │       └── login-view.tsx                 # Màn hình Login/Register/Forgot Password, Google UI Demo, Preset Accounts
+    │   │       └── login-view.tsx                 # Màn hình Login/Register/Forgot/Reset Password & Google OAuth (đã gỡ demo accounts)
     │   ├── cart/
     │   │   ├── use-cart-store.ts                  # Zustand store giỏ hàng chống trùng lặp & lưu qua StorageAdapter
     │   │   └── components/
@@ -124,6 +135,9 @@ forma/
     │   ├── types.ts                               # Interface đảm bảo hai bộ từ điển vi/en luôn khớp khóa
     │   └── use-i18n-store.ts                      # Zustand store quản lý ngôn ngữ, tiền tệ & detect browser
     ├── lib/
+    │   ├── auth/
+    │   │   ├── auth-utils.ts                      # Hàm thuần shared (`resolveSafeNextPath`, `computeAvatarInitials`, `normalizeAuthEmail`)
+    │   │   └── server-auth.ts                     # Server-only xác thực `getUser()`, sync `public.users` & guard `requireAdminUser()`
     │   ├── env.ts                                 # Kiểm tra biến môi trường server/client bằng Zod (tách biệt secret khỏi client)
     │   ├── prisma.ts                              # PrismaClient singleton server-only nối Supabase PostgreSQL
     │   ├── utils.ts                               # Hàm `cn()` gộp class Tailwind
@@ -137,17 +151,17 @@ forma/
     │       ├── client.ts                          # Supabase browser client (`@supabase/ssr`, publishable key)
     │       └── server.ts                          # Supabase server cookie client (`@supabase/ssr` + `cookies()`)
     ├── mocks/
-    │   ├── accounts.seed.ts                       # 2 tài khoản demo chọn sẵn (Customer & Admin)
     │   ├── coupons.seed.ts                        # 3 mã giảm giá mẫu (FORMA20, WELCOME10, EXPIRED50)
     │   └── products.seed.ts                       # 18 sản phẩm mẫu (11 UI Components + 7 Website Templates)
+    ├── middleware.ts                              # Edge Middleware refresh cookie Supabase Auth & chặn khách chưa đăng nhập ở `/admin`
     ├── services/
-    │   ├── index.ts                               # Export các repository instances dùng chung cho toàn app
+    │   ├── index.ts                               # Export các repository instances (`SupabaseAuthRepository` + mock catalog/orders/coupons)
     │   └── repositories/
     │       ├── interfaces.ts                      # Hợp đồng IProductRepository, IAuthRepository, IOrderRepository, ICouponRepository
-    │       ├── mock-auth.repository.ts
     │       ├── mock-coupon.repository.ts
     │       ├── mock-order.repository.ts
-    │       └── mock-product.repository.ts
+    │       ├── mock-product.repository.ts
+    │       └── supabase-auth.repository.ts        # Triển khai `IAuthRepository` dùng Supabase Auth + `/api/auth/session`
     └── types/
         └── domain.ts                              # Domain models dùng chung (Product, Order, Coupon, DemoUser...)
 ```

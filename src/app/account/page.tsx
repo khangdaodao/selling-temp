@@ -10,7 +10,7 @@ import type { Metadata } from 'next';
 import { AccountView } from '@/features/account/components/account-view';
 
 export const metadata: Metadata = {
-  title: 'Account (Demo) — forma/',
+  title: 'Account — forma/',
   description:
     'Customer Account Workspace: My Library, Order History, Wishlist, Profile Settings, and Read-Only Monaco Viewer.',
 };

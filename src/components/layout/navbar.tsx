@@ -1,9 +1,8 @@
 /**
  * Primary navigation bar for forma/, closely following the Homepage and Library reference screens.
  * Highlights active routes (`/`, `/library`, `/about`, `/support`), exposes the Cart Drawer trigger
- * with live item badge, shows active Demo User state, `/account`, `/admin` quick link, and mobile drawer.
- *
- * TODO(Phase 2): Replace mock role badge checks with server-verified session data.
+ * with live item badge, displays server-verified user session, `/account`, `/admin` link (when `role === 'admin'`),
+ * and mobile drawer.
  *
  * Related: src/features/cart/components/cart-drawer.tsx, src/features/auth/use-auth-store.ts
  */
@@ -12,7 +11,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ArrowUpRight, LogOut, Menu, ShoppingBag, X } from 'lucide-react';
 import { HeaderSwitchers } from '@/components/layout/header-switchers';
 import { Button } from '@/components/ui/button';
@@ -25,6 +24,7 @@ import { useI18n } from '@/i18n/use-i18n-store';
  */
 export function Navbar(): React.JSX.Element {
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useI18n();
   const session = useAuthStore((state) => state.session);
   const signOut = useAuthStore((state) => state.signOut);
@@ -32,6 +32,11 @@ export function Navbar(): React.JSX.Element {
   const openDrawer = useCartStore((state) => state.openDrawer);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleSignOut = async (): Promise<void> => {
+    await signOut();
+    router.refresh();
+  };
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -145,7 +150,7 @@ export function Navbar(): React.JSX.Element {
           {session ? (
             <button
               type="button"
-              onClick={() => void signOut()}
+              onClick={() => void handleSignOut()}
               aria-label={t.auth.signOut}
               title={t.auth.signOut}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-surface text-zinc-400 transition-colors hover:border-white/25 hover:text-white"
@@ -225,7 +230,7 @@ export function Navbar(): React.JSX.Element {
                 <button
                   type="button"
                   onClick={() => {
-                    void signOut();
+                    void handleSignOut();
                     setMobileMenuOpen(false);
                   }}
                   className="shrink-0 text-zinc-400 hover:text-white"
